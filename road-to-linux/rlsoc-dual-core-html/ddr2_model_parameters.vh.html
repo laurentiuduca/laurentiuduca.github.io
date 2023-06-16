@@ -1,0 +1,1257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<title>./ddr2_model_parameters.vh</title>
+<link rel="Stylesheet" title="v2html stylesheet" media="Screen" href="v2html.css">
+</head>
+<script language="JavaScript" type="text/javascript"><!--
+var agt=navigator.userAgent.toLowerCase(); 
+var is_nav  = ((agt.indexOf('mozilla')!=-1) &&
+(agt.indexOf('spoofer')==-1) &&
+(agt.indexOf('compatible') == -1) &&
+(agt.indexOf('opera')==-1) &&
+(agt.indexOf('webtv')==-1)); 
+var is_major = parseInt(navigator.appVersion); 
+var is_nav4up = (is_nav && (is_major >= 4)); 
+var is_ie     = (agt.indexOf("msie") != -1); 
+var is_ie4up  = (is_ie  && (is_major >= 4)); 
+var is_nav5up = (is_nav && (is_major >= 5));
+var dirSep = (window.location.pathname.indexOf('\\') != -1) ? '\\' : '/' ;
+function setbuttons (wndw) {
+var i;
+var sl=wndw.loc[ wndw.document.forms[0].elements[0].selectedIndex ];
+for (i=0;i<sl.length;i++) {
+if(sl[i]) wndw.document.images[i].src='v2html-b1.gif';
+else      wndw.document.images[i].src='v2html-b2.gif';
+}
+if ( wndw.document.forms[0].elements[0].options[ 
+wndw.document.forms[0].elements[0].selectedIndex ].text != '-') {
+wndw.document.images[i  ].src='v2html-b1.gif';
+wndw.document.images[i+1].src='v2html-b1.gif';
+}
+else {
+wndw.document.images[i  ].src='v2html-b2.gif';
+wndw.document.images[i+1].src='v2html-b2.gif';
+}
+}
+// Unindented and uncommented to save spave - look in v2html for a prettier version
+var disabled=1;
+if (!is_nav4up) {
+var event=false; 
+}
+var last_link=0;     
+var last_class=null; 
+function qs(e,t,extra_info_index) {
+var inc=0,bnum=0,i,j;
+if (disabled) return false;
+var sig_buttons = [ "Definition" , "Local Driver" , 
+"Up to Input Driver" , "Find Source" , "Index"];
+if (is_nav4up || is_ie4up) {
+if (((e.which==2) && (!(e.modifiers&Event.SHIFT_MASK))) ||
+((e.which==1) &&  (e.modifiers&Event.CONTROL_MASK)))   inc = 1;
+else if (((e.which==2) && (e.modifiers&Event.SHIFT_MASK)) ||
+((e.which==1) && (e.modifiers&Event.SHIFT_MASK))) inc = -1;
+if (inc == 0 && extra_info_index == 0) { 
+return true;  
+}
+var linkText = is_nav4up ? t.text : t.innerText;
+var linkY    = is_nav4up && ! is_nav5up ? t.y    : t.offsetTop;
+window.status="Searching...";
+if ((last_link==-1) || (document.links[last_link]!=t)) 
+for (last_link=0;last_link<document.links.length;last_link++) 
+if (document.links[last_link] == t)  
+break;
+if (inc != 0) { 
+return search(linkText,linkY,last_link,inc,1);
+}
+else { 
+window.status="";
+extra_info_index--; 
+if (extra_info[extra_info_index][0] != 'S') { 
+return true;
+}
+var w = window.open('','SignalPopUp','width=200,height=235');
+if (null != w.document.forms[0]) {
+if ((window.location.pathname.substring(0,window.location.pathname.lastIndexOf(dirSep)))!=
+(w.pn.substring(0,w.pn.lastIndexOf(dirSep)))) {
+w.close();
+w = window.open('','SignalPopUp','width=200,height=235');
+}
+}
+w.focus(); 
+if (null == w.document.forms[0]) { 
+var Text = '<html><head></head>';
+if (is_nav4up) { 
+w.loc = new Array(10);
+w.sel = null;
+w.pn  = window.location.pathname;
+}
+else {     
+Text += '<script>var loc = new Array(10);<\/script>\n';
+Text += '<script>var sel;<\/script>\n';
+Text += '<script>var pn = opener.location.pathname;<\/script>\n';
+}
+Text += '<body bgcolor="white">\n';
+Text += '<form>';
+Text += '  <select onchange="opener.setbuttons(window);">\n';
+Text += '  <option>---------------------------</option>\n';
+for (j=0;j<9;j++) Text += '  <option>-</option>\n';
+Text += '  </select>\n';
+Text += '</form>';
+Text += '<table cellspacing=0 cellpadding=0>\n';
+for (var i=0;i<(extra_info[extra_info_index].length-1);i++) {
+Text += hbutton(sig_buttons[i], 
+'opener.location=loc[sel.selectedIndex]['+i+'];',
+bnum++);
+}
+Text += hbutton("Search Backwards", 
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link,-1,0);',bnum++);
+Text += hbutton("Search Forwards",
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link, 1,0);',bnum++);
+Text += hbutton("Close","window.close();",bnum++);
+Text += '</table>\n';
+Text += '</body></html>\n';
+w.document.open();
+w.document.write(Text);
+w.document.close();
+w.document.forms[0].elements[0].options[0].text  = linkText;
+w.sel = w.document.forms[0].elements[0]; 
+for (j=0;j<10;j++) w.loc[j] = new Array(sig_buttons.length);  
+copy_into_loc0(w,extra_info_index);
+}
+else {
+var opts = w.document.forms[0].elements[0].options;
+if ( opts.length<10 ) { 
+w.loc[opts.length] = new Array;
+opts.length++; 
+}
+for (i=opts.length-2;i>=0;i--) {
+opts[i+1].text=opts[i].text;
+for (var j=0;j<w.loc[i].length;j++) w.loc[i+1][j] = w.loc[i][j];
+}
+opts[0].text  = linkText;
+copy_into_loc0(w,extra_info_index);
+}
+return false; 
+}
+}
+return true;
+}
+function hbutton (text,action,bnum) {
+return '  <tr><td><a href="" '+
+'onmousedown="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b3.gif\';" '+
+'onmouseup="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b1.gif\';" '+
+'onclick="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+action + 
+' return false;">'+
+'<img border=0 src="v2html-b1.gif"></a></td>' +
+'<td style="font-family:sans-serif; font-weight:bold; font-size:14px;"> '+text+'</td></tr>\n';
+}
+function copy_into_loc0 (w,extra_info_index) {
+for (var i=1;i<extra_info[extra_info_index].length;i++) {
+w.loc[0][i-1] = extra_info[extra_info_index][i];
+}
+w.document.forms[0].elements[0].selectedIndex=1;
+w.document.forms[0].elements[0].selectedIndex=0;
+setbuttons(w);
+}
+function search(text,y,i,inc,relative) {
+var nextpage,wrappage,linkText,linkY;
+window.status="Searching...";
+if (last_class) document.links[i].className=last_class;
+while (1) {
+for (i+=inc;i<document.links.length && i>=0;i+=inc) {
+linkText = is_nav4up ? document.links[i].text : document.links[i].innerText;
+linkY    = is_nav4up && ! is_nav5up ? document.links[i].y    : document.links[i].offsetTop;
+if ((linkText == text) && (linkY != y)) {
+window.status="";
+if (is_nav4up) 
+if (relative) window.scrollBy(0,linkY - y);
+else          window.scrollTo(0,linkY); 
+else if (is_ie4up)
+document.links[i].scrollIntoView(true); 
+last_link=i;
+last_class=document.links[i].className;
+document.links[i].className='HI';
+return false;
+}
+}
+nextpage = (inc==1) ? next_page() : prev_page();
+wrappage = (inc==1) ? first_page() : last_page();
+if (nextpage!="" || wrappage!="") {
+if (nextpage=="") { 
+if (!confirm(text + " not found. Search again from "+((inc==1)?"first":"last")+" page?"))
+return false;
+nextpage=wrappage;
+}
+location=nextpage+ "?" + escape(text) + "&" + ( y - window.pageYOffset ) + "&" + inc;
+return false;
+}
+if (confirm(text + " not found. Search again from "+((inc==1)?"start":"end")+"?")) {
+if (inc==1) i=-1;
+else i=document.links.length;
+} else return false;
+}
+return true;
+}
+function loadqs() {
+var opt=location.search, text="", s="", y=0, si=0, inc=1;
+if (opt.length==0) return true;  
+for (var i=1;i<opt.length;i++) { 
+if (opt.charAt(i) != "&") 
+s += opt.charAt(i);
+else {
+if (text=="") text=unescape(s);
+else             y=s;
+s="";
+}
+}
+if (text=="") return true;
+if (s == "-1") { si=document.links.length-1; inc=-1; }
+window.scrollTo(0,0);
+search(text,y,si,inc);
+return true;
+}
+// -->
+</script>
+<body onload='loadqs();'>
+<script language="JavaScript"type="text/javascript"><!--
+function prev_page() { return ""; }
+function last_page() { return "ddr2_model_parameters.vh.p2.html"; }
+// -->
+</script>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<center><table class=NB cols=2 ><tr><td align="center" width="50%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';" ><font color="#808080">1</font></td><td align="center" width="50%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='ddr2_model_parameters.vh.p2.html';"><a target="_top" href="ddr2_model_parameters.vh.p2.html">2</a></td></tr></table></center>
+<pre>
+<span class=C>/****************************************************************************************
+*
+*   Disclaimer   This software code and all associated documentation, comments or other
+*  of Warranty:  information (collectively &quot;Software&quot;) is provided &quot;AS IS&quot; without
+*                warranty of any kind. MICRON TECHNOLOGY, INC. (&quot;MTI&quot;) EXPRESSLY
+*                DISCLAIMS ALL WARRANTIES EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+*                TO, NONINFRINGEMENT OF THIRD PARTY RIGHTS, AND ANY IMPLIED WARRANTIES
+*                OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE. MTI DOES NOT
+*                WARRANT THAT THE SOFTWARE WILL MEET YOUR REQUIREMENTS, OR THAT THE
+*                OPERATION OF THE SOFTWARE WILL BE UNINTERRUPTED OR ERROR-FREE.
+*                FURTHERMORE, MTI DOES NOT MAKE ANY REPRESENTATIONS REGARDING THE USE OR
+*                THE RESULTS OF THE USE OF THE SOFTWARE IN TERMS OF ITS CORRECTNESS,
+*                ACCURACY, RELIABILITY, OR OTHERWISE. THE ENTIRE RISK ARISING OUT OF USE
+*                OR PERFORMANCE OF THE SOFTWARE REMAINS WITH YOU. IN NO EVENT SHALL MTI,
+*                ITS AFFILIATED COMPANIES OR THEIR SUPPLIERS BE LIABLE FOR ANY DIRECT,
+*                INDIRECT, CONSEQUENTIAL, INCIDENTAL, OR SPECIAL DAMAGES (INCLUDING,
+*                WITHOUT LIMITATION, DAMAGES FOR LOSS OF PROFITS, BUSINESS INTERRUPTION,
+*                OR LOSS OF INFORMATION) ARISING OUT OF YOUR USE OF OR INABILITY TO USE
+*                THE SOFTWARE, EVEN IF MTI HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+*                DAMAGES. Because some jurisdictions prohibit the exclusion or
+*                limitation of liability for consequential or incidental damages, the
+*                above limitation may not apply to you.
+*
+*                Copyright 2003 Micron Technology, Inc. All rights reserved.
+*
+****************************************************************************************/</span>
+
+    <span class=C>// Timing parameters based on Speed Grade
+</span>
+                                          <span class=C>// SYMBOL UNITS DESCRIPTION
+</span>                                          <span class=C>// ------ ----- -----------
+</span><span class=P>`ifdef x256Mb
+</span>
+<span class=P>    `ifdef sg187E
+</span><span class=P>        parameter TCK_MIN          =    1875; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =      90; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =      75; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     180; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     132; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     157; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     188; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     425; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     250; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     350; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =       0; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =      75; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     300; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     175; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     125; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     200; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   54000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   13125; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   13125; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   13125; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =      10; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       3; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       3; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       4; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =      11; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   13125; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg25E
+</span><span class=P>        parameter TCK_MIN          =    2500; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     100; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     100; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     200; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     150; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     300; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     300; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     400; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =      50; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     125; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     350; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     200; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     175; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     250; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   12500; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   12500; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   12500; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       8; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =      10; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   12500; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg25
+</span><span class=P>        parameter TCK_MIN          =    2500; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     100; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     100; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     200; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     150; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     300; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     300; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     400; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =      50; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     125; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     350; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     200; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     175; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     250; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       8; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =      10; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg3E
+</span><span class=P>        parameter TCK_MIN          =    3000; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     125; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     340; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     450; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     100; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     175; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     400; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     240; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     200; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     275; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   54000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   12000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   12000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   12000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       7; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   12000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg3
+</span><span class=P>        parameter TCK_MIN          =    3000; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     125; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     340; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     450; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     100; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     175; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     400; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     240; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     200; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     275; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       7; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg37E
+</span><span class=P>        parameter TCK_MIN          =    3750; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     125; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     400; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     500; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     100; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     225; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     450; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     300; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     250; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     375; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       6; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else </span><span class=P>//`define sg5E
+</span><span class=P>        parameter TCK_MIN          =    5000; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     150; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     450; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     600; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     150; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     275; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     500; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     350; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     350; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     475; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =   10000; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       6; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `endif `endif `endif `endif `endif `endif
+</span>
+<span class=P>    `ifdef x16
+</span><span class=P>      `ifdef sg187E
+</span><span class=P>        parameter TFAW             =   45000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25E
+</span><span class=P>        parameter TFAW             =   45000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25
+</span><span class=P>        parameter TFAW             =   45000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else </span><span class=P>// sg3E, sg3, sg37E, sg5E
+</span><span class=P>        parameter TFAW             =   50000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `endif `endif `endif
+</span><span class=P>    `else </span><span class=P>// x4, x8
+</span><span class=P>      `ifdef sg187E
+</span><span class=P>        parameter TFAW             =   35000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25E
+</span><span class=P>        parameter TFAW             =   35000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25
+</span><span class=P>        parameter TFAW             =   35000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else </span><span class=P>// sg3E, sg3, sg37E, sg5E
+</span><span class=P>        parameter TFAW             =   37500; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `endif `endif `endif
+</span><span class=P>    `endif
+</span>
+        <span class=P>// Timing Parameters
+</span>
+        <span class=P>// Mode Register
+</span><span class=P>        parameter AL_MIN           =       0; </span><span class=P>// AL     tCK   Minimum Additive Latency
+</span><span class=P>        parameter AL_MAX           =       6; </span><span class=P>// AL     tCK   Maximum Additive Latency
+</span><span class=P>        parameter CL_MIN           =       3; </span><span class=P>// CL     tCK   Minimum CAS Latency
+</span><span class=P>        parameter CL_MAX           =       7; </span><span class=P>// CL     tCK   Maximum CAS Latency
+</span><span class=P>        parameter WR_MIN           =       2; </span><span class=P>// WR     tCK   Minimum Write Recovery
+</span><span class=P>        parameter WR_MAX           =       8; </span><span class=P>// WR     tCK   Maximum Write Recovery
+</span><span class=P>        parameter BL_MIN           =       4; </span><span class=P>// BL     tCK   Minimum Burst Length
+</span><span class=P>        parameter BL_MAX           =       8; </span><span class=P>// BL     tCK   Minimum Burst Length
+</span>        <span class=P>// Clock
+</span><span class=P>        parameter TCK_MAX          =    8000; </span><span class=P>// tCK    ps    Maximum Clock Cycle Time
+</span><span class=P>        parameter TCH_MIN          =    0.48; </span><span class=P>// tCH    tCK   Minimum Clock High-Level Pulse Width
+</span><span class=P>        parameter TCH_MAX          =    0.52; </span><span class=P>// tCH    tCK   Maximum Clock High-Level Pulse Width
+</span><span class=P>        parameter TCL_MIN          =    0.48; </span><span class=P>// tCL    tCK   Minimum Clock Low-Level Pulse Width
+</span><span class=P>        parameter TCL_MAX          =    0.52; </span><span class=P>// tCL    tCK   Maximum Clock Low-Level Pulse Width
+</span>        <span class=P>// Data
+</span><span class=P>        parameter TLZ              =     TAC; </span><span class=P>// tLZ    ps    Data-out low-impedance window from CK/CK#
+</span><span class=P>        parameter THZ              =     TAC; </span><span class=P>// tHZ    ps    Data-out high impedance window from CK/CK#
+</span><span class=P>        parameter TDIPW            =    0.35; </span><span class=P>// tDIPW  tCK   DQ and DM input Pulse Width
+</span>        <span class=P>// Data Strobe
+</span><span class=P>        parameter TDQSH            =    0.35; </span><span class=P>// tDQSH  tCK   DQS input High Pulse Width
+</span><span class=P>        parameter TDQSL            =    0.35; </span><span class=P>// tDQSL  tCK   DQS input Low Pulse Width
+</span><span class=P>        parameter TDSS             =    0.20; </span><span class=P>// tDSS   tCK   DQS falling edge to CLK rising (setup time)
+</span><span class=P>        parameter TDSH             =    0.20; </span><span class=P>// tDSH   tCK   DQS falling edge from CLK rising (hold time)
+</span><span class=P>        parameter TWPRE            =    0.35; </span><span class=P>// tWPRE  tCK   DQS Write Preamble
+</span><span class=P>        parameter TWPST            =    0.40; </span><span class=P>// tWPST  tCK   DQS Write Postamble
+</span><span class=P>        parameter TDQSS            =    0.25; </span><span class=P>// tDQSS  tCK   Rising clock edge to DQS/DQS# latching transition
+</span>        <span class=P>// Command and Address
+</span><span class=P>        parameter TIPW             =     0.6; </span><span class=P>// tIPW   tCK   Control and Address input Pulse Width
+</span><span class=P>        parameter TCCD             =       2; </span><span class=P>// tCCD   tCK   Cas to Cas command delay
+</span><span class=P>        parameter TRAS_MIN         =   40000; </span><span class=P>// tRAS   ps    Minimum Active to Precharge command time
+</span><span class=P>        parameter TRAS_MAX         =70000000; </span><span class=P>// tRAS   ps    Maximum Active to Precharge command time
+</span><span class=P>        parameter TRTP             =    7500; </span><span class=P>// tRTP   ps    Read to Precharge command delay
+</span><span class=P>        parameter TWR              =   15000; </span><span class=P>// tWR    ps    Write recovery time
+</span><span class=P>        parameter TMRD             =       2; </span><span class=P>// tMRD   tCK   Load Mode Register command cycle time
+</span><span class=P>        parameter TDLLK            =     200; </span><span class=P>// tDLLK  tCK   DLL locking time
+</span>        <span class=P>// Refresh
+</span><span class=P>        parameter TRFC_MIN         =   75000; </span><span class=P>// tRFC   ps    Refresh to Refresh Command interval minimum value
+</span><span class=P>        parameter TRFC_MAX         =70000000; </span><span class=P>// tRFC   ps    Refresh to Refresh Command Interval maximum value
+</span>        <span class=P>// Self Refresh
+</span><span class=P>        parameter TXSNR   = TRFC_MIN + 10000; </span><span class=P>// tXSNR  ps    Exit self refesh to a non-read command
+</span><span class=P>        parameter TXSRD            =     200; </span><span class=P>// tXSRD  tCK   Exit self refresh to a read command
+</span><span class=P>        parameter TISXR            =     TIS; </span><span class=P>// tISXR  ps    CKE setup time during self refresh exit.
+</span>        <span class=P>// ODT
+</span><span class=P>        parameter TAOND            =       2; </span><span class=P>// tAOND  tCK   ODT turn-on delay
+</span><span class=P>        parameter TAOFD            =     2.5; </span><span class=P>// tAOFD  tCK   ODT turn-off delay
+</span><span class=P>        parameter TAONPD           =    2000; </span><span class=P>// tAONPD ps    ODT turn-on (precharge power-down mode)
+</span><span class=P>        parameter TAOFPD           =    2000; </span><span class=P>// tAOFPD ps    ODT turn-off (precharge power-down mode)
+</span><span class=P>        parameter TMOD             =   12000; </span><span class=P>// tMOD   ps    ODT enable in EMR to ODT pin transition
+</span>        <span class=P>// Power Down
+</span><span class=P>        parameter TCKE             =       3; </span><span class=P>// tCKE   tCK   CKE minimum high or low pulse width
+</span>
+        <span class=P>// Size Parameters based on Part Width
+</span>
+<span class=P>    `ifdef x4
+</span><span class=P>        parameter DM_BITS          =       1; </span><span class=P>// Number of Data Mask bits
+</span><span class=P>        parameter ROW_BITS         =      13; </span><span class=P>// Number of Address bits
+</span><span class=P>        parameter COL_BITS         =      11; </span><span class=P>// Number of Column bits
+</span><span class=P>        parameter DQ_BITS          =       4; </span><span class=P>// Number of Data bits
+</span><span class=P>        parameter DQS_BITS         =       1; </span><span class=P>// Number of Dqs bits
+</span><span class=P>        parameter TRRD             =    7500; </span><span class=P>// tRRD   Active bank a to Active bank b command time
+</span><span class=P>    `else `ifdef x8
+</span><span class=P>        parameter DM_BITS          =       1; </span><span class=P>// Number of Data Mask bits
+</span><span class=P>        parameter ROW_BITS         =      13; </span><span class=P>// Number of Address bits
+</span><span class=P>        parameter COL_BITS         =      10; </span><span class=P>// Number of Column bits
+</span><span class=P>        parameter DQ_BITS          =       8; </span><span class=P>// Number of Data bits
+</span><span class=P>        parameter DQS_BITS         =       1; </span><span class=P>// Number of Dqs bits
+</span><span class=P>        parameter TRRD             =    7500; </span><span class=P>// tRRD   Active bank a to Active bank b command time
+</span><span class=P>    `else </span><span class=P>//`define x16
+</span><span class=P>        parameter DM_BITS          =       2; </span><span class=P>// Number of Data Mask bits
+</span><span class=P>        parameter ROW_BITS         =      13; </span><span class=P>// Number of Address bits
+</span><span class=P>        parameter COL_BITS         =       9; </span><span class=P>// Number of Column bits
+</span><span class=P>        parameter DQ_BITS          =      16; </span><span class=P>// Number of Data bits
+</span><span class=P>        parameter DQS_BITS         =       2; </span><span class=P>// Number of Dqs bits
+</span><span class=P>        parameter TRRD             =   10000; </span><span class=P>// tRRD   Active bank a to Active bank b command time
+</span><span class=P>    `endif `endif
+</span>
+<span class=P>    `ifdef QUAD_RANK
+</span><span class=P>        `define DUAL_RANK </span><span class=P>// also define DUAL_RANK
+</span><span class=P>        parameter CS_BITS          =       4; </span><span class=P>// Number of Chip Select Bits
+</span><span class=P>        parameter RANKS            =       4; </span><span class=P>// Number of Chip Select Bits
+</span><span class=P>    `else `ifdef DUAL_RANK
+</span><span class=P>        parameter CS_BITS          =       2; </span><span class=P>// Number of Chip Select Bits
+</span><span class=P>        parameter RANKS            =       2; </span><span class=P>// Number of Chip Select Bits
+</span><span class=P>    `else
+</span><span class=P>        parameter CS_BITS          =       2; </span><span class=P>// Number of Chip Select Bits
+</span><span class=P>        parameter RANKS            =       1; </span><span class=P>// Number of Chip Select Bits
+</span><span class=P>    `endif `endif
+</span>
+        <span class=P>// Size Parameters
+</span><span class=P>        parameter BA_BITS          =       2; </span><span class=P>// Set this parmaeter to control how many Bank Address bits
+</span><span class=P>        parameter ADDR_BITS        =      13; </span><span class=P>// Address Bits
+</span><span class=P>        parameter MEM_BITS         =      15; </span><span class=P>// Number of write data bursts can be stored in memory.  The default is 2^10=1024.
+</span><span class=P>        parameter AP               =      10; </span><span class=P>// the address bit that controls auto-precharge and precharge-all
+</span><span class=P>        parameter BL_BITS          =       3; </span><span class=P>// the number of bits required to count to MAX_BL
+</span><span class=P>        parameter BO_BITS          =       2; </span><span class=P>// the number of Burst Order Bits
+</span>
+<span class=M>`else</span> <span class=M>`ifdef</span> <span class=D>x512Mb</span>
+
+<span class=P>    `ifdef sg187E
+</span><span class=P>        parameter TCK_MIN          =    1875; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =      90; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =      75; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     180; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     132; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     157; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     188; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     425; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     250; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     350; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =       0; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =      75; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     300; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     175; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     125; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     200; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   54000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   13125; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   13125; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   13125; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =      10; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       3; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       3; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       4; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =      11; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   13125; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span>    <span class=M>`else</span> <span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="ddr2_model.v.html#127">sg25E</a>
+<a name="400"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1194">TCK_MIN</a>          =    2500; <span class=C>// tCK    ps    Minimum Clock Cycle Time
+</span><a name="401"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1195">TJIT_PER</a>         =     100; <span class=C>// tJIT(per)  ps Period JItter
+</span><a name="402"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1196">TJIT_DUTY</a>        =     100; <span class=C>// tJIT(duty) ps Half Period Jitter
+</span><a name="403"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1197">TJIT_CC</a>          =     200; <span class=C>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><a name="404"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1198">TERR_2PER</a>        =     150; <span class=C>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><a name="405"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1199">TERR_3PER</a>        =     175; <span class=C>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><a name="406"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1200">TERR_4PER</a>        =     200; <span class=C>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><a name="407"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1201">TERR_5PER</a>        =     200; <span class=C>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><a name="408"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1202">TERR_N1PER</a>       =     300; <span class=C>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><a name="409"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1203">TERR_N2PER</a>       =     450; <span class=C>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><a name="410"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1204">TQHS</a>             =     300; <span class=C>// tQHS   ps    Data hold skew factor
+</span><a name="411"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1205">TAC</a>              =     400; <span class=C>// tAC    ps    DQ output access time from CK/CK#
+</span><a name="412"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1206">TDS</a>              =      50; <span class=C>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><a name="413"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1207">TDH</a>              =     125; <span class=C>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><a name="414"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1208">TDQSCK</a>           =     350; <span class=C>// tDQSCK ps    DQS output access time from CK/CK#
+</span><a name="415"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1209">TDQSQ</a>            =     200; <span class=C>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><a name="416"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1210">TIS</a>              =     175; <span class=C>// tIS    ps    Input Setup Time
+</span><a name="417"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1211">TIH</a>              =     250; <span class=C>// tIH    ps    Input Hold Time
+</span><a name="418"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1212">TRC</a>              =   55000; <span class=C>// tRC    ps    Active to Active/Auto Refresh command time
+</span><a name="419"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1213">TRCD</a>             =   12500; <span class=C>// tRCD   ps    Active to Read/Write command time
+</span><a name="420"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1214">TWTR</a>             =    7500; <span class=C>// tWTR   ps    Write to Read command delay
+</span><a name="421"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1215">TRP</a>              =   12500; <span class=C>// tRP    ps    Precharge command period
+</span><a name="422"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1216">TRPA</a>             =   12500; <span class=C>// tRPA   ps    Precharge All period
+</span><a name="423"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1217">TXARDS</a>           =       8; <span class=C>// tXARDS tCK   Exit low power active power down to a read command
+</span><a name="424"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1218">TXARD</a>            =       2; <span class=C>// tXARD  tCK   Exit active power down to a read command
+</span><a name="425"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1219">TXP</a>              =       2; <span class=C>// tXP    tCK   Exit power down to a non-read command
+</span><a name="426"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1220">TANPD</a>            =       3; <span class=C>// tANPD  tCK   ODT to power-down entry latency
+</span><a name="427"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1221">TAXPD</a>            =      10; <span class=C>// tAXPD  tCK   ODT power-down exit latency
+</span><a name="428"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1222">CL_TIME</a>          =   12500; <span class=C>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg25
+</span><span class=P>        parameter TCK_MIN          =    2500; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     100; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     100; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     200; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     150; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     300; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     300; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     400; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =      50; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     125; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     350; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     200; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     175; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     250; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       8; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =      10; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span>    <span class=M>`else</span> <span class=M>`ifdef</span> <span class=D>sg3E</span>
+<a name="460"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1194">TCK_MIN</a>          =    3000; <span class=C>// tCK    ps    Minimum Clock Cycle Time
+</span><a name="461"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1195">TJIT_PER</a>         =     125; <span class=C>// tJIT(per)  ps Period JItter
+</span><a name="462"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1196">TJIT_DUTY</a>        =     125; <span class=C>// tJIT(duty) ps Half Period Jitter
+</span><a name="463"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1197">TJIT_CC</a>          =     250; <span class=C>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><a name="464"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1198">TERR_2PER</a>        =     175; <span class=C>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><a name="465"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1199">TERR_3PER</a>        =     225; <span class=C>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><a name="466"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1200">TERR_4PER</a>        =     250; <span class=C>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><a name="467"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1201">TERR_5PER</a>        =     250; <span class=C>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><a name="468"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1202">TERR_N1PER</a>       =     350; <span class=C>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><a name="469"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1203">TERR_N2PER</a>       =     450; <span class=C>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><a name="470"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1204">TQHS</a>             =     340; <span class=C>// tQHS   ps    Data hold skew factor
+</span><a name="471"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1205">TAC</a>              =     450; <span class=C>// tAC    ps    DQ output access time from CK/CK#
+</span><a name="472"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1206">TDS</a>              =     100; <span class=C>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><a name="473"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1207">TDH</a>              =     175; <span class=C>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><a name="474"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1208">TDQSCK</a>           =     400; <span class=C>// tDQSCK ps    DQS output access time from CK/CK#
+</span><a name="475"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1209">TDQSQ</a>            =     240; <span class=C>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><a name="476"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1210">TIS</a>              =     200; <span class=C>// tIS    ps    Input Setup Time
+</span><a name="477"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1211">TIH</a>              =     275; <span class=C>// tIH    ps    Input Hold Time
+</span><a name="478"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1212">TRC</a>              =   54000; <span class=C>// tRC    ps    Active to Active/Auto Refresh command time
+</span><a name="479"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1213">TRCD</a>             =   12000; <span class=C>// tRCD   ps    Active to Read/Write command time
+</span><a name="480"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1214">TWTR</a>             =    7500; <span class=C>// tWTR   ps    Write to Read command delay
+</span><a name="481"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1215">TRP</a>              =   12000; <span class=C>// tRP    ps    Precharge command period
+</span><a name="482"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1216">TRPA</a>             =   12000; <span class=C>// tRPA   ps    Precharge All period
+</span><a name="483"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1217">TXARDS</a>           =       7; <span class=C>// tXARDS tCK   Exit low power active power down to a read command
+</span><a name="484"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1218">TXARD</a>            =       2; <span class=C>// tXARD  tCK   Exit active power down to a read command
+</span><a name="485"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1219">TXP</a>              =       2; <span class=C>// tXP    tCK   Exit power down to a non-read command
+</span><a name="486"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1220">TANPD</a>            =       3; <span class=C>// tANPD  tCK   ODT to power-down entry latency
+</span><a name="487"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1221">TAXPD</a>            =       8; <span class=C>// tAXPD  tCK   ODT power-down exit latency
+</span><a name="488"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1222">CL_TIME</a>          =   12000; <span class=C>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg3
+</span><span class=P>        parameter TCK_MIN          =    3000; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     125; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     340; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     450; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     100; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     175; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     400; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     240; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     200; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     275; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       7; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span>    <span class=M>`else</span> <span class=M>`ifdef</span> <span class=D>sg37E</span>
+<a name="520"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1194">TCK_MIN</a>          =    3750; <span class=C>// tCK    ps    Minimum Clock Cycle Time
+</span><a name="521"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1195">TJIT_PER</a>         =     125; <span class=C>// tJIT(per)  ps Period JItter
+</span><a name="522"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1196">TJIT_DUTY</a>        =     125; <span class=C>// tJIT(duty) ps Half Period Jitter
+</span><a name="523"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1197">TJIT_CC</a>          =     250; <span class=C>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><a name="524"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1198">TERR_2PER</a>        =     175; <span class=C>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><a name="525"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1199">TERR_3PER</a>        =     225; <span class=C>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><a name="526"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1200">TERR_4PER</a>        =     250; <span class=C>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><a name="527"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1201">TERR_5PER</a>        =     250; <span class=C>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><a name="528"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1202">TERR_N1PER</a>       =     350; <span class=C>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><a name="529"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1203">TERR_N2PER</a>       =     450; <span class=C>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><a name="530"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1204">TQHS</a>             =     400; <span class=C>// tQHS   ps    Data hold skew factor
+</span><a name="531"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1205">TAC</a>              =     500; <span class=C>// tAC    ps    DQ output access time from CK/CK#
+</span><a name="532"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1206">TDS</a>              =     100; <span class=C>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><a name="533"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1207">TDH</a>              =     225; <span class=C>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><a name="534"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1208">TDQSCK</a>           =     450; <span class=C>// tDQSCK ps    DQS output access time from CK/CK#
+</span><a name="535"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1209">TDQSQ</a>            =     300; <span class=C>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><a name="536"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1210">TIS</a>              =     250; <span class=C>// tIS    ps    Input Setup Time
+</span><a name="537"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1211">TIH</a>              =     375; <span class=C>// tIH    ps    Input Hold Time
+</span><a name="538"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1212">TRC</a>              =   55000; <span class=C>// tRC    ps    Active to Active/Auto Refresh command time
+</span><a name="539"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1213">TRCD</a>             =   15000; <span class=C>// tRCD   ps    Active to Read/Write command time
+</span><a name="540"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1214">TWTR</a>             =    7500; <span class=C>// tWTR   ps    Write to Read command delay
+</span><a name="541"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1215">TRP</a>              =   15000; <span class=C>// tRP    ps    Precharge command period
+</span><a name="542"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1216">TRPA</a>             =   15000; <span class=C>// tRPA   ps    Precharge All period
+</span><a name="543"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1217">TXARDS</a>           =       6; <span class=C>// tXARDS tCK   Exit low power active power down to a read command
+</span><a name="544"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1218">TXARD</a>            =       2; <span class=C>// tXARD  tCK   Exit active power down to a read command
+</span><a name="545"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1219">TXP</a>              =       2; <span class=C>// tXP    tCK   Exit power down to a non-read command
+</span><a name="546"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1220">TANPD</a>            =       3; <span class=C>// tANPD  tCK   ODT to power-down entry latency
+</span><a name="547"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1221">TAXPD</a>            =       8; <span class=C>// tAXPD  tCK   ODT power-down exit latency
+</span><a name="548"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1222">CL_TIME</a>          =   15000; <span class=C>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else </span><span class=P>//`define sg5E
+</span><span class=P>        parameter TCK_MIN          =    5000; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     150; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     450; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     600; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     150; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     275; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     500; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     350; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     350; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     475; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =   10000; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       6; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span>    <span class=M>`endif</span> <span class=M>`endif</span> <span class=M>`endif</span> <span class=M>`endif</span> <span class=M>`endif</span> <span class=M>`endif</span>
+
+    <span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="ddr2_model.v.html#128">x16</a>
+<span class=P>      `ifdef sg187E
+</span><span class=P>        parameter TFAW             =   45000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span>      <span class=M>`else</span> <span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="ddr2_model.v.html#127">sg25E</a>
+<a name="585"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1263">TFAW</a>             =   45000; <span class=C>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25
+</span><span class=P>        parameter TFAW             =   45000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span>      <span class=M>`else</span> <span class=C>// sg3E, sg3, sg37E, sg5E
+</span><a name="589"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1263">TFAW</a>             =   50000; <span class=C>// tFAW  ps     Four Bank Activate window
+</span>      <span class=M>`endif</span> <span class=M>`endif</span> <span class=M>`endif</span>
+<span class=P>    `else </span><span class=P>// x4, x8
+</span><span class=P>      `ifdef sg187E
+</span><span class=P>        parameter TFAW             =   35000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25E
+</span><span class=P>        parameter TFAW             =   35000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25
+</span><span class=P>        parameter TFAW             =   35000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else </span><span class=P>// sg3E, sg3, sg37E, sg5E
+</span><span class=P>        parameter TFAW             =   37500; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `endif `endif `endif
+</span>    <span class=M>`endif</span>
+
+        <span class=C>// Timing Parameters
+</span>
+        <span class=C>// Mode Register
+</span><a name="606"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1280">AL_MIN</a>           =       0; <span class=C>// AL     tCK   Minimum Additive Latency
+</span><a name="607"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1281">AL_MAX</a>           =       6; <span class=C>// AL     tCK   Maximum Additive Latency
+</span><a name="608"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1282">CL_MIN</a>           =       3; <span class=C>// CL     tCK   Minimum CAS Latency
+</span><a name="609"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1283">CL_MAX</a>           =       7; <span class=C>// CL     tCK   Maximum CAS Latency
+</span><a name="610"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1284">WR_MIN</a>           =       2; <span class=C>// WR     tCK   Minimum Write Recovery
+</span><a name="611"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1285">WR_MAX</a>           =       8; <span class=C>// WR     tCK   Maximum Write Recovery
+</span><a name="612"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1286">BL_MIN</a>           =       4; <span class=C>// BL     tCK   Minimum Burst Length
+</span><a name="613"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1287">BL_MAX</a>           =       8; <span class=C>// BL     tCK   Minimum Burst Length
+</span>        <span class=C>// Clock
+</span><a name="615"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1289">TCK_MAX</a>          =    8000; <span class=C>// tCK    ps    Maximum Clock Cycle Time
+</span><a name="616"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1290">TCH_MIN</a>          =    0.48; <span class=C>// tCH    tCK   Minimum Clock High-Level Pulse Width
+</span><a name="617"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1291">TCH_MAX</a>          =    0.52; <span class=C>// tCH    tCK   Maximum Clock High-Level Pulse Width
+</span><a name="618"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1292">TCL_MIN</a>          =    0.48; <span class=C>// tCL    tCK   Minimum Clock Low-Level Pulse Width
+</span><a name="619"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1293">TCL_MAX</a>          =    0.52; <span class=C>// tCL    tCK   Maximum Clock Low-Level Pulse Width
+</span>        <span class=C>// Data
+</span><a name="621"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1295">TLZ</a>              =     <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1205">TAC</a>; <span class=C>// tLZ    ps    Data-out low-impedance window from CK/CK#
+</span><a name="622"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1296">THZ</a>              =     <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1205">TAC</a>; <span class=C>// tHZ    ps    Data-out high impedance window from CK/CK#
+</span><a name="623"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1297">TDIPW</a>            =    0.35; <span class=C>// tDIPW  tCK   DQ and DM input Pulse Width
+</span>        <span class=C>// Data Strobe
+</span><a name="625"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1299">TDQSH</a>            =    0.35; <span class=C>// tDQSH  tCK   DQS input High Pulse Width
+</span><a name="626"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1300">TDQSL</a>            =    0.35; <span class=C>// tDQSL  tCK   DQS input Low Pulse Width
+</span><a name="627"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1301">TDSS</a>             =    0.20; <span class=C>// tDSS   tCK   DQS falling edge to CLK rising (setup time)
+</span><a name="628"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1302">TDSH</a>             =    0.20; <span class=C>// tDSH   tCK   DQS falling edge from CLK rising (hold time)
+</span><a name="629"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1303">TWPRE</a>            =    0.35; <span class=C>// tWPRE  tCK   DQS Write Preamble
+</span><a name="630"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1304">TWPST</a>            =    0.40; <span class=C>// tWPST  tCK   DQS Write Postamble
+</span><a name="631"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1305">TDQSS</a>            =    0.25; <span class=C>// tDQSS  tCK   Rising clock edge to DQS/DQS# latching transition
+</span>        <span class=C>// Command and Address
+</span><a name="633"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1307">TIPW</a>             =     0.6; <span class=C>// tIPW   tCK   Control and Address input Pulse Width
+</span><a name="634"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1308">TCCD</a>             =       2; <span class=C>// tCCD   tCK   Cas to Cas command delay
+</span><a name="635"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1309">TRAS_MIN</a>         =   40000; <span class=C>// tRAS   ps    Minimum Active to Precharge command time
+</span><a name="636"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1310">TRAS_MAX</a>         =70000000; <span class=C>// tRAS   ps    Maximum Active to Precharge command time
+</span><a name="637"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1311">TRTP</a>             =    7500; <span class=C>// tRTP   ps    Read to Precharge command delay
+</span><a name="638"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1312">TWR</a>              =   15000; <span class=C>// tWR    ps    Write recovery time
+</span><a name="639"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1313">TMRD</a>             =       2; <span class=C>// tMRD   tCK   Load Mode Register command cycle time
+</span><a name="640"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1314">TDLLK</a>            =     200; <span class=C>// tDLLK  tCK   DLL locking time
+</span>        <span class=C>// Refresh
+</span><a name="642"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1316">TRFC_MIN</a>         =  105000; <span class=C>// tRFC   ps    Refresh to Refresh Command interval minimum value
+</span><a name="643"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1317">TRFC_MAX</a>         =70000000; <span class=C>// tRFC   ps    Refresh to Refresh Command Interval maximum value
+</span>        <span class=C>// Self Refresh
+</span><a name="645"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1319">TXSNR</a>   = <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1316">TRFC_MIN</a> + 10000; <span class=C>// tXSNR  ps    Exit self refesh to a non-read command
+</span><a name="646"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1320">TXSRD</a>            =     200; <span class=C>// tXSRD  tCK   Exit self refresh to a read command
+</span><a name="647"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1321">TISXR</a>            =     <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1210">TIS</a>; <span class=C>// tISXR  ps    CKE setup time during self refresh exit.
+</span>        <span class=C>// ODT
+</span><a name="649"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1323">TAOND</a>            =       2; <span class=C>// tAOND  tCK   ODT turn-on delay
+</span><a name="650"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1324">TAOFD</a>            =     2.5; <span class=C>// tAOFD  tCK   ODT turn-off delay
+</span><a name="651"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1325">TAONPD</a>           =    2000; <span class=C>// tAONPD ps    ODT turn-on (precharge power-down mode)
+</span><a name="652"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1326">TAOFPD</a>           =    2000; <span class=C>// tAOFPD ps    ODT turn-off (precharge power-down mode)
+</span><a name="653"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1327">TMOD</a>             =   12000; <span class=C>// tMOD   ps    ODT enable in EMR to ODT pin transition
+</span>        <span class=C>// Power Down
+</span><a name="655"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1329">TCKE</a>             =       3; <span class=C>// tCKE   tCK   CKE minimum high or low pulse width
+</span>
+        <span class=C>// Size Parameters based on Part Width
+</span>
+<span class=P>    `ifdef x4
+</span><span class=P>        parameter ADDR_BITS        =      14; </span><span class=P>// Address Bits
+</span><span class=P>        parameter ROW_BITS         =      14; </span><span class=P>// Number of Address bits
+</span><span class=P>        parameter COL_BITS         =      11; </span><span class=P>// Number of Column bits
+</span><span class=P>        parameter DM_BITS          =       1; </span><span class=P>// Number of Data Mask bits
+</span><span class=P>        parameter DQ_BITS          =       4; </span><span class=P>// Number of Data bits
+</span><span class=P>        parameter DQS_BITS         =       1; </span><span class=P>// Number of Dqs bits
+</span><span class=P>        parameter TRRD             =    7500; </span><span class=P>// tRRD   Active bank a to Active bank b command time
+</span>    <span class=M>`else</span> <span class=M>`ifdef</span> <span class=D>x8</span>
+<a name="668"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1342">ADDR_BITS</a>        =      14; <span class=C>// Address Bits
+</span><a name="669"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1343">ROW_BITS</a>         =      14; <span class=C>// Number of Address bits
+</span><a name="670"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1344">COL_BITS</a>         =      10; <span class=C>// Number of Column bits
+</span><a name="671"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1345">DM_BITS</a>          =       1; <span class=C>// Number of Data Mask bits
+</span><a name="672"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1346">DQ_BITS</a>          =       8; <span class=C>// Number of Data bits
+</span><a name="673"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1347">DQS_BITS</a>         =       1; <span class=C>// Number of Dqs bits
+</span><a name="674"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1348">TRRD</a>             =    7500; <span class=C>// tRRD   Active bank a to Active bank b command time
+</span><span class=P>    `else </span><span class=P>//`define x16
+</span><span class=P>        parameter ADDR_BITS        =      13; </span><span class=P>// Address Bits
+</span><span class=P>        parameter ROW_BITS         =      13; </span><span class=P>// Number of Address bits
+</span><span class=P>        parameter COL_BITS         =      10; </span><span class=P>// Number of Column bits
+</span><span class=P>        parameter DM_BITS          =       2; </span><span class=P>// Number of Data Mask bits
+</span><span class=P>        parameter DQ_BITS          =      16; </span><span class=P>// Number of Data bits
+</span><span class=P>        parameter DQS_BITS         =       2; </span><span class=P>// Number of Dqs bits
+</span><span class=P>        parameter TRRD             =   10000; </span><span class=P>// tRRD   Active bank a to Active bank b command time
+</span>    <span class=M>`endif</span> <span class=M>`endif</span>
+
+<span class=P>    `ifdef QUAD_RANK
+</span><span class=P>        `define DUAL_RANK </span><span class=P>// also define DUAL_RANK
+</span><span class=P>        parameter CS_BITS          =       4; </span><span class=P>// Number of Chip Select Bits
+</span><span class=P>        parameter RANKS            =       4; </span><span class=P>// Number of Chip Select Bits
+</span>    <span class=M>`else</span> <span class=M>`ifdef</span> <span class=D>DUAL_RANK</span>
+<a name="690"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1364">CS_BITS</a>          =       2; <span class=C>// Number of Chip Select Bits
+</span><a name="691"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1365">RANKS</a>            =       2; <span class=C>// Number of Chip Select Bits
+</span><span class=P>    `else
+</span><span class=P>        parameter CS_BITS          =       2; </span><span class=P>// Number of Chip Select Bits
+</span><span class=P>        parameter RANKS            =       1; </span><span class=P>// Number of Chip Select Bits
+</span>    <span class=M>`endif</span> <span class=M>`endif</span>
+
+        <span class=C>// Size Parameters
+</span><a name="698"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1372">BA_BITS</a>          =       2; <span class=C>// Set this parmaeter to control how many Bank Address bits
+</span><a name="699"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1373">MEM_BITS</a>         =      15; <span class=C>// Number of write data bursts can be stored in memory.  The default is 2^10=1024.
+</span><a name="700"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1374">AP</a>               =      10; <span class=C>// the address bit that controls auto-precharge and precharge-all
+</span><a name="701"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1375">BL_BITS</a>          =       3; <span class=C>// the number of bits required to count to MAX_BL
+</span><a name="702"></a>        <span class=K>parameter</span> <a  onClick="return qs(event,this,0)"  class=PA href="ddr2_model_parameters.vh.p2.html#1376">BO_BITS</a>          =       2; <span class=C>// the number of Burst Order Bits
+</span>
+<span class=P>`else `ifdef x1Gb
+</span>
+<span class=P>    `ifdef sg187E
+</span><span class=P>        parameter TCK_MIN          =    1875; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =      90; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =      75; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     180; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     132; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     157; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     188; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     425; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     250; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     350; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =       0; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =      75; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     300; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     175; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     125; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     200; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   54000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   13125; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   13125; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =      10; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       3; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       3; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       4; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =      11; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   13125; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg25E
+</span><span class=P>        parameter TCK_MIN          =    2500; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     100; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     100; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     200; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     150; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     300; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     300; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     400; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =      50; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     125; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     350; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     200; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     175; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     250; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   12500; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   12500; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       8; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =      10; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   12500; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg25
+</span><span class=P>        parameter TCK_MIN          =    2500; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     100; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     100; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     200; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     150; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     200; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     300; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     300; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     400; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =      50; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     125; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     350; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     200; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     175; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     250; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   17500; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       8; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =      10; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg3E
+</span><span class=P>        parameter TCK_MIN          =    3000; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     125; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     340; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     450; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     100; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     175; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     400; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     240; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     200; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     275; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   54000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   12000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   12000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   15000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       7; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   12000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg3
+</span><span class=P>        parameter TCK_MIN          =    3000; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     125; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     340; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     450; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     100; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     175; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     400; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     240; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     200; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     275; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   18000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       7; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else `ifdef sg37E
+</span><span class=P>        parameter TCK_MIN          =    3750; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     125; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     400; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     500; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     100; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     225; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     450; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     300; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     250; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     375; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =    7500; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   18750; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       6; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `else </span><span class=P>//`define sg5E
+</span><span class=P>        parameter TCK_MIN          =    5000; </span><span class=P>// tCK    ps    Minimum Clock Cycle Time
+</span><span class=P>        parameter TJIT_PER         =     125; </span><span class=P>// tJIT(per)  ps Period JItter
+</span><span class=P>        parameter TJIT_DUTY        =     150; </span><span class=P>// tJIT(duty) ps Half Period Jitter
+</span><span class=P>        parameter TJIT_CC          =     250; </span><span class=P>// tJIT(cc)   ps Cycle to Cycle jitter
+</span><span class=P>        parameter TERR_2PER        =     175; </span><span class=P>// tERR(nper) ps Accumulated Error (2-cycle)
+</span><span class=P>        parameter TERR_3PER        =     225; </span><span class=P>// tERR(nper) ps Accumulated Error (3-cycle)
+</span><span class=P>        parameter TERR_4PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (4-cycle)
+</span><span class=P>        parameter TERR_5PER        =     250; </span><span class=P>// tERR(nper) ps Accumulated Error (5-cycle)
+</span><span class=P>        parameter TERR_N1PER       =     350; </span><span class=P>// tERR(nper) ps Accumulated Error (6-10-cycle)
+</span><span class=P>        parameter TERR_N2PER       =     450; </span><span class=P>// tERR(nper) ps Accumulated Error (11-50-cycle)
+</span><span class=P>        parameter TQHS             =     450; </span><span class=P>// tQHS   ps    Data hold skew factor
+</span><span class=P>        parameter TAC              =     600; </span><span class=P>// tAC    ps    DQ output access time from CK/CK#
+</span><span class=P>        parameter TDS              =     150; </span><span class=P>// tDS    ps    DQ and DM input setup time relative to DQS
+</span><span class=P>        parameter TDH              =     275; </span><span class=P>// tDH    ps    DQ and DM input hold time relative to DQS
+</span><span class=P>        parameter TDQSCK           =     500; </span><span class=P>// tDQSCK ps    DQS output access time from CK/CK#
+</span><span class=P>        parameter TDQSQ            =     350; </span><span class=P>// tDQSQ  ps    DQS-DQ skew, DQS to last DQ valid, per group, per access
+</span><span class=P>        parameter TIS              =     350; </span><span class=P>// tIS    ps    Input Setup Time
+</span><span class=P>        parameter TIH              =     475; </span><span class=P>// tIH    ps    Input Hold Time
+</span><span class=P>        parameter TRC              =   55000; </span><span class=P>// tRC    ps    Active to Active/Auto Refresh command time
+</span><span class=P>        parameter TRCD             =   15000; </span><span class=P>// tRCD   ps    Active to Read/Write command time
+</span><span class=P>        parameter TWTR             =   10000; </span><span class=P>// tWTR   ps    Write to Read command delay
+</span><span class=P>        parameter TRP              =   15000; </span><span class=P>// tRP    ps    Precharge command period
+</span><span class=P>        parameter TRPA             =   20000; </span><span class=P>// tRPA   ps    Precharge All period
+</span><span class=P>        parameter TXARDS           =       6; </span><span class=P>// tXARDS tCK   Exit low power active power down to a read command
+</span><span class=P>        parameter TXARD            =       2; </span><span class=P>// tXARD  tCK   Exit active power down to a read command
+</span><span class=P>        parameter TXP              =       2; </span><span class=P>// tXP    tCK   Exit power down to a non-read command
+</span><span class=P>        parameter TANPD            =       3; </span><span class=P>// tANPD  tCK   ODT to power-down entry latency
+</span><span class=P>        parameter TAXPD            =       8; </span><span class=P>// tAXPD  tCK   ODT power-down exit latency
+</span><span class=P>        parameter CL_TIME          =   15000; </span><span class=P>// CL     ps    Minimum CAS Latency
+</span><span class=P>    `endif `endif `endif `endif `endif `endif
+</span>
+<span class=P>    `ifdef x16
+</span><span class=P>      `ifdef sg187E
+</span><span class=P>        parameter TFAW             =   45000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25E
+</span><span class=P>        parameter TFAW             =   45000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25
+</span><span class=P>        parameter TFAW             =   45000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else </span><span class=P>// sg3E, sg3, sg37E, sg5E
+</span><span class=P>        parameter TFAW             =   50000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `endif `endif `endif
+</span><span class=P>    `else </span><span class=P>// x4, x8
+</span><span class=P>      `ifdef sg187E
+</span><span class=P>        parameter TFAW             =   35000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25E
+</span><span class=P>        parameter TFAW             =   35000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else `ifdef sg25
+</span><span class=P>        parameter TFAW             =   35000; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `else </span><span class=P>// sg3E, sg3, sg37E, sg5E
+</span><span class=P>        parameter TFAW             =   37500; </span><span class=P>// tFAW  ps     Four Bank Activate window
+</span><span class=P>      `endif `endif `endif
+</span><span class=P>    `endif
+</span>
+        <span class=P>// Timing Parameters
+</span>
+        <span class=P>// Mode Register
+</span><span class=P>        parameter AL_MIN           =       0; </span><span class=P>// AL     tCK   Minimum Additive Latency
+</span><span class=P>        parameter AL_MAX           =       6; </span><span class=P>// AL     tCK   Maximum Additive Latency
+</span><span class=P>        parameter CL_MIN           =       3; </span><span class=P>// CL     tCK   Minimum CAS Latency
+</span><span class=P>        parameter CL_MAX           =       7; </span><span class=P>// CL     tCK   Maximum CAS Latency
+</span><span class=P>        parameter WR_MIN           =       2; </span><span class=P>// WR     tCK   Minimum Write Recovery
+</span><span class=P>        parameter WR_MAX           =       8; </span><span class=P>// WR     tCK   Maximum Write Recovery
+</span><span class=P>        parameter BL_MIN           =       4; </span><span class=P>// BL     tCK   Minimum Burst Length
+</span><span class=P>        parameter BL_MAX           =       8; </span><span class=P>// BL     tCK   Minimum Burst Length
+</span>        <span class=P>// Clock
+</span><span class=P>        parameter TCK_MAX          =    8000; </span><span class=P>// tCK    ps    Maximum Clock Cycle Time
+</span><span class=P>        parameter TCH_MIN          =    0.48; </span><span class=P>// tCH    tCK   Minimum Clock High-Level Pulse Width
+</span><span class=P>        parameter TCH_MAX          =    0.52; </span><span class=P>// tCH    tCK   Maximum Clock High-Level Pulse Width
+</span><span class=P>        parameter TCL_MIN          =    0.48; </span><span class=P>// tCL    tCK   Minimum Clock Low-Level Pulse Width
+</span><span class=P>        parameter TCL_MAX          =    0.52; </span><span class=P>// tCL    tCK   Maximum Clock Low-Level Pulse Width
+</span>        <span class=P>// Data
+</span><span class=P>        parameter TLZ              =     TAC; </span><span class=P>// tLZ    ps    Data-out low-impedance window from CK/CK#
+</span><span class=P>        parameter THZ              =     TAC; </span><span class=P>// tHZ    ps    Data-out high impedance window from CK/CK#
+</span><span class=P>        parameter TDIPW            =    0.35; </span><span class=P>// tDIPW  tCK   DQ and DM input Pulse Width
+</span>        <span class=P>// Data Strobe
+</span><span class=P>        parameter TDQSH            =    0.35; </span><span class=P>// tDQSH  tCK   DQS input High Pulse Width
+</span><span class=P>        parameter TDQSL            =    0.35; </span><span class=P>// tDQSL  tCK   DQS input Low Pulse Width
+</span><span class=P>        parameter TDSS             =    0.20; </span><span class=P>// tDSS   tCK   DQS falling edge to CLK rising (setup time)
+</span><span class=P>        parameter TDSH             =    0.20; </span><span class=P>// tDSH   tCK   DQS falling edge from CLK rising (hold time)
+</span><span class=P>        parameter TWPRE            =    0.35; </span><span class=P>// tWPRE  tCK   DQS Write Preamble
+</span><span class=P>        parameter TWPST            =    0.40; </span><span class=P>// tWPST  tCK   DQS Write Postamble
+</span><span class=P>        parameter TDQSS            =    0.25; </span><span class=P>// tDQSS  tCK   Rising clock edge to DQS/DQS# latching transition
+</span>        <span class=P>// Command and Address
+</span><span class=P>        parameter TIPW             =     0.6; </span><span class=P>// tIPW   tCK   Control and Address input Pulse Width
+</span><span class=P>        parameter TCCD             =       2; </span><span class=P>// tCCD   tCK   Cas to Cas command delay
+</span><span class=P>        parameter TRAS_MIN         =   40000; </span><span class=P>// tRAS   ps    Minimum Active to Precharge command time
+</span><span class=P>        parameter TRAS_MAX         =70000000; </span><span class=P>// tRAS   ps    Maximum Active to Precharge command time
+</span><span class=P>        parameter TRTP             =    7500; </span><span class=P>// tRTP   ps    Read to Precharge command delay
+</span><span class=P>        parameter TWR              =   15000; </span><span class=P>// tWR    ps    Write recovery time
+</span><span class=P>        parameter TMRD             =       2; </span><span class=P>// tMRD   tCK   Load Mode Register command cycle time
+</span><span class=P>        parameter TDLLK            =     200; </span><span class=P>// tDLLK  tCK   DLL locking time
+</span>        <span class=P>// Refresh
+</span><span class=P>        parameter TRFC_MIN         =  127500; </span><span class=P>// tRFC   ps    Refresh to Refresh Command interval minimum value
+</span><span class=P>        parameter TRFC_MAX         =70000000; </span><span class=P>// tRFC   ps    Refresh to Refresh Command Interval maximum value
+</span>        <span class=P>// Self Refresh
+</span><span class=P>        parameter TXSNR   = TRFC_MIN + 10000; </span><span class=P>// tXSNR  ps    Exit self refesh to a non-read command
+</span><span class=P>        parameter TXSRD            =     200; </span><span class=P>// tXSRD  tCK   Exit self refresh to a read command
+</span><span class=P>        parameter TISXR            =     TIS; </span><span class=P>// tISXR  ps    CKE setup time during self refresh exit.
+</span>        <span class=P>// ODT
+</span><span class=P>        parameter TAOND            =       2; </span><span class=P>// tAOND  tCK   ODT turn-on delay
+</span><span class=P>        parameter TAOFD            =     2.5; </span><span class=P>// tAOFD  tCK   ODT turn-off delay
+</span><span class=P>        parameter TAONPD           =    2000; </span><span class=P>// tAONPD ps    ODT turn-on (precharge power-down mode)
+</span><span class=P>        parameter TAOFPD           =    2000; </span><span class=P>// tAOFPD ps    ODT turn-off (precharge power-down mode)
+</span><span class=P>        parameter TMOD             =   12000; </span><span class=P>// tMOD   ps    ODT enable in EMR to ODT pin transition
+</span>        <span class=P>// Power Down
+</span><span class=P>        parameter TCKE             =       3; </span><span class=P>// tCKE   tCK   CKE minimum high or low pulse width
+</span>
+        <span class=P>// Size Parameters based on Part Width
+</span>
+<span class=P>    `ifdef x4
+</span><span class=P>        parameter ADDR_BITS        =      14; </span><span class=P>// Address Bits
+</span><span class=P>        parameter ROW_BITS         =      14; </span><span class=P>// Number of Address bits
+</span><span class=P>        parameter COL_BITS         =      11; </span><span class=P>// Number of Column bits
+</span><span class=P>        parameter DM_BITS          =       1; </span><span class=P>// Number of Data Mask bits
+</span></pre>
+<center><table class=NB cols=3 ><tr><td align="center" width="33%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='ddr2_model_parameters.vh.p2.html';"><a target="_top" href="ddr2_model_parameters.vh.p2.html">Next</a></td><td align="center" width="33%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';" ><font color="#808080">1</font></td><td align="center" width="33%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='ddr2_model_parameters.vh.p2.html';"><a target="_top" href="ddr2_model_parameters.vh.p2.html">2</a></td></tr></table></center>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<script language="JavaScript"type="text/javascript"><!--
+function next_page() { return "ddr2_model_parameters.vh.p2.html"; }
+function first_page() { return ""; }
+var extra_info = [
+[]
+];
+disabled=0;
+// -->
+</script>
+<hr>
+<table>
+ <tr><td><i>This page:</i></td>
+  <td><i>Created:</i></td><td><i>Fri Jun 16 14:01:27 2023</i></td></tr>
+<tr>
+ <td> </td>
+ <td><i>From:</i></td><td><i>
+./ddr2_model_parameters.vh</i></td></tr>
+</table>
+<hr>
+<table width="100%"><tr><td><i>Verilog converted to html by  <a target="_top" href="http://www.burbleland.com/v2html/v2html.html">  v2html 7.30.1.3</a> 
+ (written by <a href="mailto:v2html730@burbleland.com">Costas Calamvokis</a>).</i></td><td align="right"><b><a href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></b></td></tr></table><table height="90%"><tr><td></td></tr></table>
+</body>
+</html>

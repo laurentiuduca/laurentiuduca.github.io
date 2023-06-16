@@ -1,0 +1,1284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<title>./top.v</title>
+<link rel="Stylesheet" title="v2html stylesheet" media="Screen" href="v2html.css">
+</head>
+<script language="JavaScript" type="text/javascript"><!--
+var agt=navigator.userAgent.toLowerCase(); 
+var is_nav  = ((agt.indexOf('mozilla')!=-1) &&
+(agt.indexOf('spoofer')==-1) &&
+(agt.indexOf('compatible') == -1) &&
+(agt.indexOf('opera')==-1) &&
+(agt.indexOf('webtv')==-1)); 
+var is_major = parseInt(navigator.appVersion); 
+var is_nav4up = (is_nav && (is_major >= 4)); 
+var is_ie     = (agt.indexOf("msie") != -1); 
+var is_ie4up  = (is_ie  && (is_major >= 4)); 
+var is_nav5up = (is_nav && (is_major >= 5));
+var dirSep = (window.location.pathname.indexOf('\\') != -1) ? '\\' : '/' ;
+function setbuttons (wndw) {
+var i;
+var sl=wndw.loc[ wndw.document.forms[0].elements[0].selectedIndex ];
+for (i=0;i<sl.length;i++) {
+if(sl[i]) wndw.document.images[i].src='v2html-b1.gif';
+else      wndw.document.images[i].src='v2html-b2.gif';
+}
+if ( wndw.document.forms[0].elements[0].options[ 
+wndw.document.forms[0].elements[0].selectedIndex ].text != '-') {
+wndw.document.images[i  ].src='v2html-b1.gif';
+wndw.document.images[i+1].src='v2html-b1.gif';
+}
+else {
+wndw.document.images[i  ].src='v2html-b2.gif';
+wndw.document.images[i+1].src='v2html-b2.gif';
+}
+}
+// Unindented and uncommented to save spave - look in v2html for a prettier version
+var disabled=1;
+if (!is_nav4up) {
+var event=false; 
+}
+var last_link=0;     
+var last_class=null; 
+function qs(e,t,extra_info_index) {
+var inc=0,bnum=0,i,j;
+if (disabled) return false;
+var sig_buttons = [ "Definition" , "Local Driver" , 
+"Up to Input Driver" , "Find Source" , "Index"];
+if (is_nav4up || is_ie4up) {
+if (((e.which==2) && (!(e.modifiers&Event.SHIFT_MASK))) ||
+((e.which==1) &&  (e.modifiers&Event.CONTROL_MASK)))   inc = 1;
+else if (((e.which==2) && (e.modifiers&Event.SHIFT_MASK)) ||
+((e.which==1) && (e.modifiers&Event.SHIFT_MASK))) inc = -1;
+if (inc == 0 && extra_info_index == 0) { 
+return true;  
+}
+var linkText = is_nav4up ? t.text : t.innerText;
+var linkY    = is_nav4up && ! is_nav5up ? t.y    : t.offsetTop;
+window.status="Searching...";
+if ((last_link==-1) || (document.links[last_link]!=t)) 
+for (last_link=0;last_link<document.links.length;last_link++) 
+if (document.links[last_link] == t)  
+break;
+if (inc != 0) { 
+return search(linkText,linkY,last_link,inc,1);
+}
+else { 
+window.status="";
+extra_info_index--; 
+if (extra_info[extra_info_index][0] != 'S') { 
+return true;
+}
+var w = window.open('','SignalPopUp','width=200,height=235');
+if (null != w.document.forms[0]) {
+if ((window.location.pathname.substring(0,window.location.pathname.lastIndexOf(dirSep)))!=
+(w.pn.substring(0,w.pn.lastIndexOf(dirSep)))) {
+w.close();
+w = window.open('','SignalPopUp','width=200,height=235');
+}
+}
+w.focus(); 
+if (null == w.document.forms[0]) { 
+var Text = '<html><head></head>';
+if (is_nav4up) { 
+w.loc = new Array(10);
+w.sel = null;
+w.pn  = window.location.pathname;
+}
+else {     
+Text += '<script>var loc = new Array(10);<\/script>\n';
+Text += '<script>var sel;<\/script>\n';
+Text += '<script>var pn = opener.location.pathname;<\/script>\n';
+}
+Text += '<body bgcolor="white">\n';
+Text += '<form>';
+Text += '  <select onchange="opener.setbuttons(window);">\n';
+Text += '  <option>---------------------------</option>\n';
+for (j=0;j<9;j++) Text += '  <option>-</option>\n';
+Text += '  </select>\n';
+Text += '</form>';
+Text += '<table cellspacing=0 cellpadding=0>\n';
+for (var i=0;i<(extra_info[extra_info_index].length-1);i++) {
+Text += hbutton(sig_buttons[i], 
+'opener.location=loc[sel.selectedIndex]['+i+'];',
+bnum++);
+}
+Text += hbutton("Search Backwards", 
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link,-1,0);',bnum++);
+Text += hbutton("Search Forwards",
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link, 1,0);',bnum++);
+Text += hbutton("Close","window.close();",bnum++);
+Text += '</table>\n';
+Text += '</body></html>\n';
+w.document.open();
+w.document.write(Text);
+w.document.close();
+w.document.forms[0].elements[0].options[0].text  = linkText;
+w.sel = w.document.forms[0].elements[0]; 
+for (j=0;j<10;j++) w.loc[j] = new Array(sig_buttons.length);  
+copy_into_loc0(w,extra_info_index);
+}
+else {
+var opts = w.document.forms[0].elements[0].options;
+if ( opts.length<10 ) { 
+w.loc[opts.length] = new Array;
+opts.length++; 
+}
+for (i=opts.length-2;i>=0;i--) {
+opts[i+1].text=opts[i].text;
+for (var j=0;j<w.loc[i].length;j++) w.loc[i+1][j] = w.loc[i][j];
+}
+opts[0].text  = linkText;
+copy_into_loc0(w,extra_info_index);
+}
+return false; 
+}
+}
+return true;
+}
+function hbutton (text,action,bnum) {
+return '  <tr><td><a href="" '+
+'onmousedown="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b3.gif\';" '+
+'onmouseup="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b1.gif\';" '+
+'onclick="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+action + 
+' return false;">'+
+'<img border=0 src="v2html-b1.gif"></a></td>' +
+'<td style="font-family:sans-serif; font-weight:bold; font-size:14px;"> '+text+'</td></tr>\n';
+}
+function copy_into_loc0 (w,extra_info_index) {
+for (var i=1;i<extra_info[extra_info_index].length;i++) {
+w.loc[0][i-1] = extra_info[extra_info_index][i];
+}
+w.document.forms[0].elements[0].selectedIndex=1;
+w.document.forms[0].elements[0].selectedIndex=0;
+setbuttons(w);
+}
+function search(text,y,i,inc,relative) {
+var nextpage,wrappage,linkText,linkY;
+window.status="Searching...";
+if (last_class) document.links[i].className=last_class;
+while (1) {
+for (i+=inc;i<document.links.length && i>=0;i+=inc) {
+linkText = is_nav4up ? document.links[i].text : document.links[i].innerText;
+linkY    = is_nav4up && ! is_nav5up ? document.links[i].y    : document.links[i].offsetTop;
+if ((linkText == text) && (linkY != y)) {
+window.status="";
+if (is_nav4up) 
+if (relative) window.scrollBy(0,linkY - y);
+else          window.scrollTo(0,linkY); 
+else if (is_ie4up)
+document.links[i].scrollIntoView(true); 
+last_link=i;
+last_class=document.links[i].className;
+document.links[i].className='HI';
+return false;
+}
+}
+nextpage = (inc==1) ? next_page() : prev_page();
+wrappage = (inc==1) ? first_page() : last_page();
+if (nextpage!="" || wrappage!="") {
+if (nextpage=="") { 
+if (!confirm(text + " not found. Search again from "+((inc==1)?"first":"last")+" page?"))
+return false;
+nextpage=wrappage;
+}
+location=nextpage+ "?" + escape(text) + "&" + ( y - window.pageYOffset ) + "&" + inc;
+return false;
+}
+if (confirm(text + " not found. Search again from "+((inc==1)?"start":"end")+"?")) {
+if (inc==1) i=-1;
+else i=document.links.length;
+} else return false;
+}
+return true;
+}
+function loadqs() {
+var opt=location.search, text="", s="", y=0, si=0, inc=1;
+if (opt.length==0) return true;  
+for (var i=1;i<opt.length;i++) { 
+if (opt.charAt(i) != "&") 
+s += opt.charAt(i);
+else {
+if (text=="") text=unescape(s);
+else             y=s;
+s="";
+}
+}
+if (text=="") return true;
+if (s == "-1") { si=document.links.length-1; inc=-1; }
+window.scrollTo(0,0);
+search(text,y,si,inc);
+return true;
+}
+// -->
+</script>
+<body onload='loadqs();'>
+<script language="JavaScript"type="text/javascript"><!--
+function prev_page() { return ""; }
+function last_page() { return ""; }
+// -->
+</script>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<pre>
+<span class=C>// author: Laurentiu-Cristian Duca, date: 2023-05-25
+</span><span class=C>// - dual-core support
+</span><span class=C>// spdx license identifier MIT
+</span><span class=C>/* Modified by Laurentiu-Cristian Duca, 2021-12-20
+ * - memory model similar to dram memory controller with DRAM_SIM
+ * or simple memory model
+ * - debug with RAM_DEBUG
+ * - allow ICARUS simulation
+ */</span>
+<span class=C>/**************************************************************************************************/</span>
+<span class=C>/**** RVSoC (Mini Kuroda/RISC-V)                       since 2018-08-07   ArchLab. TokyoTech   ****/</span>
+<span class=C>/**** top module and simulation module v0.01                                                   ****/</span>
+<span class=C>/**************************************************************************************************/</span>
+<span class=M>`default_nettype</span> none
+<span class=C>/**************************************************************************************************/</span>
+<span class=M>`include</span> <a  onClick="return qs(event,this,0)"  class=S href="define.vh.html">&quot;define.vh&quot;</a>
+
+<span class=C>/**************************************************************************************************/</span>
+<span class=P>`ifdef ICARUS
+</span><span class=P>module m_topsim();
+</span><span class=P>    reg CLK = 0;
+</span><span class=P>    reg RST_X;
+</span>
+<span class=P>    always #50 CLK = ~CLK;
+</span>
+<span class=P>    initial begin
+</span><span class=P>        #50  RST_X = 0;
+</span><span class=P>        #300 RST_X = 1;
+</span><span class=P>    end
+</span>
+<span class=P>    initial begin
+</span><span class=P>	    $dumpfile(</span><span class=P>&quot;signals.vcd&quot;</span><span class=P>);
+</span><span class=P>        $dumpvars(0, m_topsim);
+</span><span class=P>    end
+</span>
+<span class=M>`else</span>
+<a name="m_topsim"></a><span class=K>module</span> <span class=MM>m_topsim</span><a  href="hierarchy-m.html#m_topsim"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>, <a  onClick="return qs(event,this,2)"  class=SI href="#38">RST_X</a>);
+<a name="38"></a>    <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>, <a  onClick="return qs(event,this,2)"  class=SI href="#38">RST_X</a>;
+<span class=M>`endif</span>
+
+<a name="m_topsim_core0"></a>    <a  onClick="return qs(event,this,0)"  class=MM href="cpummusim.v.html#m_cpummu">m_cpummu</a> core0(
+<a name="42"></a>        <span class=SI>.CLK</span>(<a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>), <span class=SI>.RST_X</span>(<a  onClick="return qs(event,this,2)"  class=SI href="#38">RST_X</a>), <span class=SI>.w_hart_id</span>(0), <span class=SI>.w_ipi</span>(<a  onClick="return qs(event,this,3)"  class=SW href="#196">bus_ipi</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#113">.w_core_ir</a>(<a  onClick="return qs(event,this,4)"  class=SW href="#42">bus_core_ir_0</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#116">.w_state</a>(<a  onClick="return qs(event,this,5)"  class=SW href="#42">bus_cpustate0</a>),
+<a name="43"></a>        <span class=SI>.w_init_done</span>(<a  onClick="return qs(event,this,6)"  class=SW href="#493">w_init_done</a>), <span class=SI>.w_tx_ready</span>(<a  onClick="return qs(event,this,7)"  class=SW href="#307">w_tx_ready</a>),
+<a name="44"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#71">.w_mem_paddr</a>(<a  onClick="return qs(event,this,8)"  class=SW href="#44">bus_mem_paddr0</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#72">.w_mem_we</a>(<a  onClick="return qs(event,this,9)"  class=SW href="#44">bus_mem_we0</a>),
+<a name="45"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#95">.w_data_wdata</a>(<a  onClick="return qs(event,this,10)"  class=SW href="#45">bus_data_wdata0</a>), <span class=SI>.w_data_data</span>(<a  onClick="return qs(event,this,11)"  class=SW href="#79">bus_data_data0</a>),
+<a name="46"></a>        <span class=SI>.w_mtime</span>(<a  onClick="return qs(event,this,12)"  class=SW href="#124">w_mtime</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#102">.w_mtimecmp</a>(<a  onClick="return qs(event,this,13)"  class=SW href="#46">bus_mtimecmp0</a>), <span class=SI>.w_wmtimecmp</span>(<a  onClick="return qs(event,this,14)"  class=SW href="#80">bus_wmtimecmp0</a>), <span class=SI>.w_clint_we</span>(<a  onClick="return qs(event,this,15)"  class=SW href="#80">bus_clint_we0</a>),
+<a name="47"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#20">.w_pw_state</a>(<a  onClick="return qs(event,this,16)"  class=SW href="#47">bus_pw_state0</a>), 
+<a name="48"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#110">.w_tlb_req</a>(<a  onClick="return qs(event,this,17)"  class=SW href="#48">bus_tlb_req0</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#73">.w_tlb_busy</a>(<a  onClick="return qs(event,this,18)"  class=SW href="#48">bus_tlb_busy0</a>),
+<a name="49"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#105">.w_mip</a>(<a  onClick="return qs(event,this,19)"  class=SW href="#49">bus_mip0</a>), <span class=SI>.w_wmip</span>(<a  onClick="return qs(event,this,20)"  class=SW href="#82">bus_wmip0</a>), <span class=SI>.w_plic_we</span>(<a  onClick="return qs(event,this,21)"  class=SW href="#82">bus_plic_we0</a>),
+<a name="50"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#74">.w_dram_addr</a>(<a  onClick="return qs(event,this,22)"  class=SW href="#50">bus_dram_addr0</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#75">.w_dram_wdata</a>(<a  onClick="return qs(event,this,23)"  class=SW href="#50">bus_dram_wdata0</a>), <span class=SI>.w_dram_odata</span>(<a  onClick="return qs(event,this,24)"  class=SW href="#83">bus_dram_odata0</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#77">.w_dram_we_t</a>(<a  onClick="return qs(event,this,25)"  class=SW href="#50">bus_dram_we_t0</a>),
+<a name="51"></a>        <span class=SI>.w_dram_busy</span>(<a  onClick="return qs(event,this,26)"  class=SW href="#84">bus_dram_busy0</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#79">.w_dram_ctrl</a>(<a  onClick="return qs(event,this,27)"  class=SW href="#51">bus_dram_ctrl0</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#80">.w_dram_le</a>(<a  onClick="return qs(event,this,28)"  class=SW href="#51">bus_dram_le0</a>)
+    );
+
+<a name="m_topsim_core1"></a>     <a  onClick="return qs(event,this,0)"  class=MM href="cpummusim.v.html#m_cpummu">m_cpummu</a> core1(
+<a name="55"></a>        <span class=SI>.CLK</span>(<a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>), <span class=SI>.RST_X</span>(<a  onClick="return qs(event,this,2)"  class=SI href="#38">RST_X</a>), <span class=SI>.w_hart_id</span>(1), <span class=SI>.w_ipi</span>(<a  onClick="return qs(event,this,3)"  class=SW href="#196">bus_ipi</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#113">.w_core_ir</a>(<a  onClick="return qs(event,this,29)"  class=SW href="#55">bus_core_ir_1</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#116">.w_state</a>(<a  onClick="return qs(event,this,30)"  class=SW href="#55">bus_cpustate1</a>),
+        <span class=SI>.w_init_done</span>(<a  onClick="return qs(event,this,6)"  class=SW href="#493">w_init_done</a>), <span class=SI>.w_tx_ready</span>(<a  onClick="return qs(event,this,7)"  class=SW href="#307">w_tx_ready</a>),
+<a name="57"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#71">.w_mem_paddr</a>(<a  onClick="return qs(event,this,31)"  class=SW href="#57">bus_mem_paddr1</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#72">.w_mem_we</a>(<a  onClick="return qs(event,this,32)"  class=SW href="#57">bus_mem_we1</a>),
+<a name="58"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#95">.w_data_wdata</a>(<a  onClick="return qs(event,this,33)"  class=SW href="#58">bus_data_wdata1</a>), <span class=SI>.w_data_data</span>(<a  onClick="return qs(event,this,34)"  class=SW href="#88">bus_data_data1</a>),
+<a name="59"></a>        <span class=SI>.w_mtime</span>(<a  onClick="return qs(event,this,12)"  class=SW href="#124">w_mtime</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#102">.w_mtimecmp</a>(<a  onClick="return qs(event,this,35)"  class=SW href="#59">bus_mtimecmp1</a>), <span class=SI>.w_wmtimecmp</span>(<a  onClick="return qs(event,this,36)"  class=SW href="#89">bus_wmtimecmp1</a>), <span class=SI>.w_clint_we</span>(<a  onClick="return qs(event,this,37)"  class=SW href="#89">bus_clint_we1</a>),
+<a name="60"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#20">.w_pw_state</a>(<a  onClick="return qs(event,this,38)"  class=SW href="#60">bus_pw_state1</a>), 
+<a name="61"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#110">.w_tlb_req</a>(<a  onClick="return qs(event,this,39)"  class=SW href="#61">bus_tlb_req1</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#73">.w_tlb_busy</a>(<a  onClick="return qs(event,this,40)"  class=SW href="#61">bus_tlb_busy1</a>),
+<a name="62"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#105">.w_mip</a>(<a  onClick="return qs(event,this,41)"  class=SW href="#62">bus_mip1</a>), <span class=SI>.w_wmip</span>(<a  onClick="return qs(event,this,42)"  class=SW href="#91">bus_wmip1</a>), <span class=SI>.w_plic_we</span>(<a  onClick="return qs(event,this,43)"  class=SW href="#91">bus_plic_we1</a>),
+<a name="63"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#74">.w_dram_addr</a>(<a  onClick="return qs(event,this,44)"  class=SW href="#63">bus_dram_addr1</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#75">.w_dram_wdata</a>(<a  onClick="return qs(event,this,45)"  class=SW href="#63">bus_dram_wdata1</a>), <span class=SI>.w_dram_odata</span>(<a  onClick="return qs(event,this,46)"  class=SW href="#92">bus_dram_odata1</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#77">.w_dram_we_t</a>(<a  onClick="return qs(event,this,47)"  class=SW href="#63">bus_dram_we_t1</a>),
+<a name="64"></a>        <span class=SI>.w_dram_busy</span>(<a  onClick="return qs(event,this,48)"  class=SW href="#93">bus_dram_busy1</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#79">.w_dram_ctrl</a>(<a  onClick="return qs(event,this,49)"  class=SW href="#64">bus_dram_ctrl1</a>), <a  onClick="return qs(event,this,0)"  class=SO href="cpummusim.v.html#80">.w_dram_le</a>(<a  onClick="return qs(event,this,50)"  class=SW href="#64">bus_dram_le1</a>)
+    );   
+    
+<a name="m_topsim_ba"></a><a name="67"></a>    <a  onClick="return qs(event,this,0)"  class=MM href="busarbiter.v.html#busarbiter">busarbiter</a> ba(<span class=SI>.CLK</span>(<a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>), <span class=SI>.RST_X</span>(<a  onClick="return qs(event,this,2)"  class=SI href="#38">RST_X</a>), <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#43">.w_grant</a>(<a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a>),
+<a name="68"></a>        <span class=SI>.w_init_done</span>(<a  onClick="return qs(event,this,6)"  class=SW href="#493">w_init_done</a>), <span class=SI>.w_tx_ready</span>(<a  onClick="return qs(event,this,7)"  class=SW href="#307">w_tx_ready</a>),
+<a name="69"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#140">.w_mem_paddr</a>(<a  onClick="return qs(event,this,52)"  class=SW href="#69">w_mem_paddr</a>), <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#141">.w_mem_we</a>(<a  onClick="return qs(event,this,53)"  class=SW href="#69">w_mem_we</a>),
+<a name="70"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#142">.w_data_wdata</a>(<a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>), <span class=SI>.w_data_data</span>(<a  onClick="return qs(event,this,55)"  class=SW href="#162">w_data_data</a>),
+<a name="71"></a>        <span class=SI>.w_mtime</span>(<a  onClick="return qs(event,this,12)"  class=SW href="#124">w_mtime</a>), <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#143">.w_mtimecmp</a>(<a  onClick="return qs(event,this,56)"  class=SW href="#71">w_mtimecmp</a>), <span class=SI>.w_wmtimecmp</span>(<a  onClick="return qs(event,this,57)"  class=SW href="#297">w_wmtimecmp</a>), <span class=SI>.w_clint_we</span>(<a  onClick="return qs(event,this,58)"  class=SW href="#301">w_clint_we</a>),
+<a name="72"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#144">.w_tlb_req</a>(<a  onClick="return qs(event,this,59)"  class=SW href="#72">w_tlb_req</a>), <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#145">.w_tlb_busy</a>(<a  onClick="return qs(event,this,60)"  class=SW href="#72">w_tlb_busy</a>),
+<a name="73"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#146">.w_mip</a>(<a  onClick="return qs(event,this,61)"  class=SW href="#73">w_mip</a>), <span class=SI>.w_wmip</span>(<a  onClick="return qs(event,this,62)"  class=SW href="#213">w_wmip</a>), <span class=SI>.w_plic_aces</span>(<a  onClick="return qs(event,this,63)"  class=SW href="#183">w_plic_aces</a>), <span class=SI>.r_plic_aces_t</span>(<a  onClick="return qs(event,this,64)"  class=SW href="#193">r_plic_aces_t</a>), <span class=SI>.w_plic_we</span>(<a  onClick="return qs(event,this,65)"  class=SW href="#212">w_plic_we</a>),
+<a name="74"></a>        <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#147">.w_dram_addr</a>(<a  onClick="return qs(event,this,66)"  class=SW href="#74">w_dram_addr</a>), <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#148">.w_dram_wdata</a>(<a  onClick="return qs(event,this,67)"  class=SW href="#74">w_dram_wdata</a>), <span class=SI>.w_dram_odata</span>(<a  onClick="return qs(event,this,68)"  class=SW href="#648">w_dram_odata</a>), <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#149">.w_dram_we_t</a>(<a  onClick="return qs(event,this,69)"  class=SW href="#74">w_dram_we_t</a>),
+<a name="75"></a>        <span class=SI>.w_dram_busy</span>(<a  onClick="return qs(event,this,70)"  class=SW href="#649">w_dram_busy</a>), <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#150">.w_dram_ctrl</a>(<a  onClick="return qs(event,this,71)"  class=SW href="#75">w_dram_ctrl</a>), <a  onClick="return qs(event,this,0)"  class=SO href="busarbiter.v.html#151">.w_dram_le</a>(<a  onClick="return qs(event,this,72)"  class=SW href="#75">w_dram_le</a>),
+
+<a name="77"></a>        <span class=SI>.bus_core_ir0</span>(<a  onClick="return qs(event,this,4)"  class=SW href="#42">bus_core_ir_0</a>), <span class=SI>.bus_cpustate0</span>(<a  onClick="return qs(event,this,5)"  class=SW href="#42">bus_cpustate0</a>),
+<a name="78"></a>        <span class=SI>.bus_mem_paddr0</span>(<a  onClick="return qs(event,this,8)"  class=SW href="#44">bus_mem_paddr0</a>), <span class=SI>.bus_mem_we0</span>(<a  onClick="return qs(event,this,9)"  class=SW href="#44">bus_mem_we0</a>),
+<a name="79"></a>        <span class=SI>.bus_data_wdata0</span>(<a  onClick="return qs(event,this,10)"  class=SW href="#45">bus_data_wdata0</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#106">.bus_data_data0</a>(<a  onClick="return qs(event,this,11)"  class=SW href="#45">bus_data_data0</a>),
+<a name="80"></a>        <span class=SI>.bus_mtimecmp0</span>(<a  onClick="return qs(event,this,13)"  class=SW href="#46">bus_mtimecmp0</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#107">.bus_wmtimecmp0</a>(<a  onClick="return qs(event,this,14)"  class=SW href="#46">bus_wmtimecmp0</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#108">.bus_clint_we0</a>(<a  onClick="return qs(event,this,15)"  class=SW href="#46">bus_clint_we0</a>),
+<a name="81"></a>        <span class=SI>.bus_pw_state0</span>(<a  onClick="return qs(event,this,16)"  class=SW href="#47">bus_pw_state0</a>), <span class=SI>.bus_tlb_req0</span>(<a  onClick="return qs(event,this,17)"  class=SW href="#48">bus_tlb_req0</a>), <span class=SI>.bus_tlb_busy0</span>(<a  onClick="return qs(event,this,18)"  class=SW href="#48">bus_tlb_busy0</a>),
+<a name="82"></a>        <span class=SI>.bus_mip0</span>(<a  onClick="return qs(event,this,19)"  class=SW href="#49">bus_mip0</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#109">.bus_wmip0</a>(<a  onClick="return qs(event,this,20)"  class=SW href="#49">bus_wmip0</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#110">.bus_plic_we0</a>(<a  onClick="return qs(event,this,21)"  class=SW href="#49">bus_plic_we0</a>),
+<a name="83"></a>        <span class=SI>.bus_dram_addr0</span>(<a  onClick="return qs(event,this,22)"  class=SW href="#50">bus_dram_addr0</a>), <span class=SI>.bus_dram_wdata0</span>(<a  onClick="return qs(event,this,23)"  class=SW href="#50">bus_dram_wdata0</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#111">.bus_dram_odata0</a>(<a  onClick="return qs(event,this,24)"  class=SW href="#50">bus_dram_odata0</a>), <span class=SI>.bus_dram_we_t0</span>(<a  onClick="return qs(event,this,25)"  class=SW href="#50">bus_dram_we_t0</a>),
+<a name="84"></a>        <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#112">.bus_dram_busy0</a>(<a  onClick="return qs(event,this,26)"  class=SW href="#51">bus_dram_busy0</a>), <span class=SI>.bus_dram_ctrl0</span>(<a  onClick="return qs(event,this,27)"  class=SW href="#51">bus_dram_ctrl0</a>), <span class=SI>.bus_dram_le0</span>(<a  onClick="return qs(event,this,28)"  class=SW href="#51">bus_dram_le0</a>),
+
+<a name="86"></a>        <span class=SI>.bus_core_ir1</span>(<a  onClick="return qs(event,this,29)"  class=SW href="#55">bus_core_ir_1</a>), <span class=SI>.bus_cpustate1</span>(<a  onClick="return qs(event,this,30)"  class=SW href="#55">bus_cpustate1</a>),
+<a name="87"></a>        <span class=SI>.bus_mem_paddr1</span>(<a  onClick="return qs(event,this,31)"  class=SW href="#57">bus_mem_paddr1</a>), <span class=SI>.bus_mem_we1</span>(<a  onClick="return qs(event,this,32)"  class=SW href="#57">bus_mem_we1</a>),
+<a name="88"></a>        <span class=SI>.bus_data_wdata1</span>(<a  onClick="return qs(event,this,33)"  class=SW href="#58">bus_data_wdata1</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#114">.bus_data_data1</a>(<a  onClick="return qs(event,this,34)"  class=SW href="#58">bus_data_data1</a>),
+<a name="89"></a>        <span class=SI>.bus_mtimecmp1</span>(<a  onClick="return qs(event,this,35)"  class=SW href="#59">bus_mtimecmp1</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#115">.bus_wmtimecmp1</a>(<a  onClick="return qs(event,this,36)"  class=SW href="#59">bus_wmtimecmp1</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#116">.bus_clint_we1</a>(<a  onClick="return qs(event,this,37)"  class=SW href="#59">bus_clint_we1</a>),
+<a name="90"></a>        <span class=SI>.bus_pw_state1</span>(<a  onClick="return qs(event,this,38)"  class=SW href="#60">bus_pw_state1</a>), <span class=SI>.bus_tlb_req1</span>(<a  onClick="return qs(event,this,39)"  class=SW href="#61">bus_tlb_req1</a>), <span class=SI>.bus_tlb_busy1</span>(<a  onClick="return qs(event,this,40)"  class=SW href="#61">bus_tlb_busy1</a>),
+<a name="91"></a>        <span class=SI>.bus_mip1</span>(<a  onClick="return qs(event,this,41)"  class=SW href="#62">bus_mip1</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#117">.bus_wmip1</a>(<a  onClick="return qs(event,this,42)"  class=SW href="#62">bus_wmip1</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#118">.bus_plic_we1</a>(<a  onClick="return qs(event,this,43)"  class=SW href="#62">bus_plic_we1</a>),
+<a name="92"></a>        <span class=SI>.bus_dram_addr1</span>(<a  onClick="return qs(event,this,44)"  class=SW href="#63">bus_dram_addr1</a>), <span class=SI>.bus_dram_wdata1</span>(<a  onClick="return qs(event,this,45)"  class=SW href="#63">bus_dram_wdata1</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#119">.bus_dram_odata1</a>(<a  onClick="return qs(event,this,46)"  class=SW href="#63">bus_dram_odata1</a>), <span class=SI>.bus_dram_we_t1</span>(<a  onClick="return qs(event,this,47)"  class=SW href="#63">bus_dram_we_t1</a>),
+<a name="93"></a>        <a  onClick="return qs(event,this,0)"  class=SOR href="busarbiter.v.html#120">.bus_dram_busy1</a>(<a  onClick="return qs(event,this,48)"  class=SW href="#64">bus_dram_busy1</a>), <span class=SI>.bus_dram_ctrl1</span>(<a  onClick="return qs(event,this,49)"  class=SW href="#64">bus_dram_ctrl1</a>), <span class=SI>.bus_dram_le1</span>(<a  onClick="return qs(event,this,50)"  class=SW href="#64">bus_dram_le1</a>)
+    );
+
+    <span class=C>/**********************************************************************************************/</span>
+    <span class=C>// bus interface
+</span>    <span class=K>wire</span> <a  onClick="return qs(event,this,6)"  class=SW href="#43">w_init_done</a>;
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,4)"  class=SW href="#42">bus_core_ir_0</a>, <a  onClick="return qs(event,this,29)"  class=SW href="#55">bus_core_ir_1</a>;
+    <span class=K>wire</span> [3:0] <a  onClick="return qs(event,this,5)"  class=SW href="#42">bus_cpustate0</a>, <a  onClick="return qs(event,this,30)"  class=SW href="#55">bus_cpustate1</a>;
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,52)"  class=SW href="#69">w_mem_paddr</a>, <a  onClick="return qs(event,this,8)"  class=SW href="#44">bus_mem_paddr0</a>, <a  onClick="return qs(event,this,31)"  class=SW href="#57">bus_mem_paddr1</a>;
+    <span class=K>wire</span> <a  onClick="return qs(event,this,53)"  class=SW href="#69">w_mem_we</a>, <a  onClick="return qs(event,this,9)"  class=SW href="#44">bus_mem_we0</a>, <a  onClick="return qs(event,this,32)"  class=SW href="#57">bus_mem_we1</a>;
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>, <a  onClick="return qs(event,this,10)"  class=SW href="#45">bus_data_wdata0</a>, <a  onClick="return qs(event,this,33)"  class=SW href="#58">bus_data_wdata1</a>;
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,55)"  class=SW href="#70">w_data_data</a>, <a  onClick="return qs(event,this,11)"  class=SW href="#45">bus_data_data0</a>, <a  onClick="return qs(event,this,34)"  class=SW href="#58">bus_data_data1</a>;
+    <span class=K>wire</span> [63:0] <a  onClick="return qs(event,this,56)"  class=SW href="#71">w_mtimecmp</a>, <a  onClick="return qs(event,this,57)"  class=SW href="#71">w_wmtimecmp</a>, <a  onClick="return qs(event,this,13)"  class=SW href="#46">bus_mtimecmp0</a>, <a  onClick="return qs(event,this,14)"  class=SW href="#46">bus_wmtimecmp0</a>, <a  onClick="return qs(event,this,35)"  class=SW href="#59">bus_mtimecmp1</a>, <a  onClick="return qs(event,this,36)"  class=SW href="#59">bus_wmtimecmp1</a>;
+    <span class=K>wire</span> <a  onClick="return qs(event,this,58)"  class=SW href="#71">w_clint_we</a>, <a  onClick="return qs(event,this,15)"  class=SW href="#46">bus_clint_we0</a>, <a  onClick="return qs(event,this,37)"  class=SW href="#59">bus_clint_we1</a>;
+<a name="107"></a>    <span class=K>wire</span> [2:0]  <a  onClick="return qs(event,this,73)"  class=SW href="#107">w_pw_state</a>, <a  onClick="return qs(event,this,16)"  class=SW href="#47">bus_pw_state0</a>, <a  onClick="return qs(event,this,38)"  class=SW href="#60">bus_pw_state1</a>;
+    <span class=K>wire</span> [1:0]  <a  onClick="return qs(event,this,59)"  class=SW href="#72">w_tlb_req</a>, <a  onClick="return qs(event,this,17)"  class=SW href="#48">bus_tlb_req0</a>, <a  onClick="return qs(event,this,39)"  class=SW href="#61">bus_tlb_req1</a>;
+    <span class=K>wire</span>        <a  onClick="return qs(event,this,60)"  class=SW href="#72">w_tlb_busy</a>, <a  onClick="return qs(event,this,18)"  class=SW href="#48">bus_tlb_busy0</a>, <a  onClick="return qs(event,this,40)"  class=SW href="#61">bus_tlb_busy1</a>;
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,61)"  class=SW href="#73">w_mip</a>, <a  onClick="return qs(event,this,62)"  class=SW href="#73">w_wmip</a>, <a  onClick="return qs(event,this,19)"  class=SW href="#49">bus_mip0</a>, <a  onClick="return qs(event,this,20)"  class=SW href="#49">bus_wmip0</a>, <a  onClick="return qs(event,this,41)"  class=SW href="#62">bus_mip1</a>, <a  onClick="return qs(event,this,42)"  class=SW href="#62">bus_wmip1</a>;
+    <span class=K>wire</span> <a  onClick="return qs(event,this,65)"  class=SW href="#73">w_plic_we</a>, <a  onClick="return qs(event,this,21)"  class=SW href="#49">bus_plic_we0</a>, <a  onClick="return qs(event,this,43)"  class=SW href="#62">bus_plic_we1</a>;
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,66)"  class=SW href="#74">w_dram_addr</a>, <a  onClick="return qs(event,this,22)"  class=SW href="#50">bus_dram_addr0</a>, <a  onClick="return qs(event,this,44)"  class=SW href="#63">bus_dram_addr1</a>;
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,67)"  class=SW href="#74">w_dram_wdata</a>, <a  onClick="return qs(event,this,23)"  class=SW href="#50">bus_dram_wdata0</a>, <a  onClick="return qs(event,this,45)"  class=SW href="#63">bus_dram_wdata1</a>;
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,68)"  class=SW href="#74">w_dram_odata</a>, <a  onClick="return qs(event,this,24)"  class=SW href="#50">bus_dram_odata0</a>, <a  onClick="return qs(event,this,46)"  class=SW href="#63">bus_dram_odata1</a>;
+    <span class=K>wire</span> <a  onClick="return qs(event,this,69)"  class=SW href="#74">w_dram_we_t</a>, <a  onClick="return qs(event,this,25)"  class=SW href="#50">bus_dram_we_t0</a>, <a  onClick="return qs(event,this,47)"  class=SW href="#63">bus_dram_we_t1</a>;
+    <span class=K>wire</span> <a  onClick="return qs(event,this,70)"  class=SW href="#75">w_dram_busy</a>, <a  onClick="return qs(event,this,26)"  class=SW href="#51">bus_dram_busy0</a>, <a  onClick="return qs(event,this,48)"  class=SW href="#64">bus_dram_busy1</a>;
+    <span class=K>wire</span> [2:0]   <a  onClick="return qs(event,this,71)"  class=SW href="#75">w_dram_ctrl</a>, <a  onClick="return qs(event,this,27)"  class=SW href="#51">bus_dram_ctrl0</a>, <a  onClick="return qs(event,this,49)"  class=SW href="#64">bus_dram_ctrl1</a>;
+    <span class=K>wire</span> <a  onClick="return qs(event,this,72)"  class=SW href="#75">w_dram_le</a>, <a  onClick="return qs(event,this,28)"  class=SW href="#51">bus_dram_le0</a>, <a  onClick="return qs(event,this,50)"  class=SW href="#64">bus_dram_le1</a>;
+
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a>;
+    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,3)"  class=SW href="#42">bus_ipi</a>;
+
+<a name="123"></a>    <span class=K>reg</span> [63:0] <a  onClick="return qs(event,this,74)"  class=SR href="#127">mtime</a>=0;
+<a name="124"></a>    <span class=K>wire</span> [63:0] <a  onClick="return qs(event,this,12)"  class=SW href="#46">w_mtime</a>=<a  onClick="return qs(event,this,74)"  class=SR href="#127">mtime</a>;
+
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>)
+<a name="127"></a>        <span class=K>if</span>(<a  onClick="return qs(event,this,2)"  class=SI href="#38">RST_X</a>) <a  onClick="return qs(event,this,74)"  class=SR href="#123">mtime</a> &lt;= <a  onClick="return qs(event,this,74)"  class=SR href="#127">mtime</a> + 1;
+
+    <span class=C>/**********************************************************************************************/</span>
+
+<a name="131"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,75)"  class=SW href="#131">w_isread</a>        = (<a  onClick="return qs(event,this,59)"  class=SW href="#72">w_tlb_req</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#310">ACCESS_READ</a>);
+<a name="132"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,76)"  class=SW href="#132">w_iswrite</a>       = (<a  onClick="return qs(event,this,59)"  class=SW href="#72">w_tlb_req</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#311">ACCESS_WRITE</a>);
+
+<a name="134"></a>    <span class=K>wire</span>  [3:0] <a  onClick="return qs(event,this,77)"  class=SW href="#134">w_dev</a>       = <a  onClick="return qs(event,this,52)"  class=SW href="#69">w_mem_paddr</a>[31:28];<span class=C>// &amp; 32'hf0000000;
+</span><a name="135"></a>    <span class=K>wire</span>  [3:0] <a  onClick="return qs(event,this,78)"  class=SW href="#135">w_virt</a>      = <a  onClick="return qs(event,this,52)"  class=SW href="#69">w_mem_paddr</a>[27:24];<span class=C>// &amp; 32'h0f000000;
+</span><a name="136"></a>    <span class=K>wire</span>  [27:0] <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>   = <a  onClick="return qs(event,this,52)"  class=SW href="#69">w_mem_paddr</a> &amp; 28'h7ffffff;
+<a name="137"></a>    <span class=K>reg</span>   [31:0] <a  onClick="return qs(event,this,80)"  class=SR href="#143">r_mem_paddr</a>= 0;
+<a name="138"></a>    <span class=K>reg</span>   [3:0] <a  onClick="return qs(event,this,81)"  class=SR href="#141">r_dev</a>       = 0;<span class=C>// &amp; 32'hf0000000;
+</span><a name="139"></a>    <span class=K>reg</span>   [3:0] <a  onClick="return qs(event,this,82)"  class=SR href="#142">r_virt</a>      = 0;<span class=C>// &amp; 32'h0f000000;
+</span>    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>
+<a name="141"></a>        <a  onClick="return qs(event,this,81)"  class=SR href="#138">r_dev</a>   &lt;= <a  onClick="return qs(event,this,77)"  class=SW href="#134">w_dev</a>;
+<a name="142"></a>        <a  onClick="return qs(event,this,82)"  class=SR href="#139">r_virt</a>  &lt;= <a  onClick="return qs(event,this,78)"  class=SW href="#135">w_virt</a>;
+<a name="143"></a>        <a  onClick="return qs(event,this,80)"  class=SR href="#137">r_mem_paddr</a> &lt;= <a  onClick="return qs(event,this,52)"  class=SW href="#69">w_mem_paddr</a>;
+    <span class=K>end</span>
+
+    <span class=C>/***********************************          OUTPUT        ***********************************/</span>
+<a name="147"></a>    <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,83)"  class=SR href="#150">r_data_data</a> = 0;
+    <span class=K>always</span>@(*) <span class=K>begin</span>
+        <span class=K>case</span> (<a  onClick="return qs(event,this,81)"  class=SR href="#138">r_dev</a>)
+<a name="150"></a>            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#195">CLINT_BASE_TADDR</a> : <a  onClick="return qs(event,this,83)"  class=SR href="#147">r_data_data</a> &lt;= <a  onClick="return qs(event,this,84)"  class=SR href="#229">r_clint_odata</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#187">PLIC_BASE_TADDR</a>  : <a  onClick="return qs(event,this,83)"  class=SR href="#147">r_data_data</a> &lt;= <a  onClick="return qs(event,this,85)"  class=SR href="#221">r_plic_odata</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#199">HVC_BASE_TADDR</a>  : <span class=K>if</span>(<a  onClick="return qs(event,this,80)"  class=SR href="#137">r_mem_paddr</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#198">HVC_BASE_ADDR</a>) <span class=K>begin</span>
+                                    <span class=C>//$display(&quot;HVC_BASE_ADDR %x&quot;, r_consf_cnts);
+</span>                                    <a  onClick="return qs(event,this,83)"  class=SR href="#147">r_data_data</a> &lt;= {24'h0, <span class=C>/*8-$clog2(`KEYBOARD_QUEUE_SIZE)-1*/</span>2'h0, <a  onClick="return qs(event,this,86)"  class=SR href="#371">r_consf_cnts</a>};
+                                <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,80)"  class=SR href="#137">r_mem_paddr</a> == (<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#198">HVC_BASE_ADDR</a> + 4)) <span class=K>begin</span>
+                                    <span class=C>//$display(&quot;HVC_BASE_ADDR+4 r_char_value %x&quot;, r_char_value);
+</span>                                    <a  onClick="return qs(event,this,83)"  class=SR href="#147">r_data_data</a> &lt;= {24'h0, <a  onClick="return qs(event,this,87)"  class=SR href="#410">r_char_value</a>};
+                                <span class=K>end</span>
+            <span class=K>default</span>           : <a  onClick="return qs(event,this,83)"  class=SR href="#147">r_data_data</a> &lt;= <a  onClick="return qs(event,this,68)"  class=SW href="#648">w_dram_odata</a>;
+        <span class=K>endcase</span>
+    <span class=K>end</span>
+<a name="162"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,55)"  class=SW href="#70">w_data_data</a> = <a  onClick="return qs(event,this,83)"  class=SR href="#150">r_data_data</a>;
+
+    <span class=C>/*********************************          INTERRUPTS          *********************************/</span>
+<a name="165"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,88)"  class=SW href="#165">w_cons_irq</a>=0;
+<a name="166"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,89)"  class=SW href="#166">w_cons_irq_oe</a>=0;
+<a name="167"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,90)"  class=SW href="#167">w_key_req</a>=0;
+<a name="168"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,91)"  class=SW href="#168">w_virt_irq</a>      = <a  onClick="return qs(event,this,88)"  class=SW href="#165">w_cons_irq</a>;
+<a name="169"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,92)"  class=SW href="#169">w_virt_irq_oe</a>   = <a  onClick="return qs(event,this,89)"  class=SW href="#166">w_cons_irq_oe</a> | <a  onClick="return qs(event,this,90)"  class=SW href="#167">w_key_req</a>;
+    <span class=C>// PLIC
+</span><a name="171"></a>    <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,93)"  class=SR href="#222">plic_served_irq</a>     = 0;
+<a name="172"></a>    <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,94)"  class=SR href="#226">plic_pending_irq</a>    = 0;
+<a name="173"></a>    <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,85)"  class=SR href="#221">r_plic_odata</a>        = 0;
+    <span class=C>// CLINT
+</span><a name="175"></a>    <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,84)"  class=SR href="#229">r_clint_odata</a>       = 0;
+
+<a name="177"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,95)"  class=SW href="#177">w_plic_pending_irq_nxt</a>  =   <a  onClick="return qs(event,this,92)"  class=SW href="#169">w_virt_irq_oe</a> ? <a  onClick="return qs(event,this,91)"  class=SW href="#168">w_virt_irq</a> : <a  onClick="return qs(event,this,94)"  class=SR href="#226">plic_pending_irq</a>;
+<a name="178"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,96)"  class=SW href="#178">w_plic_mask</a>             =   <a  onClick="return qs(event,this,95)"  class=SW href="#177">w_plic_pending_irq_nxt</a> &amp; ~<a  onClick="return qs(event,this,93)"  class=SR href="#222">plic_served_irq</a>;
+<a name="179"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,97)"  class=SW href="#179">w_plic_served_irq_nxt</a>   =   (<a  onClick="return qs(event,this,92)"  class=SW href="#169">w_virt_irq_oe</a>) ? <a  onClick="return qs(event,this,93)"  class=SR href="#222">plic_served_irq</a> :
+                                            (<a  onClick="return qs(event,this,75)"  class=SW href="#131">w_isread</a>) ? <a  onClick="return qs(event,this,93)"  class=SR href="#222">plic_served_irq</a> | <a  onClick="return qs(event,this,96)"  class=SW href="#178">w_plic_mask</a> :
+                                            <a  onClick="return qs(event,this,93)"  class=SR href="#222">plic_served_irq</a> &amp; ~(1 &lt;&lt; (<a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>-1));
+
+<a name="183"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,63)"  class=SW href="#73">w_plic_aces</a> = (<a  onClick="return qs(event,this,77)"  class=SW href="#134">w_dev</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#187">PLIC_BASE_TADDR</a> &amp;&amp; !<a  onClick="return qs(event,this,60)"  class=SW href="#72">w_tlb_busy</a> &amp;&amp;
+            ((<a  onClick="return qs(event,this,75)"  class=SW href="#131">w_isread</a> &amp;&amp; <a  onClick="return qs(event,this,96)"  class=SW href="#178">w_plic_mask</a> != 0) || (<a  onClick="return qs(event,this,76)"  class=SW href="#132">w_iswrite</a> &amp;&amp; <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#189">PLIC_HART_BASE</a>+4)));
+
+<a name="186"></a>    <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,98)"  class=SR href="#186">r_wmip</a> = 0;
+<a name="187"></a>    <span class=K>reg</span>         <a  onClick="return qs(event,this,99)"  class=SR href="#187">r_plic_we</a> = 0;
+
+<a name="189"></a>    <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,100)"  class=SR href="#207">r_plic_pending_irq_t</a>    = 0;
+<a name="190"></a>    <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,101)"  class=SR href="#208">r_plic_served_irq_t</a>     = 0;
+
+<a name="192"></a>    <span class=K>reg</span>         <a  onClick="return qs(event,this,102)"  class=SR href="#205">r_virt_irq_oe_t</a> = 0;
+<a name="193"></a>    <span class=K>reg</span>         <a  onClick="return qs(event,this,64)"  class=SW href="#73">r_plic_aces_t</a>   = 0;
+
+<a name="195"></a>    <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>=0;
+<a name="196"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,3)"  class=SW href="#42">bus_ipi</a> = <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>;
+<a name="197"></a>    <span class=K>reg</span> <a  onClick="return qs(event,this,104)"  class=SR href="#283">r_was_clint_we</a>=0;
+<a name="198"></a>    <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,105)"  class=SR href="#244">r_max_displays</a>=0;
+
+<a name="200"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,106)"  class=SW href="#200">w_plic_mask_nxt</a> = <a  onClick="return qs(event,this,100)"  class=SR href="#207">r_plic_pending_irq_t</a> &amp; ~<a  onClick="return qs(event,this,101)"  class=SR href="#208">r_plic_served_irq_t</a>;
+
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>
+        <span class=K>if</span>(!<a  onClick="return qs(event,this,60)"  class=SW href="#72">w_tlb_busy</a>) <span class=K>begin</span>
+            <span class=C>//r_plic_we   &lt;= (w_virt_irq_oe || w_plic_aces);
+</span><a name="205"></a>            <a  onClick="return qs(event,this,102)"  class=SR href="#192">r_virt_irq_oe_t</a>         &lt;= <a  onClick="return qs(event,this,92)"  class=SW href="#169">w_virt_irq_oe</a>;
+            <a  onClick="return qs(event,this,64)"  class=SW href="#73">r_plic_aces_t</a>           &lt;= <a  onClick="return qs(event,this,63)"  class=SW href="#183">w_plic_aces</a>;
+<a name="207"></a>            <a  onClick="return qs(event,this,100)"  class=SR href="#189">r_plic_pending_irq_t</a>    &lt;= <a  onClick="return qs(event,this,95)"  class=SW href="#177">w_plic_pending_irq_nxt</a>;
+<a name="208"></a>            <a  onClick="return qs(event,this,101)"  class=SR href="#190">r_plic_served_irq_t</a>     &lt;= <a  onClick="return qs(event,this,97)"  class=SW href="#179">w_plic_served_irq_nxt</a>;
+        <span class=K>end</span>
+    <span class=K>end</span>
+
+<a name="212"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,65)"  class=SW href="#73">w_plic_we</a>      = (<a  onClick="return qs(event,this,102)"  class=SR href="#205">r_virt_irq_oe_t</a> || <a  onClick="return qs(event,this,64)"  class=SW href="#193">r_plic_aces_t</a>);<span class=C>//r_plic_we;
+</span><a name="213"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,62)"  class=SW href="#73">w_wmip</a>  = (<a  onClick="return qs(event,this,106)"  class=SW href="#200">w_plic_mask_nxt</a>) ? <a  onClick="return qs(event,this,61)"  class=SW href="#73">w_mip</a> | (<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#451">MIP_MEIP</a> | <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#449">MIP_SEIP</a>) :
+                            <a  onClick="return qs(event,this,61)"  class=SW href="#73">w_mip</a> &amp; ~(<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#451">MIP_MEIP</a> | <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#449">MIP_SEIP</a>);
+
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>
+        <span class=K>if</span>(<a  onClick="return qs(event,this,65)"  class=SW href="#73">w_plic_we</a>)
+            <span class=ST>$display</span>(<span class=S>&quot;----w_plic_we w_grant=%x&quot;</span>, <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a>);
+
+        <span class=K>if</span>(<a  onClick="return qs(event,this,63)"  class=SW href="#73">w_plic_aces</a>) <span class=K>begin</span>
+<a name="221"></a>            <a  onClick="return qs(event,this,85)"  class=SR href="#173">r_plic_odata</a>    &lt;= (<a  onClick="return qs(event,this,96)"  class=SW href="#178">w_plic_mask</a>!=0) ? <a  onClick="return qs(event,this,96)"  class=SW href="#178">w_plic_mask</a> : 0;
+<a name="222"></a>            <a  onClick="return qs(event,this,93)"  class=SR href="#171">plic_served_irq</a> &lt;= <a  onClick="return qs(event,this,97)"  class=SW href="#179">w_plic_served_irq_nxt</a>;
+        <span class=K>end</span>
+
+        <span class=K>if</span>(<a  onClick="return qs(event,this,92)"  class=SW href="#169">w_virt_irq_oe</a>) <span class=K>begin</span>
+<a name="226"></a>            <a  onClick="return qs(event,this,94)"  class=SR href="#172">plic_pending_irq</a>    &lt;= <a  onClick="return qs(event,this,91)"  class=SW href="#168">w_virt_irq</a>;
+        <span class=K>end</span>
+
+<a name="229"></a>        <a  onClick="return qs(event,this,84)"  class=SR href="#175">r_clint_odata</a> &lt;=    (<a  onClick="return qs(event,this,81)"  class=SR href="#141">r_dev</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#195">CLINT_BASE_TADDR</a> &amp;&amp; (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h0 || <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4) &amp;&amp; <a  onClick="return qs(event,this,107)"  class=SW href="#296">w_data_we</a> == 0) ? <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a> :
+                            (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'hbff8) ? <a  onClick="return qs(event,this,12)"  class=SW href="#124">w_mtime</a>[31:0] :
+                            (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'hbffc) ? <a  onClick="return qs(event,this,12)"  class=SW href="#124">w_mtime</a>[63:32] :
+                            (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4000) ? <a  onClick="return qs(event,this,56)"  class=SW href="#71">w_mtimecmp</a>[31:0] :
+                            (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4004) ? <a  onClick="return qs(event,this,56)"  class=SW href="#71">w_mtimecmp</a>[63:32] : 
+                            (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4008) ? <a  onClick="return qs(event,this,56)"  class=SW href="#71">w_mtimecmp</a>[31:0] :
+                            (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h400c) ? <a  onClick="return qs(event,this,56)"  class=SW href="#71">w_mtimecmp</a>[63:32] : 0;
+        
+        <span class=C>// ipi
+</span>        <span class=K>if</span>(<a  onClick="return qs(event,this,81)"  class=SR href="#138">r_dev</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#195">CLINT_BASE_TADDR</a> &amp;&amp; (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h0 || <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4) &amp;&amp; <a  onClick="return qs(event,this,107)"  class=SW href="#296">w_data_we</a> != 0) <span class=K>begin</span>
+            <span class=K>if</span>(<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h0) <span class=K>begin</span>
+                <span class=K>if</span>(<a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a> == 32'h0) <span class=K>begin</span>
+                    <span class=K>if</span>(<a  onClick="return qs(event,this,105)"  class=SR href="#198">r_max_displays</a> &lt; <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#32">IPI_MAX_DISPLAYS</a>) <span class=K>begin</span>
+                        <span class=ST>$display</span>(<span class=S>&quot;t=%8x clear ipi core0 w_grant=%1x c0pc=%x c0ir=%x c1pc=%x c1ir=%x&quot;</span>, 
+                            <a  onClick="return qs(event,this,12)"  class=SW href="#46">w_mtime</a>, <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a>, core0.p.r_cpc, core0.p.r_ir, core1.p.r_cpc, core1.p.r_ir);
+<a name="244"></a>                        <a  onClick="return qs(event,this,105)"  class=SR href="#198">r_max_displays</a> = <a  onClick="return qs(event,this,105)"  class=SR href="#244">r_max_displays</a> + 1;
+                    <span class=K>end</span>
+<a name="246"></a>                    <a  onClick="return qs(event,this,103)"  class=SR href="#195">r_ipi</a> &lt;= {<a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[31:17], 1'b0, <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[15:1], 1'b0};
+                <span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+                    <span class=K>if</span>(<a  onClick="return qs(event,this,105)"  class=SR href="#198">r_max_displays</a> &lt; <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#32">IPI_MAX_DISPLAYS</a>) <span class=K>begin</span>
+                        <span class=ST>$display</span>(<span class=S>&quot;t=%8x send ipi to core0 w_data_wdata=%x w_grant=%1x c0pc=%x c0ir=%x c1pc=%x c1ir=%x&quot;</span>, 
+                            <a  onClick="return qs(event,this,12)"  class=SW href="#46">w_mtime</a>, <a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>, <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a>, core0.p.r_cpc, core0.p.r_ir, core1.p.r_cpc, core1.p.r_ir);
+                        <a  onClick="return qs(event,this,105)"  class=SR href="#198">r_max_displays</a> = <a  onClick="return qs(event,this,105)"  class=SR href="#244">r_max_displays</a> + 1;
+                    <span class=K>end</span>
+                     <span class=C>// signal core 0
+</span>                    <span class=K>if</span>(<a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a> == 2)
+                        <a  onClick="return qs(event,this,103)"  class=SR href="#195">r_ipi</a> &lt;= {<a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[31:17], 1'b1, <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[15:1], 1'b1}; <span class=C>// S-priv
+</span>                    <span class=K>else</span>
+                        <a  onClick="return qs(event,this,103)"  class=SR href="#195">r_ipi</a> &lt;= {<a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[31:17], 1'b0, <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[15:1], 1'b1}; <span class=C>// M-priv
+</span>                <span class=K>end</span>
+            <span class=K>end</span> <span class=K>else</span> <span class=C>/*if(w_offset == 28'h4)*/</span> <span class=K>begin</span>
+                <span class=K>if</span>(<a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a> == 32'h0) <span class=K>begin</span>
+                    <span class=K>if</span>(<a  onClick="return qs(event,this,105)"  class=SR href="#198">r_max_displays</a> &lt; <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#32">IPI_MAX_DISPLAYS</a>) <span class=K>begin</span>
+                        <span class=ST>$display</span>(<span class=S>&quot;t=%8x clear ipi core1 w_grant=%1x c0pc=%x c0ir=%x c1pc=%x c1ir=%x&quot;</span>, 
+                            <a  onClick="return qs(event,this,12)"  class=SW href="#46">w_mtime</a>, <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a>, core0.p.r_cpc, core0.p.r_ir, core1.p.r_cpc, core1.p.r_ir);
+                        <a  onClick="return qs(event,this,105)"  class=SR href="#198">r_max_displays</a> = <a  onClick="return qs(event,this,105)"  class=SR href="#244">r_max_displays</a> + 1;
+                    <span class=K>end</span>
+                    <a  onClick="return qs(event,this,103)"  class=SR href="#195">r_ipi</a> &lt;= {<a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[31:18], 1'b0, <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[16], <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[15:2], 1'b0, <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[0]};
+                <span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+                    <span class=K>if</span>(<a  onClick="return qs(event,this,105)"  class=SR href="#198">r_max_displays</a> &lt; <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#32">IPI_MAX_DISPLAYS</a>) <span class=K>begin</span>
+                        <span class=ST>$display</span>(<span class=S>&quot;t=%8x send ipi to core1 w_data_wdata=%x w_grant=%1x c0pc=%x c0ir=%x c1pc=%x c1ir=%x&quot;</span>, 
+                            <a  onClick="return qs(event,this,12)"  class=SW href="#46">w_mtime</a>, <a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>, <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a>, core0.p.r_cpc, core0.p.r_ir, core1.p.r_cpc, core1.p.r_ir);
+                        <a  onClick="return qs(event,this,105)"  class=SR href="#198">r_max_displays</a> = <a  onClick="return qs(event,this,105)"  class=SR href="#244">r_max_displays</a> + 1;
+                    <span class=K>end</span>
+                     <span class=C>// signal core 1
+</span>                    <span class=K>if</span>(<a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a> == 2)
+                        <a  onClick="return qs(event,this,103)"  class=SR href="#195">r_ipi</a> &lt;= {<a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[31:18], 1'b1, <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[16], <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[15:2], 1'b1, <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[0]}; <span class=C>// S-priv
+</span>                    <span class=K>else</span>
+                        <a  onClick="return qs(event,this,103)"  class=SR href="#195">r_ipi</a> &lt;= {<a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[31:18], 1'b0, <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[16], <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[15:2], 1'b1, <a  onClick="return qs(event,this,103)"  class=SR href="#246">r_ipi</a>[0]}; <span class=C>// M-priv
+</span>                <span class=K>end</span>
+            <span class=K>end</span>
+        <span class=K>end</span>
+        <span class=K>if</span>(<a  onClick="return qs(event,this,58)"  class=SW href="#71">w_clint_we</a>) <span class=K>begin</span>
+            <span class=K>if</span>(!<a  onClick="return qs(event,this,104)"  class=SR href="#197">r_was_clint_we</a>) <span class=K>begin</span>
+<a name="283"></a>                <a  onClick="return qs(event,this,104)"  class=SR href="#197">r_was_clint_we</a> &lt;= 1;
+                <span class=C>//$display(&quot;w_clint_we gnt=%1x&quot;, w_grant);
+</span>            <span class=K>end</span>
+        <span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+            <span class=K>if</span>(<a  onClick="return qs(event,this,81)"  class=SR href="#138">r_dev</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#195">CLINT_BASE_TADDR</a> &amp;&amp; <a  onClick="return qs(event,this,107)"  class=SW href="#296">w_data_we</a> != 0 &amp;&amp;
+                (((<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4000 || <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4004) &amp;&amp; <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a> != 0) ||
+                 ((<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4008 || <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h400c) &amp;&amp; <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a> != 1)))
+                <span class=ST>$display</span>(<span class=S>&quot;clint wrong grant offset&quot;</span>);
+            <a  onClick="return qs(event,this,104)"  class=SR href="#197">r_was_clint_we</a> &lt;= 0;
+        <span class=K>end</span>
+    <span class=K>end</span>
+
+    <span class=C>// shortcut to w_data_we because we do not use microcontroller
+</span><a name="296"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,107)"  class=SW href="#296">w_data_we</a> = <a  onClick="return qs(event,this,53)"  class=SW href="#69">w_mem_we</a>;
+<a name="297"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,57)"  class=SW href="#71">w_wmtimecmp</a>  = (<a  onClick="return qs(event,this,81)"  class=SR href="#141">r_dev</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#195">CLINT_BASE_TADDR</a> &amp;&amp; (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4000 || <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4008) &amp;&amp; <a  onClick="return qs(event,this,107)"  class=SW href="#296">w_data_we</a> != 0) ?
+                                {<a  onClick="return qs(event,this,56)"  class=SW href="#71">w_mtimecmp</a>[63:32], <a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>} :
+                                (<a  onClick="return qs(event,this,81)"  class=SR href="#141">r_dev</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#195">CLINT_BASE_TADDR</a> &amp;&amp; (<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4004 || <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h400c) &amp;&amp; <a  onClick="return qs(event,this,107)"  class=SW href="#296">w_data_we</a> != 0) ?
+                                {<a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>, <a  onClick="return qs(event,this,56)"  class=SW href="#71">w_mtimecmp</a>[31:0]} : 0;
+<a name="301"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,58)"  class=SW href="#71">w_clint_we</a>   = <a  onClick="return qs(event,this,81)"  class=SR href="#141">r_dev</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#195">CLINT_BASE_TADDR</a> &amp;&amp; <a  onClick="return qs(event,this,107)"  class=SW href="#296">w_data_we</a> != 0 &amp;&amp; 
+                          (((<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4000 || <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4004) &amp;&amp; <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a> == 0) ||
+                           ((<a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h4008 || <a  onClick="return qs(event,this,79)"  class=SW href="#136">w_offset</a>==28'h400c) &amp;&amp; <a  onClick="return qs(event,this,51)"  class=SW href="#67">w_grant</a> == 1));
+
+    <span class=C>/**********************************************************************************************/</span>
+    <span class=C>// OUTPUT CHAR
+</span><a name="m_topsim_UartTx0"></a><a name="307"></a>    <a  onClick="return qs(event,this,0)"  class=MM href="loader.v.html#UartTx">UartTx</a> UartTx0(<a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>, <a  onClick="return qs(event,this,2)"  class=SI href="#38">RST_X</a>, <a  onClick="return qs(event,this,108)"  class=SW href="#310">r_uart_data</a>, <a  onClick="return qs(event,this,109)"  class=SW href="#309">r_uart_we</a>, <a  onClick="return qs(event,this,110)"  class=SW href="#307">w_txd</a>, <a  onClick="return qs(event,this,7)"  class=SW href="#43">w_tx_ready</a>);
+    <span class=K>wire</span> <a  onClick="return qs(event,this,110)"  class=SW href="#307">w_txd</a>;
+<a name="309"></a>    <span class=K>reg</span>         <a  onClick="return qs(event,this,109)"  class=SW href="#307">r_uart_we</a> = 0;
+<a name="310"></a>    <span class=K>reg</span>   [7:0] <a  onClick="return qs(event,this,108)"  class=SW href="#307">r_uart_data</a> = 0;
+<span class=P>`ifdef LAUR_MEM_RB
+</span>    <span class=P>// xsim requires declaration before use
+</span><span class=P>    reg r_rb_uart_we=0;
+</span><span class=P>    reg [7:0] r_rb_uart_data;
+</span><span class=M>`endif</span>
+    <span class=K>wire</span> <a  onClick="return qs(event,this,7)"  class=SW href="#43">w_tx_ready</a>;
+<a name="317"></a>    <span class=K>reg</span>          <a  onClick="return qs(event,this,111)"  class=SR href="#334">r_finish</a>=0;
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>
+        <span class=C>// optimisation instead of w_mem_wdata put w_data_wdata
+</span>        <span class=K>if</span>((<a  onClick="return qs(event,this,52)"  class=SW href="#69">w_mem_paddr</a>==<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#264">TOHOST_ADDR</a> &amp;&amp; <a  onClick="return qs(event,this,53)"  class=SW href="#69">w_mem_we</a>) &amp;&amp; (<a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>[31:16]==<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#267">CMD_PRINT_CHAR</a>)) <span class=K>begin</span>
+            <a  onClick="return qs(event,this,109)"  class=SW href="#307">r_uart_we</a>   &lt;= 1;
+            <a  onClick="return qs(event,this,108)"  class=SW href="#307">r_uart_data</a> &lt;= <a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>[7:0];
+<span class=P>`ifdef LAUR_MEM_RB
+</span><span class=P>	    end else if(r_rb_uart_we) begin
+</span><span class=P>		    r_uart_we &lt;= 1;
+</span><span class=P>		    r_uart_data &lt;= r_rb_uart_data;
+</span><span class=M>`endif</span>
+    	<span class=K>end</span> <span class=K>else</span> <span class=K>begin</span> 
+            <a  onClick="return qs(event,this,109)"  class=SW href="#307">r_uart_we</a>   &lt;= 0;
+            <a  onClick="return qs(event,this,108)"  class=SW href="#307">r_uart_data</a> &lt;= 0;
+        <span class=K>end</span>
+        <span class=C>// Finish Simulation
+</span>        <span class=K>if</span>((<a  onClick="return qs(event,this,52)"  class=SW href="#69">w_mem_paddr</a>==<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#264">TOHOST_ADDR</a> &amp;&amp; <a  onClick="return qs(event,this,53)"  class=SW href="#69">w_mem_we</a>) &amp;&amp; (<a  onClick="return qs(event,this,54)"  class=SW href="#70">w_data_wdata</a>[31:16]==<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#268">CMD_POWER_OFF</a>)) <span class=K>begin</span>
+<a name="334"></a>            <a  onClick="return qs(event,this,111)"  class=SR href="#317">r_finish</a> = 1;
+        <span class=K>end</span>
+    <span class=K>end</span>
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>if</span> (<a  onClick="return qs(event,this,111)"  class=SR href="#317">r_finish</a>) <span class=K>begin</span>
+        <span class=ST>$write</span>(<span class=S>&quot;FINISH!\n&quot;</span>);
+        <span class=ST>$finish</span>();
+    <span class=K>end</span>
+
+    <span class=C>/**********************************************************************************************/</span>
+    <span class=C>/***** Keyboard Input *************************************************************************/</span>
+
+<a name="345"></a>    <span class=K>wire</span> [31:0]  <a  onClick="return qs(event,this,112)"  class=SW href="#350">w_pl_init_addr</a>;
+<a name="346"></a>    <span class=K>wire</span> [31:0]  <a  onClick="return qs(event,this,113)"  class=SW href="#350">w_pl_init_data</a>;
+<a name="347"></a>    <span class=K>wire</span>         <a  onClick="return qs(event,this,114)"  class=SW href="#351">w_pl_init_done</a>;
+<a name="348"></a>    <span class=K>wire</span>         <a  onClick="return qs(event,this,115)"  class=SW href="#350">w_pl_init_we</a>;
+<a name="349"></a>    <span class=K>wire</span>         <a  onClick="return qs(event,this,116)"  class=SW href="#349">w_rxd</a>;
+<a name="m_topsim_ploader"></a><a name="350"></a>    <a  onClick="return qs(event,this,0)"  class=MM href="loader.v.html#PLOADER">PLOADER</a> ploader(<a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>, <a  onClick="return qs(event,this,2)"  class=SI href="#38">RST_X</a>, <a  onClick="return qs(event,this,116)"  class=SW href="#349">w_rxd</a>, <a  onClick="return qs(event,this,112)"  class=SW href="#345">w_pl_init_addr</a>, <a  onClick="return qs(event,this,113)"  class=SW href="#346">w_pl_init_data</a>, <a  onClick="return qs(event,this,115)"  class=SW href="#348">w_pl_init_we</a>,
+<a name="351"></a>                    <a  onClick="return qs(event,this,114)"  class=SW href="#347">w_pl_init_done</a>, <a  onClick="return qs(event,this,117)"  class=SW href="#351">w_key_we</a>, <a  onClick="return qs(event,this,118)"  class=SW href="#351">w_key_data</a>);
+
+<a name="353"></a>    <span class=K>reg</span>   [<span class=ST>$clog2</span>(<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#31">KEYBOARD_QUEUE_SIZE</a>)-1:0] <a  onClick="return qs(event,this,119)"  class=SR href="#369">r_consf_head</a>        = 0;  <span class=C>// Note!!
+</span><a name="354"></a>    <span class=K>reg</span>   [<span class=ST>$clog2</span>(<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#31">KEYBOARD_QUEUE_SIZE</a>)-1:0] <a  onClick="return qs(event,this,120)"  class=SR href="#370">r_consf_tail</a>        = 0;  <span class=C>// Note!!
+</span><a name="355"></a>    <span class=K>reg</span>   [<span class=ST>$clog2</span>(<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#31">KEYBOARD_QUEUE_SIZE</a>):0] <a  onClick="return qs(event,this,86)"  class=SR href="#371">r_consf_cnts</a>        = 0;  <span class=C>// Note!!
+</span><a name="356"></a>    <span class=K>reg</span>         <a  onClick="return qs(event,this,121)"  class=SR href="#368">r_consf_en</a>          = 0;
+<a name="357"></a>    <span class=K>reg</span>   [7:0] <a  onClick="return qs(event,this,122)"  class=SR href="#419">cons_fifo</a> [0:15];
+<a name="358"></a>    <span class=K>reg</span> [7:0] <a  onClick="return qs(event,this,87)"  class=SR href="#410">r_char_value</a>=0;
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+<a name="360"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,123)"  class=SW href="#361">w_file_we</a>;
+<a name="m_topsim_rf"></a><a name="361"></a>    <a  onClick="return qs(event,this,0)"  class=MM href="read_file.v.html#read_file">read_file</a> rf(<span class=SI>.clk</span>(<a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>), <span class=SI>.r_consf_en</span>(<a  onClick="return qs(event,this,121)"  class=SR href="#368">r_consf_en</a>), <a  onClick="return qs(event,this,0)"  class=SOR href="read_file.v.html#48">.we</a>(<a  onClick="return qs(event,this,123)"  class=SW href="#360">w_file_we</a>), <span class=SI>.w_mtime</span>(<a  onClick="return qs(event,this,12)"  class=SW href="#124">w_mtime</a>), <span class=SI>.min_time</span>(<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#82">ENABLE_TIMER</a>));
+<span class=M>`endif</span>
+
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+    <span class=K>initial</span> <span class=K>begin</span>
+<a name="366"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#366">LAUR_EMPTY_CONSOLE_BUFFER</a>
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="#366">LAUR_EMPTY_CONSOLE_BUFFER</a>
+<a name="368"></a>	<a  onClick="return qs(event,this,121)"  class=SR href="#356">r_consf_en</a> = 0;
+<a name="369"></a>	<a  onClick="return qs(event,this,119)"  class=SR href="#353">r_consf_head</a> = 0;
+<a name="370"></a>	<a  onClick="return qs(event,this,120)"  class=SR href="#354">r_consf_tail</a> = 0;
+<a name="371"></a>        <a  onClick="return qs(event,this,86)"  class=SR href="#355">r_consf_cnts</a> = 0;
+<span class=P>`else
+</span><span class=P>        r_consf_en = 1;
+</span><span class=P>        cons_fifo[0] = 8'h72;  </span><span class=P>// &quot;r&quot;
+</span><span class=P>        cons_fifo[1] = 8'h6f;  </span><span class=P>// &quot;o&quot;
+</span><span class=P>        cons_fifo[2] = 8'h6f;  </span><span class=P>// &quot;o&quot;
+</span><span class=P>        cons_fifo[3] = 8'h74;  </span><span class=P>// &quot;t&quot;
+</span><span class=P>        cons_fifo[4] = 8'hd;   </span><span class=P>// &quot;(CR)&quot;
+</span><span class=P>        cons_fifo[5] = 8'hd;   </span><span class=P>// &quot;(CR)&quot;
+</span><span class=P>        r_consf_tail = 6;
+</span><span class=P>        r_consf_cnts = 6;
+</span><span class=M>`endif</span>
+    <span class=K>end</span>
+<span class=M>`endif</span>
+
+    <span class=K>wire</span>        <a  onClick="return qs(event,this,117)"  class=SW href="#351">w_key_we</a>;
+    <span class=K>wire</span>  [7:0] <a  onClick="return qs(event,this,118)"  class=SW href="#351">w_key_data</a>;
+<a name="388"></a>    <span class=K>reg</span>         <a  onClick="return qs(event,this,124)"  class=SR href="#391">r_key_we</a>    = 0;
+<a name="389"></a>    <span class=K>reg</span>   [7:0] <a  onClick="return qs(event,this,125)"  class=SR href="#392">r_key_data</a>  = 0;
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>
+<a name="391"></a>        <a  onClick="return qs(event,this,124)"  class=SR href="#388">r_key_we</a>    &lt;= <a  onClick="return qs(event,this,117)"  class=SW href="#351">w_key_we</a>;
+<a name="392"></a>        <a  onClick="return qs(event,this,125)"  class=SR href="#389">r_key_data</a>  &lt;= <a  onClick="return qs(event,this,118)"  class=SW href="#351">w_key_data</a>;
+    <span class=K>end</span>
+
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+<a name="396"></a>    <span class=K>integer</span> <a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>;
+<span class=M>`endif</span>
+<a name="398"></a>    <span class=K>reg</span> <a  onClick="return qs(event,this,127)"  class=SR href="#401">r_read_a_char</a>=0;
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>
+        <span class=K>if</span>(<a  onClick="return qs(event,this,80)"  class=SR href="#137">r_mem_paddr</a> != (<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#198">HVC_BASE_ADDR</a> + 4))
+<a name="401"></a>            	<a  onClick="return qs(event,this,127)"  class=SR href="#398">r_read_a_char</a> &lt;= 0;
+        <span class=K>else</span> 
+	<span class=K>if</span>((<a  onClick="return qs(event,this,80)"  class=SR href="#137">r_mem_paddr</a> == (<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#198">HVC_BASE_ADDR</a> + 4)) &amp;&amp; !<a  onClick="return qs(event,this,127)"  class=SR href="#398">r_read_a_char</a> &amp;&amp; <a  onClick="return qs(event,this,86)"  class=SR href="#355">r_consf_cnts</a>)
+	    	<a  onClick="return qs(event,this,127)"  class=SR href="#398">r_read_a_char</a> &lt;= 1;
+        <span class=K>if</span>((<a  onClick="return qs(event,this,80)"  class=SR href="#137">r_mem_paddr</a> == (<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#198">HVC_BASE_ADDR</a> + 4)) &amp;&amp; !<a  onClick="return qs(event,this,127)"  class=SR href="#398">r_read_a_char</a> &amp;&amp; <a  onClick="return qs(event,this,86)"  class=SR href="#355">r_consf_cnts</a>) <span class=K>begin</span>
+                <span class=ST>$display</span>(<span class=S>&quot;HVC_BASE_ADDR+4 r_consf_cnts %x&quot;</span>, <a  onClick="return qs(event,this,86)"  class=SR href="#355">r_consf_cnts</a>);
+                <a  onClick="return qs(event,this,121)"  class=SR href="#356">r_consf_en</a> &lt;= (<a  onClick="return qs(event,this,86)"  class=SR href="#371">r_consf_cnts</a>&lt;=1) ? 0 : 1;
+                <a  onClick="return qs(event,this,119)"  class=SR href="#353">r_consf_head</a> &lt;= <a  onClick="return qs(event,this,119)"  class=SR href="#369">r_consf_head</a> + 1;
+                <a  onClick="return qs(event,this,86)"  class=SR href="#355">r_consf_cnts</a> &lt;= <a  onClick="return qs(event,this,86)"  class=SR href="#371">r_consf_cnts</a> - 1;
+<a name="410"></a>                <a  onClick="return qs(event,this,87)"  class=SR href="#358">r_char_value</a> &lt;= <a  onClick="return qs(event,this,122)"  class=SR href="#419">cons_fifo</a>[<a  onClick="return qs(event,this,119)"  class=SR href="#369">r_consf_head</a>];
+        <span class=K>end</span>
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+	<span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,123)"  class=SW href="#360">w_file_we</a>) <span class=K>begin</span>
+		<span class=ST>$display</span>(<span class=S>&quot;\nw_file_we\n&quot;</span>);
+		<span class=K>if</span>(<a  onClick="return qs(event,this,86)"  class=SR href="#355">r_consf_cnts</a> != 0)
+			<span class=ST>$display</span>(<span class=S>&quot;warning: w_file_we and r_consf_cnts = %d with r_consf_en=%d&quot;</span>, <a  onClick="return qs(event,this,86)"  class=SR href="#355">r_consf_cnts</a>, <a  onClick="return qs(event,this,121)"  class=SR href="#356">r_consf_en</a>);
+		<span class=K>else</span> <span class=K>begin</span>
+			<span class=K>for</span>(<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a> = 0; <a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a> &lt; rf.n; <a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>++)
+<a name="419"></a>				<a  onClick="return qs(event,this,122)"  class=SR href="#357">cons_fifo</a>[<a  onClick="return qs(event,this,120)"  class=SR href="#354">r_consf_tail</a>+<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>] = rf.fifo[<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>];
+			<a  onClick="return qs(event,this,120)"  class=SR href="#354">r_consf_tail</a> &lt;= <a  onClick="return qs(event,this,120)"  class=SR href="#370">r_consf_tail</a> + rf.n;
+			<a  onClick="return qs(event,this,86)"  class=SR href="#355">r_consf_cnts</a> &lt;= rf.n;
+			<a  onClick="return qs(event,this,121)"  class=SR href="#356">r_consf_en</a> &lt;= 1;
+		<span class=K>end</span>
+	<span class=K>end</span>
+<span class=P>`else
+</span><span class=P>        else if(r_key_we) begin
+</span><span class=P>            $display(</span><span class=P>&quot;r_key_we  r_consf_cnts %x&quot;</span><span class=P>, r_consf_cnts);
+</span><span class=P>            if(r_consf_cnts &lt; `KEYBOARD_QUEUE_SIZE) begin
+</span><span class=P>                cons_fifo[r_consf_tail] &lt;= r_key_data;
+</span><span class=P>                r_consf_tail            &lt;= r_consf_tail + 1;
+</span><span class=P>                r_consf_cnts            &lt;= r_consf_cnts + 1;
+</span><span class=P>                r_consf_en              &lt;= 1;
+</span><span class=P>            end
+</span><span class=P>        end
+</span><span class=M>`endif</span>
+    <span class=K>end</span>
+
+    <span class=C>/**********************************************************************************************/</span>
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+<a name="440"></a>    <span class=K>reg</span>  [2:0] <a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> = 5;
+<span class=P>`else
+</span><span class=P>    reg  [2:0] r_init_state = 0;
+</span><span class=M>`endif</span>
+<a name="444"></a>    <span class=K>reg</span>  [31:0]  <a  onClick="return qs(event,this,129)"  class=SR href="#498">r_initaddr</a>  = 0;
+<a name="445"></a>    <span class=K>reg</span>  [31:0]  <a  onClick="return qs(event,this,130)"  class=SR href="#447">r_checksum</a> = 0;
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>
+<a name="447"></a>	    <a  onClick="return qs(event,this,130)"  class=SR href="#445">r_checksum</a> &lt;= (!<a  onClick="return qs(event,this,2)"  class=SI href="#38">RST_X</a>)                      ? 0                             :
+                      (!<a  onClick="return qs(event,this,6)"  class=SW href="#493">w_init_done</a> &amp; <a  onClick="return qs(event,this,115)"  class=SW href="#350">w_pl_init_we</a>) ? <a  onClick="return qs(event,this,130)"  class=SR href="#447">r_checksum</a> + <a  onClick="return qs(event,this,113)"  class=SW href="#350">w_pl_init_data</a>   :
+		               <a  onClick="return qs(event,this,130)"  class=SR href="#447">r_checksum</a>;
+    <span class=K>end</span>
+
+<a name="452"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,131)"  class=SW href="#452">w_checksum</a> = <a  onClick="return qs(event,this,130)"  class=SR href="#447">r_checksum</a>;
+
+    <span class=C>/**************************************************************************************************/</span>
+<a name="455"></a>    <span class=K>reg</span>          <a  onClick="return qs(event,this,132)"  class=SR href="#499">r_bbl_done</a>   = 0;
+<a name="456"></a>    <span class=K>reg</span>          <a  onClick="return qs(event,this,133)"  class=SR href="#503">r_disk_done</a>  = 0;
+<a name="457"></a>    <span class=K>reg</span>          <a  onClick="return qs(event,this,134)"  class=SR href="#501">r_dtree_done</a> = 0;
+<span class=P>`ifdef LAUR_MEM_RB
+</span><span class=P>    reg  [31:0]  r_initaddr6  = 0;
+</span><span class=M>`endif</span>
+<a name="461"></a>    <span class=K>reg</span>  [31:0]  <a  onClick="return qs(event,this,135)"  class=SR href="#502">r_initaddr2</a> = <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#212">BBL_SIZE</a> ; <span class=C>/* initial addres for Disk Drive */</span>
+<a name="462"></a>    <span class=K>reg</span>  [31:0]  <a  onClick="return qs(event,this,136)"  class=SR href="#500">r_initaddr3</a> = <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#205">D_INITD_ADDR</a> ; <span class=C>/* initial address of Device Tree */</span>
+
+    <span class=C>// Zero init
+</span><a name="465"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,137)"  class=SW href="#612">w_zero_we</a>;
+<a name="466"></a>    <span class=K>reg</span>  <a  onClick="return qs(event,this,138)"  class=SR href="#599">r_zero_we</a>=0;
+<a name="467"></a>    <span class=K>reg</span>  <a  onClick="return qs(event,this,139)"  class=SR href="#607">r_zero_done</a>        = 0;
+<a name="468"></a>    <span class=K>reg</span>  [31:0]  <a  onClick="return qs(event,this,140)"  class=SR href="#605">r_zeroaddr</a> = 0;
+
+<span class=P>`ifdef LAUR_MEM_RB
+</span>    <span class=P>// xsim requires declaration before use
+</span><span class=P>    reg r_mem_rb_done=0;
+</span><span class=M>`endif</span>
+<span class=P>`ifndef SIM_MODE
+</span><span class=P>    always@(posedge CLK) begin
+</span><span class=P>        r_init_state &lt;= (!RST_X) ? 0 :
+</span><span class=P>                      (r_init_state == 0)                ? 1 :
+</span><span class=P>                      (r_init_state == 1 &amp; r_zero_done)  ? 2 :
+</span><span class=P>		      (r_init_state == 2 &amp; r_bbl_done)   ? 3 :
+</span><span class=P>                      (r_init_state == 3 &amp; r_dtree_done) ? 4 :  
+</span><span class=P>`ifdef LAUR_MEM_RB
+</span><span class=P>		      (r_init_state == 4 &amp; r_disk_done)  ? 6 :
+</span><span class=P>		      (r_init_state == 6 &amp; r_mem_rb_done)  ? 5 :
+</span><span class=P>`else 
+</span><span class=P>                      (r_init_state == 4 &amp; r_disk_done)  ? 5 :
+</span><span class=P>`endif
+</span><span class=P>                      r_init_state;
+</span><span class=P>    end
+</span><span class=M>`endif</span>
+
+<a name="491"></a>    <span class=K>wire</span> [2:0] <a  onClick="return qs(event,this,141)"  class=SW href="#491">w_init_state</a> = <a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a>;
+
+<a name="493"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,6)"  class=SW href="#43">w_init_done</a> = (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 5);
+        
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>	
+	    <span class=K>if</span>(<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> &lt; 1)
+		    <span class=ST>$display</span>(<span class=S>&quot;r_init_state=%d&quot;</span>, <a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a>);
+<a name="498"></a>        <span class=K>if</span>(<a  onClick="return qs(event,this,115)"  class=SW href="#348">w_pl_init_we</a> &amp; (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 2)) <span class=K>begin</span>     <a  onClick="return qs(event,this,129)"  class=SR href="#444">r_initaddr</a>      &lt;= <a  onClick="return qs(event,this,129)"  class=SR href="#498">r_initaddr</a> + 4; <span class=K>end</span>
+<a name="499"></a>        <span class=K>if</span>(<a  onClick="return qs(event,this,129)"  class=SR href="#444">r_initaddr</a>  &gt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#219">BIN_BBL_SIZE</a>)            <a  onClick="return qs(event,this,132)"  class=SR href="#499">r_bbl_done</a>      &lt;= 1;
+<a name="500"></a>        <span class=K>if</span>(<a  onClick="return qs(event,this,115)"  class=SW href="#348">w_pl_init_we</a> &amp; (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 3))      <a  onClick="return qs(event,this,136)"  class=SR href="#462">r_initaddr3</a>     &lt;= <a  onClick="return qs(event,this,136)"  class=SR href="#500">r_initaddr3</a> + 4;
+<a name="501"></a>        <span class=K>if</span>(<a  onClick="return qs(event,this,136)"  class=SR href="#462">r_initaddr3</a> &gt;= (<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#205">D_INITD_ADDR</a> + <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#220">D_SIZE_DEVT</a>))  <a  onClick="return qs(event,this,134)"  class=SR href="#501">r_dtree_done</a>    &lt;= 1;
+<a name="502"></a>        <span class=K>if</span>(<a  onClick="return qs(event,this,115)"  class=SW href="#348">w_pl_init_we</a> &amp; (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 4))      <a  onClick="return qs(event,this,135)"  class=SR href="#461">r_initaddr2</a>     &lt;= <a  onClick="return qs(event,this,135)"  class=SR href="#502">r_initaddr2</a> + 4;
+<a name="503"></a>        <span class=K>if</span>(<a  onClick="return qs(event,this,135)"  class=SR href="#461">r_initaddr2</a> &gt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#212">BBL_SIZE</a> + <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#221">BIN_DISK_SIZE</a>)      <a  onClick="return qs(event,this,133)"  class=SR href="#503">r_disk_done</a>     &lt;= 1;
+    <span class=K>end</span>
+
+    <span class=C>// xsim requires declaration before use
+</span><a name="507"></a>    <span class=K>reg</span> <a  onClick="return qs(event,this,142)"  class=SR href="#507">r_set_dram_le</a>=0;
+<span class=P>`ifdef LAUR_MEM_RB
+</span><span class=P>`ifdef LAUR_MEM_RB_ONLY_CHECK
+</span><span class=P>        reg [31:0] r_rb_delay=0;
+</span><span class=P>`endif
+</span><span class=P>	reg [7:0] r_rb_state=0, r_rb_cnt=0;
+</span><span class=P>	reg [31:0] r_rb_data=0, r_verify_checksum=0;
+</span><span class=P>	assign w_verify_checksum = r_verify_checksum;
+</span><span class=P>	wire w_checksum_match = (r_verify_checksum == r_checksum);
+</span><span class=P>    	always@(posedge CLK) begin
+</span><span class=P>		if(r_init_state != 6) begin
+</span><span class=P>			r_rb_state &lt;= 0;
+</span><span class=P>			r_set_dram_le &lt;= 0;
+</span><span class=P>		end else begin
+</span><span class=P>			if(r_rb_state == 0) begin </span><span class=P>// idle
+</span><span class=P>				if(!r_mem_rb_done)
+</span><span class=P>					r_rb_state &lt;= 1;
+</span><span class=P>			end else if(r_rb_state == 1) begin
+</span>				<span class=P>// memory is 0 between (`D_INITD_ADDR + `D_SIZE_DEVT) and `BBL_SIZE
+</span><span class=P>				if(r_initaddr6 &lt; (`BBL_SIZE + `BIN_DISK_SIZE)) begin
+</span><span class=P>					if(!w_dram_busy) begin
+</span><span class=P>						r_set_dram_le &lt;= 1;
+</span><span class=P>						r_rb_state &lt;= 7;
+</span><span class=P>					end
+</span><span class=P>				end else begin
+</span><span class=P>					r_mem_rb_done &lt;= 1;
+</span><span class=P>					r_rb_state &lt;= 0;
+</span><span class=P>				end
+</span><span class=P>			end else if(r_rb_state == 7) begin </span><span class=P>// we have sent command
+</span><span class=P>				if(w_dram_busy) begin
+</span><span class=P>					r_set_dram_le &lt;= 0;
+</span><span class=P>					r_rb_state &lt;= 2;
+</span><span class=P>				end
+</span><span class=P>			end else if(r_rb_state == 2) begin </span><span class=P>// wait ram data
+</span><span class=P>				r_set_dram_le &lt;= 0;
+</span><span class=P>				if(!w_dram_busy) begin
+</span>					<span class=P>// we have w_dram_odata
+</span><span class=P>					r_verify_checksum &lt;= r_verify_checksum + w_dram_odata;
+</span><span class=P>					r_rb_data &lt;= w_dram_odata;
+</span><span class=P>`ifdef LAUR_MEM_RB_ONLY_CHECK
+</span><span class=P>					$display(</span><span class=P>&quot;mem[%x]: %x='%c%c%c%c'&quot;</span><span class=P>, r_initaddr6, w_dram_odata, 
+</span><span class=P>						 w_dram_odata &gt;&gt; 24, (w_dram_odata &gt;&gt; 16) &amp; 8'hff, 
+</span><span class=P>						(w_dram_odata &gt;&gt; 8) &amp; 8'hff, w_dram_odata &amp; 8'hff);
+</span><span class=P>					r_rb_state &lt;= 20;
+</span><span class=P>					r_rb_delay &lt;= 0;
+</span><span class=P>`else
+</span><span class=P>					r_rb_state &lt;= 3;
+</span><span class=P>`endif
+</span><span class=P>					r_rb_cnt &lt;= 0;
+</span><span class=P>				end
+</span><span class=P>`ifdef LAUR_MEM_RB_ONLY_CHECK
+</span><span class=P>			end else if(r_rb_state == 20) begin
+</span><span class=P>                                if(r_rb_delay &lt; 1) 
+</span><span class=P>                                        r_rb_delay &lt;= r_rb_delay + 1;
+</span><span class=P>                                else begin
+</span><span class=P>                                        r_rb_state &lt;= 0;
+</span><span class=P>                                        r_initaddr6 &lt;= r_initaddr6 + 4;
+</span><span class=P>                                        r_rb_delay &lt;= 0;
+</span><span class=P>                                end	
+</span><span class=P>`endif
+</span><span class=P>			end else if(r_rb_state == 3) begin </span><span class=P>// send 32 bit data
+</span><span class=P>				if(w_tx_ready)
+</span><span class=P>				       if(r_rb_cnt &lt; 4) begin
+</span><span class=P>						r_rb_cnt &lt;= r_rb_cnt + 1;
+</span><span class=P>						r_rb_uart_data &lt;= r_rb_data[7:0];
+</span><span class=P>						r_rb_data &lt;= {8'h0, r_rb_data[31:8]};
+</span><span class=P>						r_rb_state &lt;= 4;
+</span><span class=P>					end else begin
+</span><span class=P>						r_rb_uart_we &lt;= 0;
+</span><span class=P>						r_initaddr6 &lt;= r_initaddr6 + 4;
+</span><span class=P>						r_rb_state &lt;= 0;
+</span><span class=P>					end
+</span><span class=P>			end else if(r_rb_state == 4) begin </span><span class=P>// send 1 byte
+</span><span class=P>				r_rb_uart_we &lt;= 1;
+</span><span class=P>				if(!w_tx_ready)
+</span><span class=P>					r_rb_state &lt;= 5;
+</span><span class=P>			end else if(r_rb_state == 5) begin </span><span class=P>// done sending 1 byte
+</span><span class=P>				r_rb_state &lt;= 3;
+</span><span class=P>				r_rb_uart_we &lt;= 0;
+</span><span class=P>			end
+</span><span class=P>		end
+</span><span class=P>    	end
+</span><span class=M>`endif</span>
+
+    <span class=C>// Zero init
+</span><a name="592"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,143)"  class=SW href="#592">calib_done</a>;
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>
+<span class=P>`ifdef SIM_MAIN
+</span><span class=P>	    r_zero_we &lt;= 0;
+</span><span class=P>	    r_zero_done &lt;= 1;
+</span><span class=M>`else</span>
+<span class=M>`ifndef</span> <span class=D>ARTYA7</span>
+<a name="599"></a>        <span class=K>if</span>(!<a  onClick="return qs(event,this,70)"  class=SW href="#75">w_dram_busy</a> &amp; !<a  onClick="return qs(event,this,139)"  class=SR href="#467">r_zero_done</a>) <a  onClick="return qs(event,this,138)"  class=SR href="#466">r_zero_we</a> &lt;= 1;
+<span class=P>`else
+</span><span class=P>        if(!w_dram_busy &amp; !r_zero_done &amp; calib_done) r_zero_we &lt;= 1;
+</span><span class=M>`endif</span>
+        <span class=K>if</span>(<a  onClick="return qs(event,this,138)"  class=SR href="#466">r_zero_we</a>) <span class=K>begin</span>
+            <a  onClick="return qs(event,this,138)"  class=SR href="#466">r_zero_we</a>    &lt;= 0;
+<a name="605"></a>            <a  onClick="return qs(event,this,140)"  class=SR href="#468">r_zeroaddr</a> &lt;= <a  onClick="return qs(event,this,140)"  class=SR href="#605">r_zeroaddr</a> + 4;
+        <span class=K>end</span>
+<a name="607"></a>        <span class=K>if</span>(<a  onClick="return qs(event,this,140)"  class=SR href="#468">r_zeroaddr</a> &gt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="ddr2_model.v.html#154">MEM_SIZE</a>) <a  onClick="return qs(event,this,139)"  class=SR href="#607">r_zero_done</a> &lt;= 1;
+<span class=M>`endif</span>
+    <span class=K>end</span>
+
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+<a name="612"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,137)"  class=SW href="#465">w_zero_we</a> = 0;
+<span class=P>`else
+</span><span class=P>`ifdef SIM_MAIN
+</span><span class=P>    assign w_zero_we = 0;
+</span><span class=P>`else
+</span><span class=P>    assign w_zero_we = r_zero_we;
+</span><span class=P>`endif
+</span><span class=M>`endif</span>
+    <span class=C>/**********************************************************************************************/</span>
+<a name="621"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,144)"  class=SW href="#621">w_dram_addr_t</a>   = ((<a  onClick="return qs(event,this,66)"  class=SW href="#74">w_dram_addr</a>[31:28]==9) ?
+                                    (<a  onClick="return qs(event,this,66)"  class=SW href="#74">w_dram_addr</a> &amp; 32'h3ffffff) + <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#212">BBL_SIZE</a> :
+                                    <a  onClick="return qs(event,this,66)"  class=SW href="#74">w_dram_addr</a> &amp; 32'h3ffffff);
+<a name="624"></a>    <span class=K>wire</span> [31:0]  <a  onClick="return qs(event,this,145)"  class=SW href="#624">w_dram_addr_t2</a> =
+                    (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 1) ? <a  onClick="return qs(event,this,140)"  class=SR href="#605">r_zeroaddr</a>     : 
+                    (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 2) ? <a  onClick="return qs(event,this,129)"  class=SR href="#498">r_initaddr</a>     :
+<span class=P>`ifdef LAUR_MEM_RB
+</span><span class=P>		            (r_init_state == 6) ? r_initaddr6    :
+</span><span class=M>`endif</span>
+                    (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 3) ? <a  onClick="return qs(event,this,136)"  class=SR href="#500">r_initaddr3</a>    : 
+                    (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 4) ? <a  onClick="return qs(event,this,135)"  class=SR href="#502">r_initaddr2</a>    : <a  onClick="return qs(event,this,144)"  class=SW href="#621">w_dram_addr_t</a>;
+    
+<a name="633"></a>    <span class=K>wire</span> [31:0]  <a  onClick="return qs(event,this,146)"  class=SW href="#633">w_dram_wdata_t</a>   =   (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 1) ? 32'b0 :
+                                    (<a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a> == 5) ? <a  onClick="return qs(event,this,67)"  class=SW href="#74">w_dram_wdata</a> : <a  onClick="return qs(event,this,113)"  class=SW href="#350">w_pl_init_data</a>;
+
+<a name="636"></a>    <span class=K>wire</span> [2:0]   <a  onClick="return qs(event,this,147)"  class=SW href="#636">w_dram_ctrl_t</a>  = (!<a  onClick="return qs(event,this,6)"  class=SW href="#493">w_init_done</a>) ? <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#554">FUNCT3_SW____</a> : <a  onClick="return qs(event,this,71)"  class=SW href="#75">w_dram_ctrl</a>;
+    <span class=C>/**********************************************************************************************/</span>
+
+<span class=P>`ifdef LAUR_MEM_RB
+</span><span class=P>    wire w_wr_en =                 (r_init_state == 6) ? 0 :
+</span><span class=P>				                    w_zero_we || w_pl_init_we || w_dram_we_t;
+</span><span class=M>`else</span>
+<a name="643"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,148)"  class=SW href="#643">w_wr_en</a> =                  <a  onClick="return qs(event,this,137)"  class=SW href="#612">w_zero_we</a> || <a  onClick="return qs(event,this,115)"  class=SW href="#350">w_pl_init_we</a> || <a  onClick="return qs(event,this,69)"  class=SW href="#74">w_dram_we_t</a>;
+<span class=M>`endif</span>
+
+
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+<a name="m_topsim_idbmem"></a><a name="648"></a>    <a  onClick="return qs(event,this,0)"  class=MM href="memsim.v.html#m_dram_sim">m_dram_sim</a> #(<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="ddr2_model.v.html#154">MEM_SIZE</a>) idbmem(<span class=SI>.CLK</span>(<a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>), <span class=SI>.w_addr</span>(<a  onClick="return qs(event,this,145)"  class=SW href="#624">w_dram_addr_t2</a>), <a  onClick="return qs(event,this,0)"  class=SO href="memsim.v.html#585">.w_odata</a>(<a  onClick="return qs(event,this,68)"  class=SW href="#74">w_dram_odata</a>), 
+<a name="649"></a>        <span class=SI>.w_we</span>(<a  onClick="return qs(event,this,69)"  class=SW href="#74">w_dram_we_t</a>), <span class=SI>.w_le</span>(<a  onClick="return qs(event,this,72)"  class=SW href="#75">w_dram_le</a>), <span class=SI>.w_wdata</span>(<a  onClick="return qs(event,this,146)"  class=SW href="#633">w_dram_wdata_t</a>), <span class=SI>.w_ctrl</span>(<a  onClick="return qs(event,this,147)"  class=SW href="#636">w_dram_ctrl_t</a>), <a  onClick="return qs(event,this,0)"  class=SO href="memsim.v.html#586">.w_stall</a>(<a  onClick="return qs(event,this,70)"  class=SW href="#75">w_dram_busy</a>), 
+<a name="650"></a>        <span class=SI>.w_mtime</span>(<a  onClick="return qs(event,this,12)"  class=SW href="#124">w_mtime</a>[31:0]));
+<span class=P>`else
+</span><span class=P>    DRAM_conRV dram_con (
+</span>                               <span class=P>// user interface ports
+</span><span class=P>`ifdef LAUR_MEM_RB
+</span><span class=P>                               .i_rd_en(w_dram_le | r_set_dram_le)
+</span><span class=P>`else
+</span><span class=P>                               .i_rd_en(w_dram_le),
+</span><span class=P>`endif
+</span><span class=P>                               .i_wr_en(w_wr_en),
+</span><span class=P>                               .i_addr(w_dram_addr_t2),
+</span><span class=P>                               .i_data(w_dram_wdata_t),
+</span><span class=P>                               .o_data(w_dram_odata),
+</span><span class=P>                               .o_busy(w_dram_busy),
+</span><span class=P>                               .i_ctrl(w_dram_ctrl_t),
+</span>                               <span class=P>// input clk, rst (active-low)
+</span><span class=P>                               .mig_clk(mig_clk),
+</span><span class=P>                               .mig_rst_x(mig_rst_x),
+</span><span class=P>`ifdef ARTYA7
+</span><span class=P>                               .ref_clk(ref_clk),
+</span><span class=P>`endif
+</span>                               <span class=P>// ddr interface ports
+</span><span class=P>`ifndef ARTYA7
+</span><span class=P>                               .ddr2_dq(ddr2_dq),
+</span><span class=P>                               .ddr2_dqs_n(ddr2_dqs_n),
+</span><span class=P>                               .ddr2_dqs_p(ddr2_dqs_p),
+</span><span class=P>                               .ddr2_addr(ddr2_addr),
+</span><span class=P>                               .ddr2_ba(ddr2_ba),
+</span><span class=P>                               .ddr2_ras_n(ddr2_ras_n),
+</span><span class=P>                               .ddr2_cas_n(ddr2_cas_n),
+</span><span class=P>                               .ddr2_we_n(ddr2_we_n),
+</span><span class=P>                               .ddr2_ck_p(ddr2_ck_p),
+</span><span class=P>                               .ddr2_ck_n(ddr2_ck_n),
+</span><span class=P>                               .ddr2_cke(ddr2_cke),
+</span><span class=P>                               .ddr2_cs_n(ddr2_cs_n),
+</span><span class=P>                               .ddr2_dm(ddr2_dm),
+</span><span class=P>                               .ddr2_odt(ddr2_odt),
+</span><span class=P>`else
+</span><span class=P>                               .ddr3_dq(ddr3_dq),
+</span><span class=P>                               .ddr3_dqs_n(ddr3_dqs_n),
+</span><span class=P>                               .ddr3_dqs_p(ddr3_dqs_p),
+</span><span class=P>                               .ddr3_addr(ddr3_addr),
+</span><span class=P>                               .ddr3_ba(ddr3_ba),
+</span><span class=P>                               .ddr3_ras_n(ddr3_ras_n),
+</span><span class=P>                               .ddr3_cas_n(ddr3_cas_n),
+</span><span class=P>                               .ddr3_we_n(ddr3_we_n),
+</span><span class=P>                               .ddr3_ck_p(ddr3_ck_p),
+</span><span class=P>                               .ddr3_ck_n(ddr3_ck_n),
+</span><span class=P>                               .ddr3_reset_n(ddr3_reset_n),
+</span><span class=P>                               .ddr3_cke(ddr3_cke),
+</span><span class=P>                               .ddr3_cs_n(ddr3_cs_n),
+</span><span class=P>                               .ddr3_dm(ddr3_dm),
+</span><span class=P>                               .ddr3_odt(ddr3_odt),
+</span><span class=P>`endif
+</span>                               <span class=P>// output clk, rst (active-low)
+</span><span class=P>                               .o_clk(o_clk),
+</span><span class=P>                               .o_rst_x(o_rst_x),
+</span>                               <span class=P>// other
+</span><span class=P>                               .o_init_calib_complete(calib_done)
+</span><span class=P>                               );
+</span><span class=M>`endif</span>
+
+<span class=M>`ifndef</span> <span class=D>ARTYA7</span>
+<a name="713"></a>    <span class=K>wire</span> [15:0] <a  onClick="return qs(event,this,149)"  class=SW href="#713">ddr2_dq</a>;
+<a name="714"></a>    <span class=K>wire</span> [1:0]  <a  onClick="return qs(event,this,150)"  class=SW href="#714">ddr2_dqs_n</a>;
+<a name="715"></a>    <span class=K>wire</span> [1:0]  <a  onClick="return qs(event,this,151)"  class=SW href="#715">ddr2_dqs_p</a>;
+<a name="716"></a>    <span class=K>wire</span> [12:0] <a  onClick="return qs(event,this,152)"  class=SW href="#716">ddr2_addr</a>;
+<a name="717"></a>    <span class=K>wire</span> [2:0]  <a  onClick="return qs(event,this,153)"  class=SW href="#717">ddr2_ba</a>;
+<a name="718"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,154)"  class=SW href="#718">ddr2_ras_n</a>;
+<a name="719"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,155)"  class=SW href="#719">ddr2_cas_n</a>;
+<a name="720"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,156)"  class=SW href="#720">ddr2_we_n</a>;
+<a name="721"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,157)"  class=SW href="#721">ddr2_ck_p</a>;
+<a name="722"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,158)"  class=SW href="#722">ddr2_ck_n</a>;
+<a name="723"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,159)"  class=SW href="#723">ddr2_cke</a>;
+<a name="724"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,160)"  class=SW href="#724">ddr2_cs_n</a>;
+<a name="725"></a>    <span class=K>wire</span> [1:0]  <a  onClick="return qs(event,this,161)"  class=SW href="#725">ddr2_dm</a>;
+<a name="726"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,162)"  class=SW href="#726">ddr2_odt</a>;
+<span class=P>`else
+</span><span class=P>    wire ref_clk;
+</span><span class=P>    wire [15:0] ddr3_dq;
+</span><span class=P>    wire [1:0]  ddr3_dqs_n;
+</span><span class=P>    wire [1:0]  ddr3_dqs_p;
+</span><span class=P>    wire [13:0] ddr3_addr;
+</span><span class=P>    wire [2:0]  ddr3_ba;
+</span><span class=P>    wire        ddr3_ras_n;
+</span><span class=P>    wire        ddr3_cas_n;
+</span><span class=P>    wire        ddr3_we_n;
+</span><span class=P>    wire        ddr3_ck_p;
+</span><span class=P>    wire        ddr3_ck_n;
+</span><span class=P>    wire        ddr3_reset_n;
+</span><span class=P>    wire        ddr3_cke;
+</span><span class=P>    wire        ddr3_cs_n;
+</span><span class=P>    wire [1:0]  ddr3_dm;
+</span><span class=P>    wire        ddr3_odt;
+</span><span class=M>`endif</span>
+
+    <span class=C>/*********************************************************************************************/</span>
+    <span class=C>// first 4 leds are set in main.v
+</span><a name="748"></a>    <span class=K>wire</span> [15:0] <a  onClick="return qs(event,this,163)"  class=SW href="#753">w_led</a>;
+<span class=P>`ifdef LAUR_MEM_RB
+</span><span class=P>    assign w_led = ({r_rb_state[2:0], w_checksum_match} &lt;&lt; 12) | (r_mem_rb_done &lt;&lt; 11) | (r_init_state &lt;&lt; 8)
+</span><span class=P>                    | ({w_pl_init_done, r_disk_done, r_bbl_done, r_zero_done} &lt;&lt; 4) | r_init_state;
+</span><span class=M>`else</span>
+<a name="753"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,163)"  class=SW href="#748">w_led</a> = <span class=C>/*(w_proc_busy &lt;&lt; 12) | (r_mc_mode &lt;&lt; 8)*/</span> 0
+                    | ({<a  onClick="return qs(event,this,114)"  class=SW href="#351">w_pl_init_done</a>, <a  onClick="return qs(event,this,133)"  class=SR href="#503">r_disk_done</a>, <a  onClick="return qs(event,this,132)"  class=SR href="#499">r_bbl_done</a>, <a  onClick="return qs(event,this,139)"  class=SR href="#607">r_zero_done</a>} &lt;&lt; 4) | <a  onClick="return qs(event,this,128)"  class=SR href="#440">r_init_state</a>;
+<span class=M>`endif</span>
+
+    <span class=C>/**********************************************************************************************/</span>
+    <span class=C>// LOAD linux
+</span><a name="759"></a>    <span class=K>integer</span> <a  onClick="return qs(event,this,164)"  class=SIT href="#771">j</a>;
+    <span class=C>//integer k;
+</span><a name="761"></a>    <span class=K>reg</span>  [7:0] <a  onClick="return qs(event,this,165)"  class=SR href="#761">mem_bbl</a> [0:<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#212">BBL_SIZE</a>-1];
+<a name="762"></a>    <span class=K>reg</span>  [7:0] <a  onClick="return qs(event,this,166)"  class=SR href="#762">mem_disk</a>[0:<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#172">DISK_SIZE</a>-1];
+    <span class=K>initial</span> <span class=K>begin</span>
+<span class=M>`ifndef</span> <span class=D>VERILATOR</span>
+    #1
+<span class=M>`endif</span>
+
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#34">LINUX</a>
+        <span class=ST>$write</span>(<span class=S>&quot;Load image file: %s\n&quot;</span>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#44">IMAGE_FILE</a>);
+        <span class=ST>$readmemh</span>(<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#44">IMAGE_FILE</a>, <a  onClick="return qs(event,this,166)"  class=SR href="#762">mem_disk</a>);
+<a name="771"></a>        <a  onClick="return qs(event,this,164)"  class=SIT href="#759">j</a>=<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#212">BBL_SIZE</a>;
+
+        <span class=K>for</span>(<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>=0;<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>&lt;<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#172">DISK_SIZE</a>;<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>=<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>+1) <span class=K>begin</span>
+<span class=P>`ifdef DRAM_SIM
+</span><span class=P>`ifdef SKIP_CACHE
+</span><span class=P>	    idbmem.idbmem.mem[j]=mem_disk[i];
+</span><span class=P>`else
+</span><span class=P>	    idbmem.cache_ctrl.mi.mem[j]=mem_disk[i];
+</span><span class=P>`endif
+</span><span class=M>`else</span>
+	    idbmem.idbmem.mem[<a  onClick="return qs(event,this,164)"  class=SIT href="#771">j</a>]=<a  onClick="return qs(event,this,166)"  class=SR href="#762">mem_disk</a>[<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>];
+<span class=M>`endif</span> <span class=C>// DRAM_SIM
+</span>            <a  onClick="return qs(event,this,164)"  class=SIT href="#759">j</a>=<a  onClick="return qs(event,this,164)"  class=SIT href="#771">j</a>+1;
+        <span class=K>end</span>
+<span class=M>`endif</span> <span class=C>// LINUX
+</span>
+        <span class=ST>$write</span>(<span class=S>&quot;Running %s\n&quot;</span>, {<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#40">HEX_DIR</a>,<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#43">HEXFILE</a>});
+        <span class=ST>$readmemh</span>({<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#40">HEX_DIR</a>,<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#43">HEXFILE</a>}, <a  onClick="return qs(event,this,165)"  class=SR href="#761">mem_bbl</a>);
+        <a  onClick="return qs(event,this,164)"  class=SIT href="#759">j</a>=0;
+
+        <span class=K>for</span>(<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>=0;<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>&lt;<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#212">BBL_SIZE</a>;<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>=<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>+1) <span class=K>begin</span>
+<span class=P>`ifdef DRAM_SIM
+</span><span class=P>`ifdef SKIP_CACHE
+</span><span class=P>        idbmem.idbmem.mem[j]=mem_bbl[i];
+</span><span class=P>`else
+</span><span class=P>	    idbmem.cache_ctrl.mi.mem[j]=mem_bbl[i];
+</span><span class=P>`endif
+</span><span class=M>`else</span>
+	    idbmem.idbmem.mem[<a  onClick="return qs(event,this,164)"  class=SIT href="#771">j</a>]=<a  onClick="return qs(event,this,165)"  class=SR href="#761">mem_bbl</a>[<a  onClick="return qs(event,this,126)"  class=SIT href="#396">i</a>];
+<span class=M>`endif</span> <span class=C>// DRAM_SIM
+</span>            <a  onClick="return qs(event,this,164)"  class=SIT href="#759">j</a>=<a  onClick="return qs(event,this,164)"  class=SIT href="#771">j</a>+1;
+        <span class=K>end</span>
+        <span class=ST>$write</span>(<span class=S>&quot;-------------------------------------------------------------------\n&quot;</span>);
+    <span class=K>end</span>
+
+<span class=C>/**********************************************************************************************/</span>
+
+<span class=C>/***********************************          write time        *******************************/</span>
+<a name="809"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#809">LAUR_WRITE_TIME</a>
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="#809">LAUR_WRITE_TIME</a>
+<a name="811"></a>    <span class=K>reg</span> [63:0] <a  onClick="return qs(event,this,167)"  class=SR href="#814">old_w_mtime</a>=0;
+    <span class=K>always</span> @(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#38">CLK</a>) <span class=K>begin</span>
+	    <span class=K>if</span>(<a  onClick="return qs(event,this,167)"  class=SR href="#811">old_w_mtime</a> != <a  onClick="return qs(event,this,12)"  class=SW href="#46">w_mtime</a>) <span class=K>begin</span>
+<a name="814"></a>		    <a  onClick="return qs(event,this,167)"  class=SR href="#811">old_w_mtime</a> = <a  onClick="return qs(event,this,12)"  class=SW href="#124">w_mtime</a>;
+		    <span class=K>if</span>(<a  onClick="return qs(event,this,12)"  class=SW href="#46">w_mtime</a> % 64'd10000000 == 64'd0) <span class=K>begin</span>
+			    <span class=ST>$write</span>(<span class=S>&quot;w_mtime=%d ENABLE_TIMER=%d\n&quot;</span>, <a  onClick="return qs(event,this,12)"  class=SW href="#46">w_mtime</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#82">ENABLE_TIMER</a>);
+		    <span class=K>end</span>
+	    <span class=K>end</span>
+    <span class=K>end</span>
+<span class=M>`endif</span>
+
+<span class=C>//`define RAM_DEBUG 
+</span><span class=P>`ifdef RAM_DEBUG
+</span><span class=P>reg [31:0] o_pc0=-1, o_ir0=-1, o_pc1=-1, o_ir1=-1, old_time=-1, rd_cnt=0;
+</span><span class=P>always @(posedge CLK)
+</span><span class=P>begin
+</span><span class=P>    if(w_mtime &lt; 100) begin
+</span><span class=P>		o_pc0 &lt;= core0.p.r_cpc;
+</span><span class=P>		o_ir0 &lt;= core0.p.r_ir;
+</span><span class=P>		o_pc1 &lt;= core1.p.r_cpc;
+</span><span class=P>		o_ir1 &lt;= core1.p.r_ir;
+</span><span class=P>		$write(</span><span class=P>&quot;t=%08d pc0=%08x ir0=%08x pc1=%08x ir1=%08x grant=%x state=%x a_w_dram_busy=%x w_dram_busy=%x le=%x w=%x mw=%x pb=%x,%x bus_dram_busy=%x,%x \n&quot;</span><span class=P>,
+</span><span class=P>                	w_mtime[31:0], 
+</span><span class=P>                    core0.p.r_cpc, core0.p.r_ir,
+</span><span class=P>                    core1.p.r_cpc, core1.p.r_ir,
+</span><span class=P>                    ba.grant[0], ba.state,
+</span><span class=P>                    ba.a_w_dram_busy, w_dram_busy, 
+</span><span class=P>                    w_dram_le, w_dram_we_t, w_mem_we, 
+</span><span class=P>                    core1.mmu.w_proc_busy, core0.mmu.w_proc_busy,
+</span><span class=P>                    bus_dram_busy1, bus_dram_busy0
+</span><span class=P>        );
+</span><span class=P>	end
+</span><span class=P>/*
+    if(core0.p.r_cpc &gt;= 32'h800023b0 &amp;&amp; core0.p.r_cpc &lt;= 32'h8000242e &amp;&amp; rd_cnt &lt; 400) begin
+        rd_cnt &lt;= rd_cnt + 1;
+        $write(&quot;t=%08d pc0=%08x ir0=%08x pc1=%08x ir1=%08x grant=%x state=%x a_w_dram_busy=%x w_dram_busy=%x le=%x w=%x mw=%x pb=%x,%x bus_dram_busy=%x,%x \n&quot;,
+                	w_mtime[31:0],
+                    core0.p.r_cpc, core0.p.r_ir,
+                    core1.p.r_cpc, core1.p.r_ir,
+                    ba.grant[0], ba.state,
+                    ba.a_w_dram_busy, w_dram_busy, 
+                    w_dram_le, w_dram_we_t, w_mem_we, 
+                    core1.mmu.w_proc_busy, core0.mmu.w_proc_busy,
+                    bus_dram_busy1, bus_dram_busy0
+        );
+    end
+*/</span>
+<span class=P>end
+</span>
+<span class=M>`endif</span>
+<span class=K>endmodule</span>
+
+
+</pre>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<script language="JavaScript"type="text/javascript"><!--
+function next_page() { return ""; }
+function first_page() { return ""; }
+var extra_info = [
+["S","top.v.html#38","","","top.v.html#38","hierarchy-s.p2.html#CLK___m_topsim"],
+["S","top.v.html#38","","","top.v.html#38","hierarchy-s.p6.html#RST_X___m_topsim"],
+["S","top.v.html#42","top.v.html#196","","top.v.html#196","hierarchy-s.html#bus_ipi___m_topsim"],
+["S","top.v.html#42","top.v.html#42","","rvcorem.v.html#890","hierarchy-s.html#bus_core_ir_0___m_topsim"],
+["S","top.v.html#42","top.v.html#42","","rvcorem.v.html#88","hierarchy-s.html#bus_cpustate0___m_topsim"],
+["S","top.v.html#43","top.v.html#493","","top.v.html#493","hierarchy-s.p8.html#w_init_done___m_topsim"],
+["S","top.v.html#43","top.v.html#307","","loader.v.html#70","hierarchy-s.p8.html#w_tx_ready___m_topsim"],
+["S","top.v.html#44","top.v.html#44","","mmu.v.html#232","hierarchy-s.html#bus_mem_paddr0___m_topsim"],
+["S","top.v.html#44","top.v.html#44","","mmu.v.html#69","hierarchy-s.html#bus_mem_we0___m_topsim"],
+["S","top.v.html#45","top.v.html#45","","rvcorem.v.html#428","hierarchy-s.html#bus_data_wdata0___m_topsim"],
+["S","top.v.html#45","top.v.html#79","","busarbiter.v.html#106","hierarchy-s.html#bus_data_data0___m_topsim"],
+["S","top.v.html#46","top.v.html#124","","top.v.html#124","hierarchy-s.p8.html#w_mtime___m_topsim"],
+["S","top.v.html#46","top.v.html#46","","rvcorem.v.html#882","hierarchy-s.html#bus_mtimecmp0___m_topsim"],
+["S","top.v.html#46","top.v.html#80","","busarbiter.v.html#107","hierarchy-s.html#bus_wmtimecmp0___m_topsim"],
+["S","top.v.html#46","top.v.html#80","","busarbiter.v.html#108","hierarchy-s.html#bus_clint_we0___m_topsim"],
+["S","top.v.html#47","top.v.html#47","","","hierarchy-s.html#bus_pw_state0___m_topsim"],
+["S","top.v.html#48","top.v.html#48","","rvcorem.v.html#876","hierarchy-s.html#bus_tlb_req0___m_topsim"],
+["S","top.v.html#48","top.v.html#48","","mmu.v.html#274","hierarchy-s.html#bus_tlb_busy0___m_topsim"],
+["S","top.v.html#49","top.v.html#49","","rvcorem.v.html#883","hierarchy-s.html#bus_mip0___m_topsim"],
+["S","top.v.html#49","top.v.html#82","","busarbiter.v.html#109","hierarchy-s.html#bus_wmip0___m_topsim"],
+["S","top.v.html#49","top.v.html#82","","busarbiter.v.html#110","hierarchy-s.html#bus_plic_we0___m_topsim"],
+["S","top.v.html#50","top.v.html#50","","mmu.v.html#253","hierarchy-s.html#bus_dram_addr0___m_topsim"],
+["S","top.v.html#50","top.v.html#50","","mmu.v.html#249","hierarchy-s.html#bus_dram_wdata0___m_topsim"],
+["S","top.v.html#50","top.v.html#83","","busarbiter.v.html#111","hierarchy-s.html#bus_dram_odata0___m_topsim"],
+["S","top.v.html#50","top.v.html#50","","mmu.v.html#278","hierarchy-s.html#bus_dram_we_t0___m_topsim"],
+["S","top.v.html#51","top.v.html#84","","busarbiter.v.html#112","hierarchy-s.html#bus_dram_busy0___m_topsim"],
+["S","top.v.html#51","top.v.html#51","","mmu.v.html#258","hierarchy-s.html#bus_dram_ctrl0___m_topsim"],
+["S","top.v.html#51","top.v.html#51","","mmu.v.html#264","hierarchy-s.html#bus_dram_le0___m_topsim"],
+["S","top.v.html#55","top.v.html#55","","rvcorem.v.html#890","hierarchy-s.html#bus_core_ir_1___m_topsim"],
+["S","top.v.html#55","top.v.html#55","","rvcorem.v.html#88","hierarchy-s.html#bus_cpustate1___m_topsim"],
+["S","top.v.html#57","top.v.html#57","","mmu.v.html#232","hierarchy-s.html#bus_mem_paddr1___m_topsim"],
+["S","top.v.html#57","top.v.html#57","","mmu.v.html#69","hierarchy-s.html#bus_mem_we1___m_topsim"],
+["S","top.v.html#58","top.v.html#58","","rvcorem.v.html#428","hierarchy-s.html#bus_data_wdata1___m_topsim"],
+["S","top.v.html#58","top.v.html#88","","busarbiter.v.html#114","hierarchy-s.html#bus_data_data1___m_topsim"],
+["S","top.v.html#59","top.v.html#59","","rvcorem.v.html#882","hierarchy-s.html#bus_mtimecmp1___m_topsim"],
+["S","top.v.html#59","top.v.html#89","","busarbiter.v.html#115","hierarchy-s.html#bus_wmtimecmp1___m_topsim"],
+["S","top.v.html#59","top.v.html#89","","busarbiter.v.html#116","hierarchy-s.html#bus_clint_we1___m_topsim"],
+["S","top.v.html#60","top.v.html#60","","","hierarchy-s.html#bus_pw_state1___m_topsim"],
+["S","top.v.html#61","top.v.html#61","","rvcorem.v.html#876","hierarchy-s.html#bus_tlb_req1___m_topsim"],
+["S","top.v.html#61","top.v.html#61","","mmu.v.html#274","hierarchy-s.html#bus_tlb_busy1___m_topsim"],
+["S","top.v.html#62","top.v.html#62","","rvcorem.v.html#883","hierarchy-s.html#bus_mip1___m_topsim"],
+["S","top.v.html#62","top.v.html#91","","busarbiter.v.html#117","hierarchy-s.html#bus_wmip1___m_topsim"],
+["S","top.v.html#62","top.v.html#91","","busarbiter.v.html#118","hierarchy-s.html#bus_plic_we1___m_topsim"],
+["S","top.v.html#63","top.v.html#63","","mmu.v.html#253","hierarchy-s.html#bus_dram_addr1___m_topsim"],
+["S","top.v.html#63","top.v.html#63","","mmu.v.html#249","hierarchy-s.html#bus_dram_wdata1___m_topsim"],
+["S","top.v.html#63","top.v.html#92","","busarbiter.v.html#119","hierarchy-s.html#bus_dram_odata1___m_topsim"],
+["S","top.v.html#63","top.v.html#63","","mmu.v.html#278","hierarchy-s.html#bus_dram_we_t1___m_topsim"],
+["S","top.v.html#64","top.v.html#93","","busarbiter.v.html#120","hierarchy-s.html#bus_dram_busy1___m_topsim"],
+["S","top.v.html#64","top.v.html#64","","mmu.v.html#258","hierarchy-s.html#bus_dram_ctrl1___m_topsim"],
+["S","top.v.html#64","top.v.html#64","","mmu.v.html#264","hierarchy-s.html#bus_dram_le1___m_topsim"],
+["S","top.v.html#67","top.v.html#67","","busarbiter.v.html#43","hierarchy-s.p8.html#w_grant___m_topsim"],
+["S","top.v.html#69","top.v.html#69","","busarbiter.v.html#140","hierarchy-s.p8.html#w_mem_paddr___m_topsim"],
+["S","top.v.html#69","top.v.html#69","","busarbiter.v.html#141","hierarchy-s.p8.html#w_mem_we___m_topsim"],
+["S","top.v.html#70","top.v.html#70","","busarbiter.v.html#142","hierarchy-s.p8.html#w_data_wdata___m_topsim"],
+["S","top.v.html#70","top.v.html#162","","top.v.html#162","hierarchy-s.p8.html#w_data_data___m_topsim"],
+["S","top.v.html#71","top.v.html#71","","busarbiter.v.html#143","hierarchy-s.p8.html#w_mtimecmp___m_topsim"],
+["S","top.v.html#71","top.v.html#297","","top.v.html#297","hierarchy-s.p8.html#w_wmtimecmp___m_topsim"],
+["S","top.v.html#71","top.v.html#301","","top.v.html#301","hierarchy-s.p8.html#w_clint_we___m_topsim"],
+["S","top.v.html#72","top.v.html#72","","busarbiter.v.html#144","hierarchy-s.p8.html#w_tlb_req___m_topsim"],
+["S","top.v.html#72","top.v.html#72","","busarbiter.v.html#145","hierarchy-s.p8.html#w_tlb_busy___m_topsim"],
+["S","top.v.html#73","top.v.html#73","","busarbiter.v.html#146","hierarchy-s.p8.html#w_mip___m_topsim"],
+["S","top.v.html#73","top.v.html#213","","top.v.html#213","hierarchy-s.p8.html#w_wmip___m_topsim"],
+["S","top.v.html#73","top.v.html#183","","top.v.html#183","hierarchy-s.p8.html#w_plic_aces___m_topsim"],
+["S","top.v.html#73","top.v.html#193","","top.v.html#193","hierarchy-s.p6.html#r_plic_aces_t___m_topsim"],
+["S","top.v.html#73","top.v.html#212","","top.v.html#212","hierarchy-s.p8.html#w_plic_we___m_topsim"],
+["S","top.v.html#74","top.v.html#74","","busarbiter.v.html#147","hierarchy-s.p8.html#w_dram_addr___m_topsim"],
+["S","top.v.html#74","top.v.html#74","","busarbiter.v.html#148","hierarchy-s.p8.html#w_dram_wdata___m_topsim"],
+["S","top.v.html#74","top.v.html#648","","memsim.v.html#502","hierarchy-s.p8.html#w_dram_odata___m_topsim"],
+["S","top.v.html#74","top.v.html#74","","busarbiter.v.html#149","hierarchy-s.p8.html#w_dram_we_t___m_topsim"],
+["S","top.v.html#75","top.v.html#649","","memsim.v.html#509","hierarchy-s.p8.html#w_dram_busy___m_topsim"],
+["S","top.v.html#75","top.v.html#75","","busarbiter.v.html#150","hierarchy-s.p8.html#w_dram_ctrl___m_topsim"],
+["S","top.v.html#75","top.v.html#75","","busarbiter.v.html#151","hierarchy-s.p8.html#w_dram_le___m_topsim"],
+["S","top.v.html#107","","","","hierarchy-s.p8.html#w_pw_state___m_topsim"],
+["S","top.v.html#123","top.v.html#127","","top.v.html#127","hierarchy-s.p5.html#mtime___m_topsim"],
+["S","top.v.html#131","top.v.html#131","","top.v.html#131","hierarchy-s.p8.html#w_isread___m_topsim"],
+["S","top.v.html#132","top.v.html#132","","top.v.html#132","hierarchy-s.p8.html#w_iswrite___m_topsim"],
+["S","top.v.html#134","top.v.html#134","","top.v.html#134","hierarchy-s.p8.html#w_dev___m_topsim"],
+["S","top.v.html#135","top.v.html#135","","top.v.html#135","hierarchy-s.p8.html#w_virt___m_topsim"],
+["S","top.v.html#136","top.v.html#136","","top.v.html#136","hierarchy-s.p8.html#w_offset___m_topsim"],
+["S","top.v.html#137","top.v.html#143","","top.v.html#143","hierarchy-s.p6.html#r_mem_paddr___m_topsim"],
+["S","top.v.html#138","top.v.html#141","","top.v.html#141","hierarchy-s.p6.html#r_dev___m_topsim"],
+["S","top.v.html#139","top.v.html#142","","top.v.html#142","hierarchy-s.p6.html#r_virt___m_topsim"],
+["S","top.v.html#147","top.v.html#150","","top.v.html#150","hierarchy-s.p6.html#r_data_data___m_topsim"],
+["S","top.v.html#175","top.v.html#229","","top.v.html#229","hierarchy-s.p6.html#r_clint_odata___m_topsim"],
+["S","top.v.html#173","top.v.html#221","","top.v.html#221","hierarchy-s.p6.html#r_plic_odata___m_topsim"],
+["S","top.v.html#355","top.v.html#371","","top.v.html#371","hierarchy-s.p6.html#r_consf_cnts___m_topsim"],
+["S","top.v.html#358","top.v.html#410","","top.v.html#410","hierarchy-s.p6.html#r_char_value___m_topsim"],
+["S","top.v.html#165","top.v.html#165","","top.v.html#165","hierarchy-s.p8.html#w_cons_irq___m_topsim"],
+["S","top.v.html#166","top.v.html#166","","top.v.html#166","hierarchy-s.p8.html#w_cons_irq_oe___m_topsim"],
+["S","top.v.html#167","top.v.html#167","","top.v.html#167","hierarchy-s.p8.html#w_key_req___m_topsim"],
+["S","top.v.html#168","top.v.html#168","","top.v.html#168","hierarchy-s.p8.html#w_virt_irq___m_topsim"],
+["S","top.v.html#169","top.v.html#169","","top.v.html#169","hierarchy-s.p8.html#w_virt_irq_oe___m_topsim"],
+["S","top.v.html#171","top.v.html#222","","top.v.html#222","hierarchy-s.p6.html#plic_served_irq___m_topsim"],
+["S","top.v.html#172","top.v.html#226","","top.v.html#226","hierarchy-s.p6.html#plic_pending_irq___m_topsim"],
+["S","top.v.html#177","top.v.html#177","","top.v.html#177","hierarchy-s.p8.html#w_plic_pending_irq_nxt___m_topsim"],
+["S","top.v.html#178","top.v.html#178","","top.v.html#178","hierarchy-s.p8.html#w_plic_mask___m_topsim"],
+["S","top.v.html#179","top.v.html#179","","top.v.html#179","hierarchy-s.p8.html#w_plic_served_irq_nxt___m_topsim"],
+["S","top.v.html#186","","","","hierarchy-s.p6.html#r_wmip___m_topsim"],
+["S","top.v.html#187","","","","hierarchy-s.p6.html#r_plic_we___m_topsim"],
+["S","top.v.html#189","top.v.html#207","","top.v.html#207","hierarchy-s.p6.html#r_plic_pending_irq_t___m_topsim"],
+["S","top.v.html#190","top.v.html#208","","top.v.html#208","hierarchy-s.p6.html#r_plic_served_irq_t___m_topsim"],
+["S","top.v.html#192","top.v.html#205","","top.v.html#205","hierarchy-s.p6.html#r_virt_irq_oe_t___m_topsim"],
+["S","top.v.html#195","top.v.html#246","","top.v.html#246","hierarchy-s.p6.html#r_ipi___m_topsim"],
+["S","top.v.html#197","top.v.html#283","","top.v.html#283","hierarchy-s.p6.html#r_was_clint_we___m_topsim"],
+["S","top.v.html#198","top.v.html#244","","top.v.html#244","hierarchy-s.p6.html#r_max_displays___m_topsim"],
+["S","top.v.html#200","top.v.html#200","","top.v.html#200","hierarchy-s.p8.html#w_plic_mask_nxt___m_topsim"],
+["S","top.v.html#296","top.v.html#296","","top.v.html#296","hierarchy-s.p8.html#w_data_we___m_topsim"],
+["S","top.v.html#307","top.v.html#310","","top.v.html#310","hierarchy-s.p6.html#r_uart_data___m_topsim"],
+["S","top.v.html#307","top.v.html#309","","top.v.html#309","hierarchy-s.p6.html#r_uart_we___m_topsim"],
+["S","top.v.html#307","top.v.html#307","","loader.v.html#69","hierarchy-s.p8.html#w_txd___m_topsim"],
+["S","top.v.html#317","top.v.html#334","","top.v.html#334","hierarchy-s.p6.html#r_finish___m_topsim"],
+["S","top.v.html#345","top.v.html#350","","loader.v.html#42","hierarchy-s.p8.html#w_pl_init_addr___m_topsim"],
+["S","top.v.html#346","top.v.html#350","","loader.v.html#42","hierarchy-s.p8.html#w_pl_init_data___m_topsim"],
+["S","top.v.html#347","top.v.html#351","","loader.v.html#42","hierarchy-s.p8.html#w_pl_init_done___m_topsim"],
+["S","top.v.html#348","top.v.html#350","","loader.v.html#42","hierarchy-s.p8.html#w_pl_init_we___m_topsim"],
+["S","top.v.html#349","","","","hierarchy-s.p8.html#w_rxd___m_topsim"],
+["S","top.v.html#351","top.v.html#351","","loader.v.html#37","hierarchy-s.p8.html#w_key_we___m_topsim"],
+["S","top.v.html#351","top.v.html#351","","loader.v.html#38","hierarchy-s.p8.html#w_key_data___m_topsim"],
+["S","top.v.html#353","top.v.html#369","","top.v.html#369","hierarchy-s.p6.html#r_consf_head___m_topsim"],
+["S","top.v.html#354","top.v.html#370","","top.v.html#370","hierarchy-s.p6.html#r_consf_tail___m_topsim"],
+["S","top.v.html#356","top.v.html#368","","top.v.html#368","hierarchy-s.p6.html#r_consf_en___m_topsim"],
+["S","top.v.html#357","top.v.html#419","","top.v.html#419","hierarchy-s.p2.html#cons_fifo___m_topsim"],
+["S","top.v.html#360","top.v.html#361","","read_file.v.html#48","hierarchy-s.p8.html#w_file_we___m_topsim"],
+["S","top.v.html#388","top.v.html#391","","top.v.html#391","hierarchy-s.p6.html#r_key_we___m_topsim"],
+["S","top.v.html#389","top.v.html#392","","top.v.html#392","hierarchy-s.p6.html#r_key_data___m_topsim"],
+["S","top.v.html#396","","","","hierarchy-s.p4.html#i___m_topsim"],
+["S","top.v.html#398","top.v.html#401","","top.v.html#401","hierarchy-s.p6.html#r_read_a_char___m_topsim"],
+["S","top.v.html#440","","","","hierarchy-s.p6.html#r_init_state___m_topsim"],
+["S","top.v.html#444","top.v.html#498","","top.v.html#498","hierarchy-s.p6.html#r_initaddr___m_topsim"],
+["S","top.v.html#445","top.v.html#447","","top.v.html#447","hierarchy-s.p6.html#r_checksum___m_topsim"],
+["S","top.v.html#452","top.v.html#452","","top.v.html#452","hierarchy-s.p8.html#w_checksum___m_topsim"],
+["S","top.v.html#455","top.v.html#499","","top.v.html#499","hierarchy-s.p6.html#r_bbl_done___m_topsim"],
+["S","top.v.html#456","top.v.html#503","","top.v.html#503","hierarchy-s.p6.html#r_disk_done___m_topsim"],
+["S","top.v.html#457","top.v.html#501","","top.v.html#501","hierarchy-s.p6.html#r_dtree_done___m_topsim"],
+["S","top.v.html#461","top.v.html#502","","top.v.html#502","hierarchy-s.p6.html#r_initaddr2___m_topsim"],
+["S","top.v.html#462","top.v.html#500","","top.v.html#500","hierarchy-s.p6.html#r_initaddr3___m_topsim"],
+["S","top.v.html#465","top.v.html#612","","top.v.html#612","hierarchy-s.p8.html#w_zero_we___m_topsim"],
+["S","top.v.html#466","top.v.html#599","","top.v.html#599","hierarchy-s.p6.html#r_zero_we___m_topsim"],
+["S","top.v.html#467","top.v.html#607","","top.v.html#607","hierarchy-s.p6.html#r_zero_done___m_topsim"],
+["S","top.v.html#468","top.v.html#605","","top.v.html#605","hierarchy-s.p6.html#r_zeroaddr___m_topsim"],
+["S","top.v.html#491","top.v.html#491","","top.v.html#491","hierarchy-s.p8.html#w_init_state___m_topsim"],
+["S","top.v.html#507","","","","hierarchy-s.p6.html#r_set_dram_le___m_topsim"],
+["S","top.v.html#592","","","","hierarchy-s.p2.html#calib_done___m_topsim"],
+["S","top.v.html#621","top.v.html#621","","top.v.html#621","hierarchy-s.p8.html#w_dram_addr_t___m_topsim"],
+["S","top.v.html#624","top.v.html#624","","top.v.html#624","hierarchy-s.p8.html#w_dram_addr_t2___m_topsim"],
+["S","top.v.html#633","top.v.html#633","","top.v.html#633","hierarchy-s.p8.html#w_dram_wdata_t___m_topsim"],
+["S","top.v.html#636","top.v.html#636","","top.v.html#636","hierarchy-s.p8.html#w_dram_ctrl_t___m_topsim"],
+["S","top.v.html#643","top.v.html#643","","top.v.html#643","hierarchy-s.p8.html#w_wr_en___m_topsim"],
+["S","top.v.html#713","","","","hierarchy-s.p3.html#ddr2_dq___m_topsim"],
+["S","top.v.html#714","","","","hierarchy-s.p3.html#ddr2_dqs_n___m_topsim"],
+["S","top.v.html#715","","","","hierarchy-s.p3.html#ddr2_dqs_p___m_topsim"],
+["S","top.v.html#716","","","","hierarchy-s.p3.html#ddr2_addr___m_topsim"],
+["S","top.v.html#717","","","","hierarchy-s.p3.html#ddr2_ba___m_topsim"],
+["S","top.v.html#718","","","","hierarchy-s.p3.html#ddr2_ras_n___m_topsim"],
+["S","top.v.html#719","","","","hierarchy-s.p3.html#ddr2_cas_n___m_topsim"],
+["S","top.v.html#720","","","","hierarchy-s.p3.html#ddr2_we_n___m_topsim"],
+["S","top.v.html#721","","","","hierarchy-s.p3.html#ddr2_ck_p___m_topsim"],
+["S","top.v.html#722","","","","hierarchy-s.p3.html#ddr2_ck_n___m_topsim"],
+["S","top.v.html#723","","","","hierarchy-s.p3.html#ddr2_cke___m_topsim"],
+["S","top.v.html#724","","","","hierarchy-s.p3.html#ddr2_cs_n___m_topsim"],
+["S","top.v.html#725","","","","hierarchy-s.p3.html#ddr2_dm___m_topsim"],
+["S","top.v.html#726","","","","hierarchy-s.p3.html#ddr2_odt___m_topsim"],
+["S","top.v.html#748","top.v.html#753","","top.v.html#753","hierarchy-s.p8.html#w_led___m_topsim"],
+["S","top.v.html#759","top.v.html#771","","top.v.html#771","hierarchy-s.p4.html#j___m_topsim"],
+["S","top.v.html#761","","","","hierarchy-s.p5.html#mem_bbl___m_topsim"],
+["S","top.v.html#762","","","","hierarchy-s.p5.html#mem_disk___m_topsim"],
+["S","top.v.html#811","top.v.html#814","","top.v.html#814","hierarchy-s.p6.html#old_w_mtime___m_topsim"]
+];
+disabled=0;
+// -->
+</script>
+<hr>
+<table>
+ <tr><td><i>This page:</i></td>
+  <td><i>Created:</i></td><td><i>Fri Jun 16 14:01:28 2023</i></td></tr>
+<tr>
+ <td> </td>
+ <td><i>From:</i></td><td><i>
+./top.v</i></td></tr>
+</table>
+<hr>
+<table width="100%"><tr><td><i>Verilog converted to html by  <a target="_top" href="http://www.burbleland.com/v2html/v2html.html">  v2html 7.30.1.3</a> 
+ (written by <a href="mailto:v2html730@burbleland.com">Costas Calamvokis</a>).</i></td><td align="right"><b><a href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></b></td></tr></table><table height="90%"><tr><td></td></tr></table>
+</body>
+</html>
