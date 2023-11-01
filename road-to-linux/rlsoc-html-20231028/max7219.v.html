@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<title>../rlsoc-tn/rvsoc_src_ver053/src/max7219.v</title>
+<link rel="Stylesheet" title="v2html stylesheet" media="Screen" href="v2html.css">
+</head>
+<script language="JavaScript" type="text/javascript"><!--
+var agt=navigator.userAgent.toLowerCase(); 
+var is_nav  = ((agt.indexOf('mozilla')!=-1) &&
+(agt.indexOf('spoofer')==-1) &&
+(agt.indexOf('compatible') == -1) &&
+(agt.indexOf('opera')==-1) &&
+(agt.indexOf('webtv')==-1)); 
+var is_major = parseInt(navigator.appVersion); 
+var is_nav4up = (is_nav && (is_major >= 4)); 
+var is_ie     = (agt.indexOf("msie") != -1); 
+var is_ie4up  = (is_ie  && (is_major >= 4)); 
+var is_nav5up = (is_nav && (is_major >= 5));
+var dirSep = (window.location.pathname.indexOf('\\') != -1) ? '\\' : '/' ;
+function setbuttons (wndw) {
+var i;
+var sl=wndw.loc[ wndw.document.forms[0].elements[0].selectedIndex ];
+for (i=0;i<sl.length;i++) {
+if(sl[i]) wndw.document.images[i].src='v2html-b1.gif';
+else      wndw.document.images[i].src='v2html-b2.gif';
+}
+if ( wndw.document.forms[0].elements[0].options[ 
+wndw.document.forms[0].elements[0].selectedIndex ].text != '-') {
+wndw.document.images[i  ].src='v2html-b1.gif';
+wndw.document.images[i+1].src='v2html-b1.gif';
+}
+else {
+wndw.document.images[i  ].src='v2html-b2.gif';
+wndw.document.images[i+1].src='v2html-b2.gif';
+}
+}
+// Unindented and uncommented to save spave - look in v2html for a prettier version
+var disabled=1;
+if (!is_nav4up) {
+var event=false; 
+}
+var last_link=0;     
+var last_class=null; 
+function qs(e,t,extra_info_index) {
+var inc=0,bnum=0,i,j;
+if (disabled) return false;
+var sig_buttons = [ "Definition" , "Local Driver" , 
+"Up to Input Driver" , "Find Source" , "Index"];
+if (is_nav4up || is_ie4up) {
+if (((e.which==2) && (!(e.modifiers&Event.SHIFT_MASK))) ||
+((e.which==1) &&  (e.modifiers&Event.CONTROL_MASK)))   inc = 1;
+else if (((e.which==2) && (e.modifiers&Event.SHIFT_MASK)) ||
+((e.which==1) && (e.modifiers&Event.SHIFT_MASK))) inc = -1;
+if (inc == 0 && extra_info_index == 0) { 
+return true;  
+}
+var linkText = is_nav4up ? t.text : t.innerText;
+var linkY    = is_nav4up && ! is_nav5up ? t.y    : t.offsetTop;
+window.status="Searching...";
+if ((last_link==-1) || (document.links[last_link]!=t)) 
+for (last_link=0;last_link<document.links.length;last_link++) 
+if (document.links[last_link] == t)  
+break;
+if (inc != 0) { 
+return search(linkText,linkY,last_link,inc,1);
+}
+else { 
+window.status="";
+extra_info_index--; 
+if (extra_info[extra_info_index][0] != 'S') { 
+return true;
+}
+var w = window.open('','SignalPopUp','width=200,height=235');
+if (null != w.document.forms[0]) {
+if ((window.location.pathname.substring(0,window.location.pathname.lastIndexOf(dirSep)))!=
+(w.pn.substring(0,w.pn.lastIndexOf(dirSep)))) {
+w.close();
+w = window.open('','SignalPopUp','width=200,height=235');
+}
+}
+w.focus(); 
+if (null == w.document.forms[0]) { 
+var Text = '<html><head></head>';
+if (is_nav4up) { 
+w.loc = new Array(10);
+w.sel = null;
+w.pn  = window.location.pathname;
+}
+else {     
+Text += '<script>var loc = new Array(10);<\/script>\n';
+Text += '<script>var sel;<\/script>\n';
+Text += '<script>var pn = opener.location.pathname;<\/script>\n';
+}
+Text += '<body bgcolor="white">\n';
+Text += '<form>';
+Text += '  <select onchange="opener.setbuttons(window);">\n';
+Text += '  <option>---------------------------</option>\n';
+for (j=0;j<9;j++) Text += '  <option>-</option>\n';
+Text += '  </select>\n';
+Text += '</form>';
+Text += '<table cellspacing=0 cellpadding=0>\n';
+for (var i=0;i<(extra_info[extra_info_index].length-1);i++) {
+Text += hbutton(sig_buttons[i], 
+'opener.location=loc[sel.selectedIndex]['+i+'];',
+bnum++);
+}
+Text += hbutton("Search Backwards", 
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link,-1,0);',bnum++);
+Text += hbutton("Search Forwards",
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link, 1,0);',bnum++);
+Text += hbutton("Close","window.close();",bnum++);
+Text += '</table>\n';
+Text += '</body></html>\n';
+w.document.open();
+w.document.write(Text);
+w.document.close();
+w.document.forms[0].elements[0].options[0].text  = linkText;
+w.sel = w.document.forms[0].elements[0]; 
+for (j=0;j<10;j++) w.loc[j] = new Array(sig_buttons.length);  
+copy_into_loc0(w,extra_info_index);
+}
+else {
+var opts = w.document.forms[0].elements[0].options;
+if ( opts.length<10 ) { 
+w.loc[opts.length] = new Array;
+opts.length++; 
+}
+for (i=opts.length-2;i>=0;i--) {
+opts[i+1].text=opts[i].text;
+for (var j=0;j<w.loc[i].length;j++) w.loc[i+1][j] = w.loc[i][j];
+}
+opts[0].text  = linkText;
+copy_into_loc0(w,extra_info_index);
+}
+return false; 
+}
+}
+return true;
+}
+function hbutton (text,action,bnum) {
+return '  <tr><td><a href="" '+
+'onmousedown="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b3.gif\';" '+
+'onmouseup="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b1.gif\';" '+
+'onclick="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+action + 
+' return false;">'+
+'<img border=0 src="v2html-b1.gif"></a></td>' +
+'<td style="font-family:sans-serif; font-weight:bold; font-size:14px;"> '+text+'</td></tr>\n';
+}
+function copy_into_loc0 (w,extra_info_index) {
+for (var i=1;i<extra_info[extra_info_index].length;i++) {
+w.loc[0][i-1] = extra_info[extra_info_index][i];
+}
+w.document.forms[0].elements[0].selectedIndex=1;
+w.document.forms[0].elements[0].selectedIndex=0;
+setbuttons(w);
+}
+function search(text,y,i,inc,relative) {
+var nextpage,wrappage,linkText,linkY;
+window.status="Searching...";
+if (last_class) document.links[i].className=last_class;
+while (1) {
+for (i+=inc;i<document.links.length && i>=0;i+=inc) {
+linkText = is_nav4up ? document.links[i].text : document.links[i].innerText;
+linkY    = is_nav4up && ! is_nav5up ? document.links[i].y    : document.links[i].offsetTop;
+if ((linkText == text) && (linkY != y)) {
+window.status="";
+if (is_nav4up) 
+if (relative) window.scrollBy(0,linkY - y);
+else          window.scrollTo(0,linkY); 
+else if (is_ie4up)
+document.links[i].scrollIntoView(true); 
+last_link=i;
+last_class=document.links[i].className;
+document.links[i].className='HI';
+return false;
+}
+}
+nextpage = (inc==1) ? next_page() : prev_page();
+wrappage = (inc==1) ? first_page() : last_page();
+if (nextpage!="" || wrappage!="") {
+if (nextpage=="") { 
+if (!confirm(text + " not found. Search again from "+((inc==1)?"first":"last")+" page?"))
+return false;
+nextpage=wrappage;
+}
+location=nextpage+ "?" + escape(text) + "&" + ( y - window.pageYOffset ) + "&" + inc;
+return false;
+}
+if (confirm(text + " not found. Search again from "+((inc==1)?"start":"end")+"?")) {
+if (inc==1) i=-1;
+else i=document.links.length;
+} else return false;
+}
+return true;
+}
+function loadqs() {
+var opt=location.search, text="", s="", y=0, si=0, inc=1;
+if (opt.length==0) return true;  
+for (var i=1;i<opt.length;i++) { 
+if (opt.charAt(i) != "&") 
+s += opt.charAt(i);
+else {
+if (text=="") text=unescape(s);
+else             y=s;
+s="";
+}
+}
+if (text=="") return true;
+if (s == "-1") { si=document.links.length-1; inc=-1; }
+window.scrollTo(0,0);
+search(text,y,si,inc);
+return true;
+}
+// -->
+</script>
+<body onload='loadqs();'>
+<script language="JavaScript"type="text/javascript"><!--
+function prev_page() { return ""; }
+function last_page() { return ""; }
+// -->
+</script>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<pre>
+
+<span class=C>// modified by L.-C. Duca 20231028
+</span><span class=C>// a stable way to print on max7219 display
+</span><span class=C>// original source - https://github.com/cerkit/max7219TinyFPGA
+</span>
+<a name="max7219"></a><a  href="maintn.v.html#m_maintn_max7219"><img alt="[Up: m_maintn max7219]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>max7219</span><a  href="hierarchy-m.html#max7219"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,1)"  class=SI href="#8">clk</a>, <a  onClick="return qs(event,this,2)"  class=SI href="#8">clkdiv</a>, <a  onClick="return qs(event,this,3)"  class=SI href="#8">reset_n</a>, <a  onClick="return qs(event,this,4)"  class=SI href="#9">data_vector</a>, <a  onClick="return qs(event,this,5)"  class=SOR href="#10">clk_out</a>, <a  onClick="return qs(event,this,6)"  class=SOR href="#10">data_out</a>, <a  onClick="return qs(event,this,7)"  class=SOR href="#10">load_out</a>);
+
+<a name="8"></a><span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,1)"  class=SI href="maintn.v.html#823">clk</a>, <a  onClick="return qs(event,this,2)"  class=SI href="maintn.v.html#823">clkdiv</a>, <a  onClick="return qs(event,this,3)"  class=SI href="maintn.v.html#823">reset_n</a>;
+<a name="9"></a><span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,4)"  class=SI href="maintn.v.html#823">data_vector</a>;
+<a name="10"></a><span class=K>output</span> <span class=K>reg</span> <a  onClick="return qs(event,this,5)"  class=SOR href="#145">clk_out</a>, <a  onClick="return qs(event,this,6)"  class=SOR href="#159">data_out</a>, <a  onClick="return qs(event,this,7)"  class=SOR href="#52">load_out</a>;
+
+<a name="12"></a>localparam <a  onClick="return qs(event,this,0)"  class=PA href="#12">ActiveDigits</a> = 8;
+<a name="13"></a>localparam <a  onClick="return qs(event,this,0)"  class=PA href="#13">DataBits</a> = <a  onClick="return qs(event,this,0)"  class=PA href="#12">ActiveDigits</a> * 4;
+<a name="14"></a>localparam <a  onClick="return qs(event,this,0)"  class=PA href="#14">CommandRegSize</a> = 16;
+
+<span class=C>//reg [3:0] digits [0:7];
+</span><span class=C>// state
+</span><a name="18"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#18">reset</a> 0
+<a name="19"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#19">init_on</a> 1
+<a name="20"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#20">init_mode</a> 2
+<a name="21"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#21">init_intensity</a> 3
+<a name="22"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#22">init_scan</a> 4
+<a name="23"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#23">latch_data</a> 5
+<a name="24"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#24">send_digits</a> 6
+<a name="25"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#25">finish_state</a> 7
+<a name="26"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#26">wait_state</a> 8
+<a name="27"></a><span class=K>reg</span> [7:0] <a  onClick="return qs(event,this,8)"  class=SR href="#51">state</a>=<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#18">reset</a>, <a  onClick="return qs(event,this,9)"  class=SR href="#66">next_state</a>;
+
+<span class=C>// driver_state
+</span><a name="30"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a> 0
+<a name="31"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#31">ds_start</a> 1
+<a name="32"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#32">ds_clk_data</a> 2
+<a name="33"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#33">ds_clk_high</a> 3
+<a name="34"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#34">ds_clk_low</a> 4
+<a name="35"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#35">ds_finished</a> 5
+<a name="36"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#36">ds_pre_clk_high</a> 6
+<a name="37"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#37">ds_pre_clk_low</a> 7
+<a name="38"></a><span class=M>`define</span> <a  onClick="return qs(event,this,0)"  class=D href="#38">ds_pre_clk_low2</a> 8
+<a name="39"></a><span class=K>reg</span> [7:0] <a  onClick="return qs(event,this,10)"  class=SR href="#50">driver_state</a>=<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>;
+<a name="40"></a><span class=K>reg</span> <a  onClick="return qs(event,this,11)"  class=SR href="#56">start_ds</a>=0;
+<a name="41"></a><span class=K>reg</span> [15:0] <a  onClick="return qs(event,this,12)"  class=SR href="#55">command_reg</a>=0;
+<a name="42"></a><span class=K>reg</span> [15:0] <a  onClick="return qs(event,this,13)"  class=SR href="#53">counter</a>=0;
+<a name="43"></a><span class=K>reg</span> [3:0] <a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a>=7;
+<a name="44"></a><span class=K>reg</span> [7:0] <a  onClick="return qs(event,this,15)"  class=SR href="#213">segments</a>;
+<a name="45"></a><span class=K>reg</span> [7:0] <a  onClick="return qs(event,this,16)"  class=SR href="#57">ds_cnt</a>=0;
+
+<span class=K>always</span> @(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#8">clk</a>) 
+<span class=K>begin</span>
+	<span class=K>if</span> (<a  onClick="return qs(event,this,3)"  class=SI href="#8">reset_n</a> == 0) <span class=K>begin</span>
+<a name="50"></a>            <a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>;
+<a name="51"></a>            <a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a>        &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#18">reset</a>;
+<a name="52"></a>            <a  onClick="return qs(event,this,7)"  class=SOR href="#10">load_out</a>     &lt;= 0;
+<a name="53"></a>            <a  onClick="return qs(event,this,13)"  class=SR href="#42">counter</a>      &lt;= 0;
+<a name="54"></a>            <a  onClick="return qs(event,this,14)"  class=SR href="#43">digit_index</a>  &lt;= 7;
+<a name="55"></a>	    <a  onClick="return qs(event,this,12)"  class=SR href="#41">command_reg</a> &lt;= 16'h0c00;
+<a name="56"></a>	    <a  onClick="return qs(event,this,11)"  class=SR href="#40">start_ds</a> &lt;= 0;
+<a name="57"></a>		<a  onClick="return qs(event,this,16)"  class=SR href="#45">ds_cnt</a> &lt;= 0;
+	<span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+		<span class=K>if</span>(<a  onClick="return qs(event,this,2)"  class=SI href="#8">clkdiv</a>) <span class=K>begin</span>
+	    <span class=K>case</span>(<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a>)
+		    <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#18">reset</a>:
+			    <span class=K>if</span>(<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>) <span class=K>begin</span>
+					<a  onClick="return qs(event,this,12)"  class=SR href="#41">command_reg</a> &lt;= 16'h0c00;
+					<span class=C>// Shutdown Register (0x0C): Shutdown Mode (0x00)
+</span>					<a  onClick="return qs(event,this,11)"  class=SR href="#40">start_ds</a> &lt;= 1;
+<a name="66"></a>					<a  onClick="return qs(event,this,9)"  class=SR href="#27">next_state</a>        &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#19">init_on</a>;
+					<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#26">wait_state</a>;
+				<span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#19">init_on</a>:
+				<span class=K>if</span> (<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>) <span class=K>begin</span>
+					<span class=C>// Shutdown Register (0x0C): Normal Operation (0x01)
+</span>					<a  onClick="return qs(event,this,12)"  class=SR href="#41">command_reg</a> &lt;= 16'h0c01;
+					<a  onClick="return qs(event,this,11)"  class=SR href="#40">start_ds</a> &lt;= 1;
+					<a  onClick="return qs(event,this,9)"  class=SR href="#27">next_state</a>        &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#20">init_mode</a>;
+					<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#26">wait_state</a>;
+			    <span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#20">init_mode</a>:
+			    <span class=K>if</span> (<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>) <span class=K>begin</span>
+					<span class=C>// Decode-Mode Register (0x09): No decode for digits 7-0 (0x00)
+</span>					<a  onClick="return qs(event,this,12)"  class=SR href="#41">command_reg</a> &lt;= 16'h0900;
+					<a  onClick="return qs(event,this,11)"  class=SR href="#40">start_ds</a> &lt;= 1;
+					<a  onClick="return qs(event,this,9)"  class=SR href="#27">next_state</a>        &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#21">init_intensity</a>;
+					<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#26">wait_state</a>;
+			    <span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#21">init_intensity</a>:
+				<span class=K>if</span> (<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>) <span class=K>begin</span>
+					<span class=C>// Intensity Register (0x0A)
+</span>					<a  onClick="return qs(event,this,12)"  class=SR href="#41">command_reg</a> &lt;= {12'h0a0, 4'h3};
+					<a  onClick="return qs(event,this,11)"  class=SR href="#40">start_ds</a> &lt;= 1;
+					<a  onClick="return qs(event,this,9)"  class=SR href="#27">next_state</a>        &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#22">init_scan</a>;
+					<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#26">wait_state</a>;
+				<span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#22">init_scan</a>:
+			    <span class=K>if</span> (<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>) <span class=K>begin</span>
+					<span class=C>// Scan-Limit Register(0x0B): Display digits 0 1 2 3 4 5 6 7 (0x07)
+</span>					<a  onClick="return qs(event,this,12)"  class=SR href="#41">command_reg</a> &lt;= 16'h0b07;
+					<a  onClick="return qs(event,this,11)"  class=SR href="#40">start_ds</a> &lt;= 1;
+					<a  onClick="return qs(event,this,9)"  class=SR href="#27">next_state</a>        &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#23">latch_data</a>;
+					<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#26">wait_state</a>;
+			    <span class=K>end</span>
+		    <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#23">latch_data</a>: <span class=K>begin</span>
+<span class=P>					`ifdef laur0
+</span><span class=P>					digits[7] &lt;= data_vector[31:28];
+</span><span class=P>					digits[6] &lt;= data_vector[27:24];
+</span><span class=P>					digits[5] &lt;= data_vector[23:20];
+</span><span class=P>					digits[4] &lt;= data_vector[19:16];
+</span><span class=P>					digits[3] &lt;= data_vector[15:12];
+</span><span class=P>					digits[2] &lt;= data_vector[11:8];
+</span><span class=P>					digits[1] &lt;= data_vector[7:4];
+</span><span class=P>					digits[0] &lt;= data_vector[3:0];
+</span>					<span class=M>`endif</span>
+					<a  onClick="return qs(event,this,14)"  class=SR href="#43">digit_index</a> &lt;= 7;
+					<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#24">send_digits</a>;
+		    <span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#24">send_digits</a>: 
+				<span class=K>if</span> (<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>) <span class=K>begin</span>
+					<a  onClick="return qs(event,this,12)"  class=SR href="#41">command_reg</a> &lt;= {4'h0, <a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a> + 1, <a  onClick="return qs(event,this,15)"  class=SR href="#213">segments</a>};
+					<a  onClick="return qs(event,this,11)"  class=SR href="#40">start_ds</a> &lt;= 1;
+					<span class=K>if</span> (<a  onClick="return qs(event,this,14)"  class=SR href="#43">digit_index</a> == 0) <span class=K>begin</span>
+						<span class=C>//next_state &lt;= `latch_data;
+</span>						<a  onClick="return qs(event,this,9)"  class=SR href="#27">next_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#25">finish_state</a>;
+						<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#26">wait_state</a>;
+					<span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+						<a  onClick="return qs(event,this,14)"  class=SR href="#43">digit_index</a> &lt;= <a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a> - 4'h1;
+						<a  onClick="return qs(event,this,9)"  class=SR href="#27">next_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#24">send_digits</a>;
+						<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#26">wait_state</a>;
+					<span class=K>end</span>
+				<span class=K>end</span>
+		    <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#26">wait_state</a>: <span class=K>begin</span>
+				<span class=K>if</span>(<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> != <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>) <span class=K>begin</span>
+					<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <a  onClick="return qs(event,this,9)"  class=SR href="#66">next_state</a>;
+					<a  onClick="return qs(event,this,11)"  class=SR href="#40">start_ds</a> &lt;= 0;
+				<span class=K>end</span>
+			<span class=K>end</span>
+		    <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#25">finish_state</a>: <span class=K>begin</span>
+				<span class=K>if</span>(<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>)
+					<a  onClick="return qs(event,this,8)"  class=SR href="#27">state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#23">latch_data</a>;
+					<span class=C>//state &lt;= `reset;
+</span>			<span class=K>end</span>
+            <span class=K>endcase</span>
+
+            <span class=K>case</span> (<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a>)
+		    <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>: <span class=K>begin</span>
+				<a  onClick="return qs(event,this,7)"  class=SOR href="#10">load_out</a> &lt;= 1;
+<a name="145"></a>				<a  onClick="return qs(event,this,5)"  class=SOR href="#10">clk_out</a>  &lt;= 0;
+				<a  onClick="return qs(event,this,16)"  class=SR href="#45">ds_cnt</a> &lt;= <a  onClick="return qs(event,this,16)"  class=SR href="#57">ds_cnt</a> + 1;
+				<span class=K>if</span>(<a  onClick="return qs(event,this,11)"  class=SR href="#40">start_ds</a> &amp;&amp; <a  onClick="return qs(event,this,16)"  class=SR href="#45">ds_cnt</a> &gt; 10) <span class=K>begin</span>
+					<a  onClick="return qs(event,this,16)"  class=SR href="#45">ds_cnt</a> &lt;= 0;
+					<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#31">ds_start</a>;
+				<span class=K>end</span>
+			<span class=K>end</span>
+		    <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#31">ds_start</a>: <span class=K>begin</span>
+				<a  onClick="return qs(event,this,7)"  class=SOR href="#10">load_out</a> &lt;= 0;
+				<a  onClick="return qs(event,this,13)"  class=SR href="#42">counter</a> &lt;= <a  onClick="return qs(event,this,0)"  class=PA href="#14">CommandRegSize</a>;
+				<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#32">ds_clk_data</a>;
+		    <span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#32">ds_clk_data</a>: <span class=K>begin</span>
+				<a  onClick="return qs(event,this,13)"  class=SR href="#42">counter</a> &lt;= <a  onClick="return qs(event,this,13)"  class=SR href="#53">counter</a> - 16'h1;
+<a name="159"></a>				<a  onClick="return qs(event,this,6)"  class=SOR href="#10">data_out</a> &lt;= <a  onClick="return qs(event,this,12)"  class=SR href="#55">command_reg</a>[<a  onClick="return qs(event,this,13)"  class=SR href="#53">counter</a> - 1];
+				<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#36">ds_pre_clk_high</a>;
+			<span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#36">ds_pre_clk_high</a>: <span class=K>begin</span>
+				<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#33">ds_clk_high</a>;
+			<span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#33">ds_clk_high</a>: <span class=K>begin</span>
+				<a  onClick="return qs(event,this,5)"  class=SOR href="#10">clk_out</a>      &lt;= 1;
+				<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#37">ds_pre_clk_low</a>;
+			<span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#37">ds_pre_clk_low</a>: <span class=K>begin</span>
+				<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#38">ds_pre_clk_low2</a>;
+			<span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#38">ds_pre_clk_low2</a>: <span class=K>begin</span>
+				<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#34">ds_clk_low</a>;
+			<span class=K>end</span>
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#34">ds_clk_low</a>: <span class=K>begin</span>
+				<a  onClick="return qs(event,this,5)"  class=SOR href="#10">clk_out</a> &lt;= 0;
+				<span class=K>if</span> (<a  onClick="return qs(event,this,13)"  class=SR href="#42">counter</a> == 0) <span class=K>begin</span>
+					<a  onClick="return qs(event,this,7)"  class=SOR href="#10">load_out</a>     &lt;= 1;
+					<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#35">ds_finished</a>;
+				<span class=K>end</span> <span class=K>else</span>
+					<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#32">ds_clk_data</a>;
+			<span class=K>end</span> 
+			<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#35">ds_finished</a>: <span class=K>begin</span>
+				<a  onClick="return qs(event,this,10)"  class=SR href="#39">driver_state</a> &lt;= <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="#30">ds_idle</a>;
+				<a  onClick="return qs(event,this,16)"  class=SR href="#45">ds_cnt</a> &lt;= 0;
+			<span class=K>end</span>
+            <span class=K>endcase</span>
+        <span class=K>end</span>
+		<span class=K>end</span>
+    <span class=K>end</span>
+
+<a name="192"></a><span class=K>wire</span> [3:0] <a  onClick="return qs(event,this,17)"  class=SW href="#194">mydigits</a>;
+<span class=C>//assign mydigits = digits[digit_index];
+</span><a name="194"></a><span class=K>assign</span> <a  onClick="return qs(event,this,17)"  class=SW href="#192">mydigits</a> = 
+			<a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a> == 7 ? <a  onClick="return qs(event,this,4)"  class=SI href="#9">data_vector</a>[31:28] :
+			<a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a> == 6 ? <a  onClick="return qs(event,this,4)"  class=SI href="#9">data_vector</a>[27:24] :
+			<a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a> == 5 ? <a  onClick="return qs(event,this,4)"  class=SI href="#9">data_vector</a>[23:20] :
+			<a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a> == 4 ? <a  onClick="return qs(event,this,4)"  class=SI href="#9">data_vector</a>[19:16] :
+			<a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a> == 3 ? <a  onClick="return qs(event,this,4)"  class=SI href="#9">data_vector</a>[15:12] :
+			<a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a> == 2 ? <a  onClick="return qs(event,this,4)"  class=SI href="#9">data_vector</a>[11:8]  :
+			<a  onClick="return qs(event,this,14)"  class=SR href="#54">digit_index</a> == 1 ? <a  onClick="return qs(event,this,4)"  class=SI href="#9">data_vector</a>[7:4]   :
+			<a  onClick="return qs(event,this,4)"  class=SI href="#9">data_vector</a>[3:0] ;
+
+
+    <span class=K>always</span> @(*)
+    <span class=K>begin</span>
+        <span class=K>case</span> (<a  onClick="return qs(event,this,17)"  class=SW href="#192">mydigits</a>)
+                <span class=C>// +----+----+----+----+----+----+----+----+
+</span>                <span class=C>// | D7 | D6 | D5 | D4 | D3 | D2 | D1 | D0 |
+</span>                <span class=C>// +----+----+----+----+----+----+----+----+
+</span>                <span class=C>// | DP | A  | B  | C  | D  | E  | F  | G  |
+</span>                <span class=C>// +----+----+----+----+----+----+----+----+
+</span><a name="213"></a>            4'b0000: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01111110; <span class=C>// 0
+</span>            4'b0001: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b00110000; <span class=C>// 1
+</span>            4'b0010: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01101101; <span class=C>// 2
+</span>            4'b0011: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01111001; <span class=C>// 3
+</span>            4'b0100: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b00110011; <span class=C>// 4
+</span>            4'b0101: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01011011; <span class=C>// 5
+</span>            4'b0110: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01011111; <span class=C>// 6
+</span>            4'b0111: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01110000; <span class=C>// 7
+</span>            4'b1000: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01111111; <span class=C>// 8
+</span>            4'b1001: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01111011; <span class=C>// 9
+</span>            4'b1010: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01111101; <span class=C>// a
+</span>            4'b1011: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b00011111; <span class=C>// b
+</span>            4'b1100: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b00001101; <span class=C>// c
+</span>            4'b1101: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b00111101; <span class=C>// d
+</span>            4'b1110: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01001111; <span class=C>// E
+</span>            4'b1111: <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b01000111; <span class=C>// F
+</span>            <span class=K>default</span>:  <a  onClick="return qs(event,this,15)"  class=SR href="#44">segments</a> &lt;= 8'b10000000; <span class=C>// .
+</span>        <span class=K>endcase</span>
+    <span class=K>end</span>
+
+
+<span class=K>endmodule</span>
+
+</pre>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<script language="JavaScript"type="text/javascript"><!--
+function next_page() { return ""; }
+function first_page() { return ""; }
+var extra_info = [
+["S","max7219.v.html#8","","maintn.v.html#823","","hierarchy-s.p2.html#clk___max7219"],
+["S","max7219.v.html#8","","maintn.v.html#823","clkdivider.v.html#8","hierarchy-s.p2.html#clkdiv___max7219"],
+["S","max7219.v.html#8","","maintn.v.html#823","maintn.v.html#59","hierarchy-s.p7.html#reset_n___max7219"],
+["S","max7219.v.html#9","","maintn.v.html#823","maintn.v.html#831","hierarchy-s.p3.html#data_vector___max7219"],
+["S","max7219.v.html#10","max7219.v.html#145","","max7219.v.html#145","hierarchy-s.p2.html#clk_out___max7219"],
+["S","max7219.v.html#10","max7219.v.html#159","","max7219.v.html#159","hierarchy-s.p3.html#data_out___max7219"],
+["S","max7219.v.html#10","max7219.v.html#52","","max7219.v.html#52","hierarchy-s.p5.html#load_out___max7219"],
+["S","max7219.v.html#27","max7219.v.html#51","","max7219.v.html#51","hierarchy-s.p8.html#state___max7219"],
+["S","max7219.v.html#27","max7219.v.html#66","","max7219.v.html#66","hierarchy-s.p6.html#next_state___max7219"],
+["S","max7219.v.html#39","max7219.v.html#50","","max7219.v.html#50","hierarchy-s.p3.html#driver_state___max7219"],
+["S","max7219.v.html#40","max7219.v.html#56","","max7219.v.html#56","hierarchy-s.p8.html#start_ds___max7219"],
+["S","max7219.v.html#41","max7219.v.html#55","","max7219.v.html#55","hierarchy-s.p2.html#command_reg___max7219"],
+["S","max7219.v.html#42","max7219.v.html#53","","max7219.v.html#53","hierarchy-s.p2.html#counter___max7219"],
+["S","max7219.v.html#43","max7219.v.html#54","","max7219.v.html#54","hierarchy-s.p3.html#digit_index___max7219"],
+["S","max7219.v.html#44","max7219.v.html#213","","max7219.v.html#213","hierarchy-s.p8.html#segments___max7219"],
+["S","max7219.v.html#45","max7219.v.html#57","","max7219.v.html#57","hierarchy-s.p3.html#ds_cnt___max7219"],
+["S","max7219.v.html#192","max7219.v.html#194","","max7219.v.html#194","hierarchy-s.p5.html#mydigits___max7219"]
+];
+disabled=0;
+// -->
+</script>
+<hr>
+<table>
+ <tr><td><i>This page:</i></td>
+  <td><i>Created:</i></td><td><i>Mon Oct 30 14:02:56 2023</i></td></tr>
+<tr>
+ <td> </td>
+ <td><i>From:</i></td><td><i>
+../rlsoc-tn/rvsoc_src_ver053/src/max7219.v</i></td></tr>
+</table>
+<hr>
+<table width="100%"><tr><td><i>Verilog converted to html by  <a target="_top" href="http://www.burbleland.com/v2html/v2html.html">  v2html 7.30.1.3</a> 
+ (written by <a href="mailto:v2html730@burbleland.com">Costas Calamvokis</a>).</i></td><td align="right"><b><a href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></b></td></tr></table><table height="90%"><tr><td></td></tr></table>
+</body>
+</html>
