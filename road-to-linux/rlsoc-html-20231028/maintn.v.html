@@ -698,8 +698,8 @@ function last_page() { return ""; }
 <a name="468"></a>            <a  onClick="return qs(event,this,152)"  class=SR href="#458">r_grant_console</a> &lt;= <a  onClick="return qs(event,this,37)"  class=SW href="#151">w_grant</a>;
         <span class=K>end</span>
         <span class=K>if</span>((<a  onClick="return qs(event,this,117)"  class=SR href="#191">r_mem_paddr</a> == (<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#218">HVC_BASE_ADDR</a> + 4)) &amp;&amp; !<a  onClick="return qs(event,this,151)"  class=SR href="#457">r_read_a_char</a> &amp;&amp; <a  onClick="return qs(event,this,105)"  class=SR href="#113">r_consf_cnts</a> &amp;&amp; <a  onClick="return qs(event,this,90)"  class=SW href="#98">w_dram_le</a>) <span class=K>begin</span>
-                <span class=K>if</span>(<a  onClick="return qs(event,this,148)"  class=SR href="#417">r_consf_en</a>)
-                    <span class=C>//$display(&quot;HVC_BASE_ADDR+4 r_consf_cnts=%x c=%x w_grant=%x w_pc0=%x w_pc1=%x&quot;, 
+                <span class=C>//if(r_consf_en)
+</span>                    <span class=C>//$display(&quot;HVC_BASE_ADDR+4 r_consf_cnts=%x c=%x w_grant=%x w_pc0=%x w_pc1=%x&quot;, 
 </span>                    <span class=C>//    r_consf_cnts, cons_fifo[r_consf_head], w_grant, w_pc0, w_pc1);
 </span><a name="474"></a>                <a  onClick="return qs(event,this,148)"  class=SR href="#417">r_consf_en</a> &lt;= (<a  onClick="return qs(event,this,105)"  class=SR href="#476">r_consf_cnts</a>&lt;=1) ? 0 : 1;
 <a name="475"></a>                <a  onClick="return qs(event,this,122)"  class=SR href="#414">r_consf_head</a> &lt;= <a  onClick="return qs(event,this,122)"  class=SR href="#475">r_consf_head</a> + 1;
@@ -1311,7 +1311,7 @@ disabled=0;
 <hr>
 <table>
  <tr><td><i>This page:</i></td>
-  <td><i>Created:</i></td><td><i>Mon Oct 30 14:02:56 2023</i></td></tr>
+  <td><i>Created:</i></td><td><i>Thu Nov  2 14:59:42 2023</i></td></tr>
 <tr>
  <td> </td>
  <td><i>From:</i></td><td><i>
