@@ -230,7 +230,7 @@ function last_page() { return "rvcorem.v.p2.html"; }
 <center><table class=NB cols=2 ><tr><td align="center" width="50%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';" ><font color="#808080">1</font></td><td align="center" width="50%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='rvcorem.v.p2.html';"><a target="_top" href="rvcorem.v.p2.html">2</a></td></tr></table></center>
 <pre>
 <span class=C>// modified: Laurentiu-Cristian Duca, date: 2023-10-28
-</span><span class=C>// bug correction for wfi and ipi and added tlb flush when satp is changed
+</span><span class=C>// bug correction for wfi and ipi and added tlb flush when FUNCT7_SFENCE_VMA
 </span><span class=C>// modified: Laurentiu-Cristian Duca, date: 2023-05-25
 </span><span class=C>// - ipi support
 </span><span class=C>// - wfi
@@ -1473,7 +1473,7 @@ disabled=0;
 <hr>
 <table>
  <tr><td><i>This page:</i></td>
-  <td><i>Created:</i></td><td><i>Mon Oct 30 14:02:56 2023</i></td></tr>
+  <td><i>Created:</i></td><td><i>Thu Nov  2 15:30:07 2023</i></td></tr>
 <tr>
  <td> </td>
  <td><i>From:</i></td><td><i>
