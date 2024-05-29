@@ -1,0 +1,715 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<title>../src/busarbiter.v</title>
+<link rel="Stylesheet" title="v2html stylesheet" media="Screen" href="v2html.css">
+</head>
+<script language="JavaScript" type="text/javascript"><!--
+var agt=navigator.userAgent.toLowerCase(); 
+var is_nav  = ((agt.indexOf('mozilla')!=-1) &&
+(agt.indexOf('spoofer')==-1) &&
+(agt.indexOf('compatible') == -1) &&
+(agt.indexOf('opera')==-1) &&
+(agt.indexOf('webtv')==-1)); 
+var is_major = parseInt(navigator.appVersion); 
+var is_nav4up = (is_nav && (is_major >= 4)); 
+var is_ie     = (agt.indexOf("msie") != -1); 
+var is_ie4up  = (is_ie  && (is_major >= 4)); 
+var is_nav5up = (is_nav && (is_major >= 5));
+var dirSep = (window.location.pathname.indexOf('\\') != -1) ? '\\' : '/' ;
+function setbuttons (wndw) {
+var i;
+var sl=wndw.loc[ wndw.document.forms[0].elements[0].selectedIndex ];
+for (i=0;i<sl.length;i++) {
+if(sl[i]) wndw.document.images[i].src='v2html-b1.gif';
+else      wndw.document.images[i].src='v2html-b2.gif';
+}
+if ( wndw.document.forms[0].elements[0].options[ 
+wndw.document.forms[0].elements[0].selectedIndex ].text != '-') {
+wndw.document.images[i  ].src='v2html-b1.gif';
+wndw.document.images[i+1].src='v2html-b1.gif';
+}
+else {
+wndw.document.images[i  ].src='v2html-b2.gif';
+wndw.document.images[i+1].src='v2html-b2.gif';
+}
+}
+// Unindented and uncommented to save spave - look in v2html for a prettier version
+var disabled=1;
+if (!is_nav4up) {
+var event=false; 
+}
+var last_link=0;     
+var last_class=null; 
+function qs(e,t,extra_info_index) {
+var inc=0,bnum=0,i,j;
+if (disabled) return false;
+var sig_buttons = [ "Definition" , "Local Driver" , 
+"Up to Input Driver" , "Find Source" , "Index"];
+if (is_nav4up || is_ie4up) {
+if (((e.which==2) && (!(e.modifiers&Event.SHIFT_MASK))) ||
+((e.which==1) &&  (e.modifiers&Event.CONTROL_MASK)))   inc = 1;
+else if (((e.which==2) && (e.modifiers&Event.SHIFT_MASK)) ||
+((e.which==1) && (e.modifiers&Event.SHIFT_MASK))) inc = -1;
+if (inc == 0 && extra_info_index == 0) { 
+return true;  
+}
+var linkText = is_nav4up ? t.text : t.innerText;
+var linkY    = is_nav4up && ! is_nav5up ? t.y    : t.offsetTop;
+window.status="Searching...";
+if ((last_link==-1) || (document.links[last_link]!=t)) 
+for (last_link=0;last_link<document.links.length;last_link++) 
+if (document.links[last_link] == t)  
+break;
+if (inc != 0) { 
+return search(linkText,linkY,last_link,inc,1);
+}
+else { 
+window.status="";
+extra_info_index--; 
+if (extra_info[extra_info_index][0] != 'S') { 
+return true;
+}
+var w = window.open('','SignalPopUp','width=200,height=235');
+if (null != w.document.forms[0]) {
+if ((window.location.pathname.substring(0,window.location.pathname.lastIndexOf(dirSep)))!=
+(w.pn.substring(0,w.pn.lastIndexOf(dirSep)))) {
+w.close();
+w = window.open('','SignalPopUp','width=200,height=235');
+}
+}
+w.focus(); 
+if (null == w.document.forms[0]) { 
+var Text = '<html><head></head>';
+if (is_nav4up) { 
+w.loc = new Array(10);
+w.sel = null;
+w.pn  = window.location.pathname;
+}
+else {     
+Text += '<script>var loc = new Array(10);<\/script>\n';
+Text += '<script>var sel;<\/script>\n';
+Text += '<script>var pn = opener.location.pathname;<\/script>\n';
+}
+Text += '<body bgcolor="white">\n';
+Text += '<form>';
+Text += '  <select onchange="opener.setbuttons(window);">\n';
+Text += '  <option>---------------------------</option>\n';
+for (j=0;j<9;j++) Text += '  <option>-</option>\n';
+Text += '  </select>\n';
+Text += '</form>';
+Text += '<table cellspacing=0 cellpadding=0>\n';
+for (var i=0;i<(extra_info[extra_info_index].length-1);i++) {
+Text += hbutton(sig_buttons[i], 
+'opener.location=loc[sel.selectedIndex]['+i+'];',
+bnum++);
+}
+Text += hbutton("Search Backwards", 
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link,-1,0);',bnum++);
+Text += hbutton("Search Forwards",
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link, 1,0);',bnum++);
+Text += hbutton("Close","window.close();",bnum++);
+Text += '</table>\n';
+Text += '</body></html>\n';
+w.document.open();
+w.document.write(Text);
+w.document.close();
+w.document.forms[0].elements[0].options[0].text  = linkText;
+w.sel = w.document.forms[0].elements[0]; 
+for (j=0;j<10;j++) w.loc[j] = new Array(sig_buttons.length);  
+copy_into_loc0(w,extra_info_index);
+}
+else {
+var opts = w.document.forms[0].elements[0].options;
+if ( opts.length<10 ) { 
+w.loc[opts.length] = new Array;
+opts.length++; 
+}
+for (i=opts.length-2;i>=0;i--) {
+opts[i+1].text=opts[i].text;
+for (var j=0;j<w.loc[i].length;j++) w.loc[i+1][j] = w.loc[i][j];
+}
+opts[0].text  = linkText;
+copy_into_loc0(w,extra_info_index);
+}
+return false; 
+}
+}
+return true;
+}
+function hbutton (text,action,bnum) {
+return '  <tr><td><a href="" '+
+'onmousedown="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b3.gif\';" '+
+'onmouseup="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b1.gif\';" '+
+'onclick="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+action + 
+' return false;">'+
+'<img border=0 src="v2html-b1.gif"></a></td>' +
+'<td style="font-family:sans-serif; font-weight:bold; font-size:14px;"> '+text+'</td></tr>\n';
+}
+function copy_into_loc0 (w,extra_info_index) {
+for (var i=1;i<extra_info[extra_info_index].length;i++) {
+w.loc[0][i-1] = extra_info[extra_info_index][i];
+}
+w.document.forms[0].elements[0].selectedIndex=1;
+w.document.forms[0].elements[0].selectedIndex=0;
+setbuttons(w);
+}
+function search(text,y,i,inc,relative) {
+var nextpage,wrappage,linkText,linkY;
+window.status="Searching...";
+if (last_class) document.links[i].className=last_class;
+while (1) {
+for (i+=inc;i<document.links.length && i>=0;i+=inc) {
+linkText = is_nav4up ? document.links[i].text : document.links[i].innerText;
+linkY    = is_nav4up && ! is_nav5up ? document.links[i].y    : document.links[i].offsetTop;
+if ((linkText == text) && (linkY != y)) {
+window.status="";
+if (is_nav4up) 
+if (relative) window.scrollBy(0,linkY - y);
+else          window.scrollTo(0,linkY); 
+else if (is_ie4up)
+document.links[i].scrollIntoView(true); 
+last_link=i;
+last_class=document.links[i].className;
+document.links[i].className='HI';
+return false;
+}
+}
+nextpage = (inc==1) ? next_page() : prev_page();
+wrappage = (inc==1) ? first_page() : last_page();
+if (nextpage!="" || wrappage!="") {
+if (nextpage=="") { 
+if (!confirm(text + " not found. Search again from "+((inc==1)?"first":"last")+" page?"))
+return false;
+nextpage=wrappage;
+}
+location=nextpage+ "?" + escape(text) + "&" + ( y - window.pageYOffset ) + "&" + inc;
+return false;
+}
+if (confirm(text + " not found. Search again from "+((inc==1)?"start":"end")+"?")) {
+if (inc==1) i=-1;
+else i=document.links.length;
+} else return false;
+}
+return true;
+}
+function loadqs() {
+var opt=location.search, text="", s="", y=0, si=0, inc=1;
+if (opt.length==0) return true;  
+for (var i=1;i<opt.length;i++) { 
+if (opt.charAt(i) != "&") 
+s += opt.charAt(i);
+else {
+if (text=="") text=unescape(s);
+else             y=s;
+s="";
+}
+}
+if (text=="") return true;
+if (s == "-1") { si=document.links.length-1; inc=-1; }
+window.scrollTo(0,0);
+search(text,y,si,inc);
+return true;
+}
+// -->
+</script>
+<body onload='loadqs();'>
+<script language="JavaScript"type="text/javascript"><!--
+function prev_page() { return ""; }
+function last_page() { return ""; }
+// -->
+</script>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<pre>
+<span class=C>// author: Laurentiu-Cristian Duca, date: 20240322
+</span><span class=C>// spdx license identifier MIT
+</span>
+<span class=M>`include</span> <a  onClick="return qs(event,this,0)"  class=S href="define.vh.html">&quot;define.vh&quot;</a>
+
+<a name="busarbiter"></a><a  href="maintn.v.html#m_topsim_ba"><img alt="[Up: m_topsim ba]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>busarbiter</span><a  href="hierarchy-m.html#busarbiter"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(
+    <span class=C>// here we do not keep the w_ notation for wire
+</span><a name="8"></a>    <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,1)"  class=SI href="maintn.v.html#162">CLK</a>, <a  onClick="return qs(event,this,2)"  class=SI href="maintn.v.html#162">RST_X</a>, <span class=K>output</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,3)"  class=SO href="#40">w_grant</a>,
+<a name="9"></a>    <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,4)"  class=SI href="maintn.v.html#163">w_init_done</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,5)"  class=SI href="maintn.v.html#163">w_tx_ready</a>,
+<a name="10"></a>    <span class=K>output</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,6)"  class=SO href="#331">w_mem_paddr</a>, <span class=K>output</span> <span class=K>wire</span> <a  onClick="return qs(event,this,7)"  class=SO href="#332">w_data_we</a>, <span class=K>output</span> <span class=K>wire</span> <a  onClick="return qs(event,this,8)"  class=SO href="#333">w_data_le</a>, 
+<a name="11"></a>    <span class=K>input</span> <span class=K>wire</span> [3:0] <a  onClick="return qs(event,this,9)"  class=SI href="maintn.v.html#165">w_data_busy</a>, <span class=K>output</span> <span class=K>reg</span> [3:0] <a  onClick="return qs(event,this,10)"  class=SOR href="#168">bus_data_busy0</a>, <span class=K>output</span> <span class=K>reg</span> [3:0] <a  onClick="return qs(event,this,11)"  class=SOR href="#175">bus_data_busy1</a>,
+<a name="12"></a>    <span class=K>output</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,12)"  class=SO href="#334">w_data_wdata</a>, <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,13)"  class=SI href="maintn.v.html#166">w_data_data</a>,
+<a name="13"></a>    <span class=K>input</span> <span class=K>wire</span> [63:0] <a  onClick="return qs(event,this,14)"  class=SI href="maintn.v.html#167">w_mtime</a>,
+<a name="14"></a>    <span class=K>output</span> <span class=K>wire</span> [1:0]  <a  onClick="return qs(event,this,15)"  class=SO href="#336">w_tlb_req</a>, <span class=K>output</span> <span class=K>wire</span> <a  onClick="return qs(event,this,16)"  class=SO href="#337">w_tlb_busy</a>,
+<a name="15"></a>    <span class=K>output</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,17)"  class=SO href="#338">w_mip</a>, <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,18)"  class=SI href="maintn.v.html#169">w_wmip</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,19)"  class=SI href="maintn.v.html#169">w_plic_aces</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,20)"  class=SI href="maintn.v.html#169">r_plic_aces_t</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,21)"  class=SI href="maintn.v.html#169">w_plic_we</a>,
+<a name="16"></a>    <span class=K>output</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,22)"  class=SO href="#325">w_dram_addr</a>, <span class=K>output</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,23)"  class=SO href="#326">w_dram_wdata</a>, <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,24)"  class=SI href="maintn.v.html#170">w_dram_odata</a>, <span class=K>output</span> <span class=K>wire</span> <a  onClick="return qs(event,this,25)"  class=SO href="#327">w_dram_we_t</a>,
+<a name="17"></a>    <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,26)"  class=SI href="maintn.v.html#171">w_dram_busy</a>, <span class=K>output</span> <span class=K>wire</span> [2:0] <a  onClick="return qs(event,this,27)"  class=SO href="#329">w_dram_ctrl</a>, <span class=K>output</span> <span class=K>wire</span> <a  onClick="return qs(event,this,28)"  class=SO href="#328">w_dram_le</a>,
+
+<a name="19"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,29)"  class=SI href="maintn.v.html#173">bus_core_ir0</a>, <span class=K>input</span> <span class=K>wire</span> [3:0] <a  onClick="return qs(event,this,30)"  class=SI href="maintn.v.html#173">bus_cpustate0</a>,
+<a name="20"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,31)"  class=SI href="maintn.v.html#174">bus_mem_paddr0</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,32)"  class=SI href="maintn.v.html#174">bus_data_we0</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,33)"  class=SI href="maintn.v.html#174">bus_data_le0</a>,
+<a name="21"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,34)"  class=SI href="maintn.v.html#175">bus_data_wdata0</a>, 
+<a name="22"></a>    <span class=K>output</span> <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,35)"  class=SOR href="#320">bus_data_data0</a>,
+<a name="23"></a>    <span class=K>input</span> <span class=K>wire</span> [1:0] <a  onClick="return qs(event,this,36)"  class=SI href="maintn.v.html#176">bus_tlb_req0</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,37)"  class=SI href="maintn.v.html#176">bus_tlb_busy0</a>,
+<a name="24"></a>    <span class=K>input</span> [31:0] <a  onClick="return qs(event,this,38)"  class=SI href="maintn.v.html#177">bus_mip0</a>, <span class=K>output</span> <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,39)"  class=SOR href="#313">bus_wmip0</a>, <span class=K>output</span> <span class=K>reg</span> <a  onClick="return qs(event,this,40)"  class=SOR href="#314">bus_plic_we0</a>,
+<a name="25"></a>    <span class=K>input</span> [31:0] <a  onClick="return qs(event,this,41)"  class=SI href="maintn.v.html#178">bus_dram_addr0</a>, <span class=K>input</span> [31:0] <a  onClick="return qs(event,this,42)"  class=SI href="maintn.v.html#178">bus_dram_wdata0</a>, <span class=K>output</span> <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,43)"  class=SOR href="#319">bus_dram_odata0</a>, <span class=K>input</span> <a  onClick="return qs(event,this,44)"  class=SI href="maintn.v.html#178">bus_dram_we_t0</a>,
+<a name="26"></a>    <span class=K>output</span> <span class=K>reg</span> <a  onClick="return qs(event,this,45)"  class=SOR href="#167">bus_dram_busy0</a>, <span class=K>input</span> <span class=K>wire</span> [2:0] <a  onClick="return qs(event,this,46)"  class=SI href="maintn.v.html#179">bus_dram_ctrl0</a>, <span class=K>input</span> <a  onClick="return qs(event,this,47)"  class=SI href="maintn.v.html#179">bus_dram_le0</a>,
+
+<a name="28"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,48)"  class=SI href="maintn.v.html#181">bus_core_ir1</a>, <span class=K>input</span> <span class=K>wire</span> [3:0] <a  onClick="return qs(event,this,49)"  class=SI href="maintn.v.html#181">bus_cpustate1</a>,
+<a name="29"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,50)"  class=SI href="maintn.v.html#182">bus_mem_paddr1</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,51)"  class=SI href="maintn.v.html#182">bus_data_we1</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,52)"  class=SI href="maintn.v.html#182">bus_data_le1</a>,
+<a name="30"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,53)"  class=SI href="maintn.v.html#183">bus_data_wdata1</a>, 
+<a name="31"></a>    <span class=K>output</span> <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,54)"  class=SOR href="#322">bus_data_data1</a>,
+<a name="32"></a>    <span class=K>input</span> <span class=K>wire</span> [1:0] <a  onClick="return qs(event,this,55)"  class=SI href="maintn.v.html#184">bus_tlb_req1</a>, <span class=K>input</span> <span class=K>wire</span> <a  onClick="return qs(event,this,56)"  class=SI href="maintn.v.html#184">bus_tlb_busy1</a>,
+<a name="33"></a>    <span class=K>input</span> [31:0] <a  onClick="return qs(event,this,57)"  class=SI href="maintn.v.html#185">bus_mip1</a>, <span class=K>output</span> <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,58)"  class=SOR href="#316">bus_wmip1</a>, <span class=K>output</span> <span class=K>reg</span> <a  onClick="return qs(event,this,59)"  class=SOR href="#317">bus_plic_we1</a>,
+<a name="34"></a>    <span class=K>input</span> [31:0] <a  onClick="return qs(event,this,60)"  class=SI href="maintn.v.html#186">bus_dram_addr1</a>, <span class=K>input</span> [31:0] <a  onClick="return qs(event,this,61)"  class=SI href="maintn.v.html#186">bus_dram_wdata1</a>, <span class=K>output</span> <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,62)"  class=SOR href="#321">bus_dram_odata1</a>, <span class=K>input</span> <a  onClick="return qs(event,this,63)"  class=SI href="maintn.v.html#186">bus_dram_we_t1</a>,
+<a name="35"></a>    <span class=K>output</span> <span class=K>reg</span> <a  onClick="return qs(event,this,64)"  class=SOR href="#174">bus_dram_busy1</a>, <span class=K>input</span> <span class=K>wire</span> [2:0] <a  onClick="return qs(event,this,65)"  class=SI href="maintn.v.html#187">bus_dram_ctrl1</a>, <span class=K>input</span> <a  onClick="return qs(event,this,66)"  class=SI href="maintn.v.html#187">bus_dram_le1</a>
+    );
+    <span class=C>/**********************************************************************************************/</span>
+    
+<a name="39"></a>    <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a>=0; <span class=C>// bus granted core
+</span><a name="40"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,3)"  class=SO href="#8">w_grant</a>=<a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a>;
+
+<a name="42"></a>    <span class=K>reg</span> [7:0] <a  onClick="return qs(event,this,68)"  class=SR href="#112">state</a>=0;
+    
+<a name="44"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,69)"  class=SW href="#44">w_sys_busy</a> = <a  onClick="return qs(event,this,26)"  class=SI href="#17">w_dram_busy</a> || !<a  onClick="return qs(event,this,5)"  class=SI href="#9">w_tx_ready</a> || <a  onClick="return qs(event,this,9)"  class=SI href="#11">w_data_busy</a>;
+
+<a name="46"></a>    <span class=K>reg</span> <a  onClick="return qs(event,this,70)"  class=SR href="#170">r_pending_req0</a>=0, <a  onClick="return qs(event,this,71)"  class=SR href="#177">r_pending_req1</a>=0;
+
+<span class=P>`ifdef USE_SINGLE_CORE
+</span>
+<span class=P>    always@(posedge CLK) 
+</span><span class=P>    begin
+</span><span class=P>        if(!RST_X) begin
+</span><span class=P>            grant &lt;= 0;
+</span><span class=P>        end else if(w_init_done) begin
+</span><span class=P>        if(state == 0) begin
+</span><span class=P>            if(w_sys_busy) begin
+</span><span class=P>                $display(</span><span class=P>&quot;------------- sys-busy in state0&quot;</span><span class=P>);
+</span><span class=P>                $finish;
+</span><span class=P>            end
+</span><span class=P>            if(bus_dram_le0 | bus_dram_we_t0 | bus_data_le0 | bus_data_we0) begin      
+</span>                <span class=P>// set control signals
+</span><span class=P>                r_ba_dram_le0 &lt;= bus_dram_le0;
+</span><span class=P>                r_ba_dram_we_t0 &lt;= bus_dram_we_t0;
+</span><span class=P>                r_ba_data_le0 &lt;= bus_data_le0;
+</span><span class=P>                r_ba_data_we0 &lt;= bus_data_we0;
+</span>                <span class=P>// dram read or write
+</span><span class=P>                bus_dram_busy0 &lt;= bus_dram_le0 | bus_dram_we_t0;
+</span><span class=P>                r_bus_dram_addr0 &lt;= bus_dram_addr0;
+</span><span class=P>                r_bus_dram_ctrl0 &lt;= bus_dram_ctrl0;
+</span><span class=P>                r_bus_dram_wdata0 &lt;= bus_dram_wdata0;
+</span>                <span class=P>// data read or write
+</span><span class=P>                bus_data_busy0 &lt;= bus_data_le0 | bus_data_we0;
+</span><span class=P>                r_bus_mem_paddr0 &lt;= bus_mem_paddr0;
+</span><span class=P>                r_bus_data_wdata0 &lt;= bus_data_wdata0;
+</span><span class=P>                state &lt;= 1;
+</span><span class=P>            end
+</span><span class=P>        end else if(state == 1) begin </span><span class=P>// dram read
+</span><span class=P>            if(w_sys_busy) begin
+</span><span class=P>                r_ba_dram_le0 &lt;=0;
+</span><span class=P>                r_ba_dram_we_t0 &lt;= 0;
+</span><span class=P>                r_ba_data_le0 &lt;= 0;
+</span><span class=P>                r_ba_data_we0 &lt;= 0;
+</span><span class=P>                state &lt;= 2;
+</span><span class=P>            end
+</span><span class=P>        end else if(state == 2) begin
+</span><span class=P>            if(!w_sys_busy) begin
+</span><span class=P>                r_bus_dram_odata0 &lt;= w_dram_odata;
+</span><span class=P>                r_bus_data_data0 &lt;= w_data_data;
+</span><span class=P>                bus_dram_busy0 &lt;= 0;
+</span><span class=P>                bus_data_busy0 &lt;= 0;
+</span><span class=P>                state &lt;= 0;
+</span><span class=P>            end
+</span><span class=P>        end 
+</span><span class=P>        end </span><span class=P>// init_done
+</span><span class=P>    end
+</span>
+<span class=M>`else</span> <span class=C>// dual core
+</span>
+    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,1)"  class=SI href="#8">CLK</a>) 
+    <span class=K>begin</span>
+        <span class=K>if</span>(!<a  onClick="return qs(event,this,2)"  class=SI href="#8">RST_X</a>) <span class=K>begin</span>
+<a name="102"></a>            <a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> &lt;= 0;
+        <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,4)"  class=SI href="#9">w_init_done</a>) <span class=K>begin</span>
+        <span class=K>if</span>(<a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> == 0) <span class=K>begin</span>
+            <span class=K>if</span>(<a  onClick="return qs(event,this,69)"  class=SW href="#44">w_sys_busy</a>) <span class=K>begin</span>
+                <span class=ST>$display</span>(<span class=S>&quot;------------- sys-busy in state0&quot;</span>);
+                <span class=ST>$finish</span>;
+            <span class=K>end</span>
+            <span class=K>if</span>(<a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> == 1 &amp;&amp; <a  onClick="return qs(event,this,48)"  class=SI href="#28">bus_core_ir1</a>[6:0]==<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#532">OPCODE_AMO_____</a>) <span class=K>begin</span>
+                <span class=K>if</span>(<a  onClick="return qs(event,this,66)"  class=SI href="#35">bus_dram_le1</a> | <a  onClick="return qs(event,this,63)"  class=SI href="#34">bus_dram_we_t1</a> | <a  onClick="return qs(event,this,52)"  class=SI href="#29">bus_data_le1</a> | <a  onClick="return qs(event,this,51)"  class=SI href="#29">bus_data_we1</a>) <span class=K>begin</span>
+                    <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_prepare_exec1">prepare_exec1</a>;
+<a name="112"></a>                    <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 1;
+                <span class=K>end</span>
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request0">check_request0</a>;
+            <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> == 0 &amp;&amp; <a  onClick="return qs(event,this,29)"  class=SI href="#19">bus_core_ir0</a>[6:0]==<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#532">OPCODE_AMO_____</a>) <span class=K>begin</span>
+                <span class=K>if</span>(<a  onClick="return qs(event,this,47)"  class=SI href="#26">bus_dram_le0</a> | <a  onClick="return qs(event,this,44)"  class=SI href="#25">bus_dram_we_t0</a> | <a  onClick="return qs(event,this,33)"  class=SI href="#20">bus_data_le0</a> | <a  onClick="return qs(event,this,32)"  class=SI href="#20">bus_data_we0</a>) <span class=K>begin</span>
+                    <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_prepare_exec0">prepare_exec0</a>;
+                    <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 1;
+                <span class=K>end</span>
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request1">check_request1</a>;
+            <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,71)"  class=SR href="#46">r_pending_req1</a>) <span class=K>begin</span>
+                <a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> &lt;= 1;
+                <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 1;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_exec1_aux">exec1_aux</a>;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request0">check_request0</a>;
+            <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,70)"  class=SR href="#46">r_pending_req0</a>) <span class=K>begin</span>
+                <a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> &lt;= 0;
+                <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 1;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_exec0_aux">exec0_aux</a>;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request1">check_request1</a>;
+            <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,66)"  class=SI href="#35">bus_dram_le1</a> | <a  onClick="return qs(event,this,63)"  class=SI href="#34">bus_dram_we_t1</a> | <a  onClick="return qs(event,this,52)"  class=SI href="#29">bus_data_le1</a> | <a  onClick="return qs(event,this,51)"  class=SI href="#29">bus_data_we1</a>) <span class=K>begin</span>
+                <a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> &lt;= 1;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_prepare_exec1">prepare_exec1</a>;
+                <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 1;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request0">check_request0</a>;
+            <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,47)"  class=SI href="#26">bus_dram_le0</a> | <a  onClick="return qs(event,this,44)"  class=SI href="#25">bus_dram_we_t0</a> | <a  onClick="return qs(event,this,33)"  class=SI href="#20">bus_data_le0</a> | <a  onClick="return qs(event,this,32)"  class=SI href="#20">bus_data_we0</a>) <span class=K>begin</span>
+                <a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> &lt;= 0;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_prepare_exec0">prepare_exec0</a>;
+                <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 1;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request1">check_request1</a>;
+            <span class=K>end</span> 
+        <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> == 1) <span class=K>begin</span>
+            <span class=K>if</span>(<a  onClick="return qs(event,this,69)"  class=SW href="#44">w_sys_busy</a>) <span class=K>begin</span>
+                <span class=K>if</span>(<a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> == 0) <span class=K>begin</span>
+                    <a  onClick="return qs(event,this,72)"  class=SR href="#346">r_ba_dram_le0</a> &lt;=0;
+                    <a  onClick="return qs(event,this,73)"  class=SR href="#345">r_ba_dram_we_t0</a> &lt;= 0;
+                    <a  onClick="return qs(event,this,74)"  class=SR href="#352">r_ba_data_le0</a> &lt;= 0;
+                    <a  onClick="return qs(event,this,75)"  class=SR href="#351">r_ba_data_we0</a> &lt;= 0;
+                    <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 2;
+                <span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+                    <a  onClick="return qs(event,this,76)"  class=SR href="#346">r_ba_dram_le1</a> &lt;=0;
+                    <a  onClick="return qs(event,this,77)"  class=SR href="#345">r_ba_dram_we_t1</a> &lt;= 0;
+                    <a  onClick="return qs(event,this,78)"  class=SR href="#352">r_ba_data_le1</a> &lt;= 0;
+                    <a  onClick="return qs(event,this,79)"  class=SR href="#351">r_ba_data_we1</a> &lt;= 0;
+                    <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 2;
+                <span class=K>end</span>
+            <span class=K>end</span>
+            <span class=K>if</span>(<a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> == 0)
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request1">check_request1</a>;
+            <span class=K>else</span>
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request0">check_request0</a>;
+        <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> == 2) <span class=K>begin</span>
+            <span class=K>if</span>(!<a  onClick="return qs(event,this,69)"  class=SW href="#44">w_sys_busy</a>) <span class=K>begin</span>
+                <span class=K>if</span>(<a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> == 0) <span class=K>begin</span>
+                    <a  onClick="return qs(event,this,80)"  class=SR href="#348">r_bus_dram_odata0</a> &lt;= <a  onClick="return qs(event,this,24)"  class=SI href="#16">w_dram_odata</a>;
+                    <a  onClick="return qs(event,this,81)"  class=SR href="#354">r_bus_data_data0</a> &lt;= <a  onClick="return qs(event,this,13)"  class=SI href="#12">w_data_data</a>;
+<a name="167"></a>                    <a  onClick="return qs(event,this,45)"  class=SOR href="#26">bus_dram_busy0</a> &lt;= 0;
+<a name="168"></a>                    <a  onClick="return qs(event,this,10)"  class=SOR href="#11">bus_data_busy0</a> &lt;= 0;
+                    <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 0;
+<a name="170"></a>                    <a  onClick="return qs(event,this,70)"  class=SR href="#46">r_pending_req0</a> &lt;= 0;
+                <span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+                    <a  onClick="return qs(event,this,82)"  class=SR href="#348">r_bus_dram_odata1</a> &lt;= <a  onClick="return qs(event,this,24)"  class=SI href="#16">w_dram_odata</a>;
+                    <a  onClick="return qs(event,this,83)"  class=SR href="#354">r_bus_data_data1</a> &lt;= <a  onClick="return qs(event,this,13)"  class=SI href="#12">w_data_data</a>;
+<a name="174"></a>                    <a  onClick="return qs(event,this,64)"  class=SOR href="#35">bus_dram_busy1</a> &lt;= 0;
+<a name="175"></a>                    <a  onClick="return qs(event,this,11)"  class=SOR href="#11">bus_data_busy1</a> &lt;= 0;
+                    <a  onClick="return qs(event,this,68)"  class=SR href="#42">state</a> &lt;= 0;
+<a name="177"></a>                    <a  onClick="return qs(event,this,71)"  class=SR href="#46">r_pending_req1</a> &lt;= 0;
+                <span class=K>end</span>
+            <span class=K>end</span>
+            <span class=K>if</span>(<a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> == 0)
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request1">check_request1</a>;
+            <span class=K>else</span>
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request0">check_request0</a>;
+        <span class=K>end</span> 
+        <span class=K>end</span> <span class=C>// init_done
+</span>    <span class=K>end</span>
+<span class=M>`endif</span>
+
+<a name="busarbiter_check_request0"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request0">check_request0</a>;
+<span class=K>begin</span>
+    <span class=K>if</span>((<a  onClick="return qs(event,this,0)"  class=SI href="#26">bus_dram_le0</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#25">bus_dram_we_t0</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_le0</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_we0</a>) &amp;&amp; !<a  onClick="return qs(event,this,0)"  class=SR href="#46">r_pending_req0</a>) <span class=K>begin</span>
+        <a  onClick="return qs(event,this,0)"  class=SR href="#46">r_pending_req0</a> &lt;= 1;
+        <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_exec0">save_exec0</a>;
+    <span class=K>end</span>
+<span class=K>end</span>
+<span class=K>endtask</span>
+
+<a name="busarbiter_save_exec0"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_exec0">save_exec0</a>;
+<span class=K>begin</span>
+                <span class=C>// set control signals
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le0</a> &lt;= 0;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t0</a> &lt;= 0;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le0</a> &lt;= 0;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we0</a> &lt;= 0;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le0_aux</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#26">bus_dram_le0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t0_aux</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#25">bus_dram_we_t0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le0_aux</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_le0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we0_aux</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_we0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SOR href="#26">bus_dram_busy0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#26">bus_dram_le0</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#25">bus_dram_we_t0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SOR href="#11">bus_data_busy0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_le0</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_we0</a>;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_bus_signals0">save_bus_signals0</a>;
+<span class=K>end</span>
+<span class=K>endtask</span>
+
+<a name="busarbiter_save_bus_signals0"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_bus_signals0">save_bus_signals0</a>;
+<span class=K>begin</span>
+                <span class=C>// dram read or write
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#343">r_bus_dram_addr0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#25">bus_dram_addr0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#347">r_bus_dram_ctrl0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#26">bus_dram_ctrl0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#344">r_bus_dram_wdata0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#25">bus_dram_wdata0</a>;
+                <span class=C>// data read or write
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#350">r_bus_mem_paddr0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_mem_paddr0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#353">r_bus_data_wdata0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#21">bus_data_wdata0</a>; 
+<span class=K>end</span>
+<span class=K>endtask</span>
+
+<a name="busarbiter_exec0_aux"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_exec0_aux">exec0_aux</a>;
+<span class=K>begin</span>
+                <span class=C>// set control signals
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le0_aux</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t0_aux</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le0_aux</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we0_aux</a>;
+<span class=K>end</span>
+<span class=K>endtask</span>
+
+<a name="busarbiter_prepare_exec0"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_prepare_exec0">prepare_exec0</a>;
+<span class=K>begin</span>
+                <span class=C>// set control signals
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#26">bus_dram_le0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#25">bus_dram_we_t0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_le0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_we0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SOR href="#26">bus_dram_busy0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#26">bus_dram_le0</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#25">bus_dram_we_t0</a>;
+                <a  onClick="return qs(event,this,0)"  class=SOR href="#11">bus_data_busy0</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_le0</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#20">bus_data_we0</a>;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_bus_signals0">save_bus_signals0</a>;
+<span class=K>end</span>
+<span class=K>endtask</span> 
+
+<a name="busarbiter_check_request1"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_check_request1">check_request1</a>;
+<span class=K>begin</span>
+    <span class=K>if</span>((<a  onClick="return qs(event,this,0)"  class=SI href="#35">bus_dram_le1</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#34">bus_dram_we_t1</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_le1</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_we1</a>) &amp;&amp; !<a  onClick="return qs(event,this,0)"  class=SR href="#46">r_pending_req1</a>) <span class=K>begin</span>
+        <a  onClick="return qs(event,this,0)"  class=SR href="#46">r_pending_req1</a> &lt;= 1;
+        <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_exec1">save_exec1</a>;
+    <span class=K>end</span>
+<span class=K>end</span>
+<span class=K>endtask</span>
+
+<a name="busarbiter_save_exec1"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_exec1">save_exec1</a>;
+<span class=K>begin</span>
+                <span class=C>// set control signals
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le1</a> &lt;= 0;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t1</a> &lt;= 0;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le1</a> &lt;= 0;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we1</a> &lt;= 0;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le1_aux</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#35">bus_dram_le1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t1_aux</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#34">bus_dram_we_t1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le1_aux</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_le1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we1_aux</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_we1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SOR href="#35">bus_dram_busy1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#35">bus_dram_le1</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#34">bus_dram_we_t1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SOR href="#11">bus_data_busy1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_le1</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_we1</a>;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_bus_signals1">save_bus_signals1</a>;
+<span class=K>end</span>
+<span class=K>endtask</span>
+
+<a name="busarbiter_save_bus_signals1"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_bus_signals1">save_bus_signals1</a>;
+<span class=K>begin</span>
+                <span class=C>// dram read or write
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#343">r_bus_dram_addr1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#34">bus_dram_addr1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#347">r_bus_dram_ctrl1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#35">bus_dram_ctrl1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#344">r_bus_dram_wdata1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#34">bus_dram_wdata1</a>;
+                <span class=C>// data read or write
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#350">r_bus_mem_paddr1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_mem_paddr1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#353">r_bus_data_wdata1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#30">bus_data_wdata1</a>;
+<span class=K>end</span>
+<span class=K>endtask</span>
+
+<a name="busarbiter_exec1_aux"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_exec1_aux">exec1_aux</a>;
+<span class=K>begin</span>
+                <span class=C>// set control signals
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le1_aux</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t1_aux</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le1_aux</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we1_aux</a>;
+<span class=K>end</span>
+<span class=K>endtask</span>
+
+<a name="busarbiter_prepare_exec1"></a><span class=K>task</span> <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_prepare_exec1">prepare_exec1</a>;
+<span class=K>begin</span>
+                <span class=C>// set control signals
+</span>                <a  onClick="return qs(event,this,0)"  class=SR href="#346">r_ba_dram_le1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#35">bus_dram_le1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#345">r_ba_dram_we_t1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#34">bus_dram_we_t1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#352">r_ba_data_le1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_le1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SR href="#351">r_ba_data_we1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_we1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SOR href="#35">bus_dram_busy1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#35">bus_dram_le1</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#34">bus_dram_we_t1</a>;
+                <a  onClick="return qs(event,this,0)"  class=SOR href="#11">bus_data_busy1</a> &lt;= <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_le1</a> | <a  onClick="return qs(event,this,0)"  class=SI href="#29">bus_data_we1</a>;
+                <a  onClick="return qs(event,this,0)"  class=T href="#busarbiter_save_bus_signals1">save_bus_signals1</a>;
+<span class=K>end</span>
+<span class=K>endtask</span> 
+
+    <span class=K>always</span> @(*) <span class=K>begin</span>
+        <span class=K>if</span>(<a  onClick="return qs(event,this,67)"  class=SR href="#39">grant</a> == 0) <span class=K>begin</span>
+<a name="313"></a>            <a  onClick="return qs(event,this,39)"  class=SOR href="#24">bus_wmip0</a> &lt;= <a  onClick="return qs(event,this,18)"  class=SI href="#15">w_wmip</a>; 
+<a name="314"></a>            <a  onClick="return qs(event,this,40)"  class=SOR href="#24">bus_plic_we0</a> &lt;= <a  onClick="return qs(event,this,21)"  class=SI href="#15">w_plic_we</a>;
+        <span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+<a name="316"></a>            <a  onClick="return qs(event,this,58)"  class=SOR href="#33">bus_wmip1</a> &lt;= <a  onClick="return qs(event,this,18)"  class=SI href="#15">w_wmip</a>; 
+<a name="317"></a>            <a  onClick="return qs(event,this,59)"  class=SOR href="#33">bus_plic_we1</a> &lt;= <a  onClick="return qs(event,this,21)"  class=SI href="#15">w_plic_we</a>;
+        <span class=K>end</span>
+<a name="319"></a>            <a  onClick="return qs(event,this,43)"  class=SOR href="#25">bus_dram_odata0</a> &lt;= <a  onClick="return qs(event,this,80)"  class=SR href="#348">r_bus_dram_odata0</a>;
+<a name="320"></a>            <a  onClick="return qs(event,this,35)"  class=SOR href="#22">bus_data_data0</a>  &lt;= <a  onClick="return qs(event,this,81)"  class=SR href="#354">r_bus_data_data0</a>;
+<a name="321"></a>            <a  onClick="return qs(event,this,62)"  class=SOR href="#34">bus_dram_odata1</a> &lt;= <a  onClick="return qs(event,this,82)"  class=SR href="#348">r_bus_dram_odata1</a>;
+<a name="322"></a>            <a  onClick="return qs(event,this,54)"  class=SOR href="#31">bus_data_data1</a>  &lt;= <a  onClick="return qs(event,this,83)"  class=SR href="#354">r_bus_data_data1</a>;
+    <span class=K>end</span>    
+
+<a name="325"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,22)"  class=SO href="#16">w_dram_addr</a>  = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,84)"  class=SR href="#343">r_bus_dram_addr0</a> : <a  onClick="return qs(event,this,85)"  class=SR href="#343">r_bus_dram_addr1</a>;
+<a name="326"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,23)"  class=SO href="#16">w_dram_wdata</a> = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,86)"  class=SR href="#344">r_bus_dram_wdata0</a> : <a  onClick="return qs(event,this,87)"  class=SR href="#344">r_bus_dram_wdata1</a>;
+<a name="327"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,25)"  class=SO href="#16">w_dram_we_t</a>  = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,73)"  class=SR href="#345">r_ba_dram_we_t0</a> : <a  onClick="return qs(event,this,77)"  class=SR href="#345">r_ba_dram_we_t1</a>;
+<a name="328"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,28)"  class=SO href="#17">w_dram_le</a>    = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,72)"  class=SR href="#346">r_ba_dram_le0</a> : <a  onClick="return qs(event,this,76)"  class=SR href="#346">r_ba_dram_le1</a>;
+<a name="329"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,27)"  class=SO href="#17">w_dram_ctrl</a>  = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,88)"  class=SR href="#347">r_bus_dram_ctrl0</a> : <a  onClick="return qs(event,this,89)"  class=SR href="#347">r_bus_dram_ctrl1</a>; 
+
+<a name="331"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,6)"  class=SO href="#10">w_mem_paddr</a>  = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,90)"  class=SR href="#350">r_bus_mem_paddr0</a> : <a  onClick="return qs(event,this,91)"  class=SR href="#350">r_bus_mem_paddr1</a>;
+<a name="332"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,7)"  class=SO href="#10">w_data_we</a>    = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,75)"  class=SR href="#351">r_ba_data_we0</a> : <a  onClick="return qs(event,this,79)"  class=SR href="#351">r_ba_data_we1</a>;
+<a name="333"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,8)"  class=SO href="#10">w_data_le</a>    = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,74)"  class=SR href="#352">r_ba_data_le0</a> : <a  onClick="return qs(event,this,78)"  class=SR href="#352">r_ba_data_le1</a>;
+<a name="334"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,12)"  class=SO href="#12">w_data_wdata</a> = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,92)"  class=SR href="#353">r_bus_data_wdata0</a> : <a  onClick="return qs(event,this,93)"  class=SR href="#353">r_bus_data_wdata1</a>;
+
+<a name="336"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,15)"  class=SO href="#14">w_tlb_req</a>    = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,36)"  class=SI href="#23">bus_tlb_req0</a> : <a  onClick="return qs(event,this,55)"  class=SI href="#32">bus_tlb_req1</a>;
+<a name="337"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,16)"  class=SO href="#14">w_tlb_busy</a>   = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,37)"  class=SI href="#23">bus_tlb_busy0</a> : <a  onClick="return qs(event,this,56)"  class=SI href="#32">bus_tlb_busy1</a>;
+<a name="338"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,17)"  class=SO href="#15">w_mip</a>        = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,38)"  class=SI href="#24">bus_mip0</a> : <a  onClick="return qs(event,this,57)"  class=SI href="#33">bus_mip1</a>;
+
+<a name="340"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,94)"  class=SW href="#340">w_core_ir</a> = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,29)"  class=SI href="#19">bus_core_ir0</a> : <a  onClick="return qs(event,this,48)"  class=SI href="#28">bus_core_ir1</a>;
+<a name="341"></a>    <span class=K>wire</span> [3:0] <a  onClick="return qs(event,this,95)"  class=SW href="#341">w_bus_cpustate</a> = <a  onClick="return qs(event,this,67)"  class=SR href="#102">grant</a> == 0 ? <a  onClick="return qs(event,this,30)"  class=SI href="#19">bus_cpustate0</a> : <a  onClick="return qs(event,this,49)"  class=SI href="#28">bus_cpustate1</a>;
+
+<a name="343"></a>    <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,84)"  class=SR href="#343">r_bus_dram_addr0</a>=0, <a  onClick="return qs(event,this,85)"  class=SR href="#343">r_bus_dram_addr1</a>=0;
+<a name="344"></a>    <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,86)"  class=SR href="#344">r_bus_dram_wdata0</a>=0, <a  onClick="return qs(event,this,87)"  class=SR href="#344">r_bus_dram_wdata1</a>=0;
+<a name="345"></a>    <span class=K>reg</span> <a  onClick="return qs(event,this,73)"  class=SR href="#345">r_ba_dram_we_t0</a>=0, <a  onClick="return qs(event,this,77)"  class=SR href="#345">r_ba_dram_we_t1</a>=0, <a  onClick="return qs(event,this,96)"  class=SR href="#345">r_ba_dram_we_t0_aux</a>=0, <a  onClick="return qs(event,this,97)"  class=SR href="#345">r_ba_dram_we_t1_aux</a>=0;
+<a name="346"></a>    <span class=K>reg</span> <a  onClick="return qs(event,this,72)"  class=SR href="#346">r_ba_dram_le0</a>=0, <a  onClick="return qs(event,this,76)"  class=SR href="#346">r_ba_dram_le1</a>=0, <a  onClick="return qs(event,this,98)"  class=SR href="#346">r_ba_dram_le0_aux</a>=0, <a  onClick="return qs(event,this,99)"  class=SR href="#346">r_ba_dram_le1_aux</a>=0;
+<a name="347"></a>    <span class=K>reg</span> [2:0] <a  onClick="return qs(event,this,88)"  class=SR href="#347">r_bus_dram_ctrl0</a>=0, <a  onClick="return qs(event,this,89)"  class=SR href="#347">r_bus_dram_ctrl1</a>=0;
+<a name="348"></a>    <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,80)"  class=SR href="#348">r_bus_dram_odata0</a>=0, <a  onClick="return qs(event,this,82)"  class=SR href="#348">r_bus_dram_odata1</a>=0;
+
+<a name="350"></a>    <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,90)"  class=SR href="#350">r_bus_mem_paddr0</a>=0, <a  onClick="return qs(event,this,91)"  class=SR href="#350">r_bus_mem_paddr1</a>=0;
+<a name="351"></a>    <span class=K>reg</span> <a  onClick="return qs(event,this,75)"  class=SR href="#351">r_ba_data_we0</a>=0, <a  onClick="return qs(event,this,79)"  class=SR href="#351">r_ba_data_we1</a>=0, <a  onClick="return qs(event,this,100)"  class=SR href="#351">r_ba_data_we0_aux</a>=0, <a  onClick="return qs(event,this,101)"  class=SR href="#351">r_ba_data_we1_aux</a>=0;
+<a name="352"></a>    <span class=K>reg</span> <a  onClick="return qs(event,this,74)"  class=SR href="#352">r_ba_data_le0</a>=0, <a  onClick="return qs(event,this,78)"  class=SR href="#352">r_ba_data_le1</a>=0, <a  onClick="return qs(event,this,102)"  class=SR href="#352">r_ba_data_le0_aux</a>=0, <a  onClick="return qs(event,this,103)"  class=SR href="#352">r_ba_data_le1_aux</a>=0;
+<a name="353"></a>    <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,92)"  class=SR href="#353">r_bus_data_wdata0</a>=0, <a  onClick="return qs(event,this,93)"  class=SR href="#353">r_bus_data_wdata1</a>=0;
+<a name="354"></a>    <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,81)"  class=SR href="#354">r_bus_data_data0</a>=0, <a  onClick="return qs(event,this,83)"  class=SR href="#354">r_bus_data_data1</a>=0;
+
+<span class=K>endmodule</span>
+
+</pre>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<script language="JavaScript"type="text/javascript"><!--
+function next_page() { return ""; }
+function first_page() { return ""; }
+var extra_info = [
+["S","busarbiter.v.html#8","","maintn.v.html#162","maintn.v.html#67","hierarchy-s.p2.html#CLK___busarbiter"],
+["S","busarbiter.v.html#8","","maintn.v.html#162","maintn.v.html#66","hierarchy-s.p7.html#RST_X___busarbiter"],
+["S","busarbiter.v.html#8","busarbiter.v.html#40","","busarbiter.v.html#40","hierarchy-s.p9.html#w_grant___busarbiter"],
+["S","busarbiter.v.html#9","","maintn.v.html#163","maintn.v.html#596","hierarchy-s.p9.html#w_init_done___busarbiter"],
+["S","busarbiter.v.html#9","","maintn.v.html#163","loader.v.html#78","hierarchy-s.p9.html#w_tx_ready___busarbiter"],
+["S","busarbiter.v.html#10","busarbiter.v.html#331","","busarbiter.v.html#331","hierarchy-s.p9.html#w_mem_paddr___busarbiter"],
+["S","busarbiter.v.html#10","busarbiter.v.html#332","","busarbiter.v.html#332","hierarchy-s.p9.html#w_data_we___busarbiter"],
+["S","busarbiter.v.html#10","busarbiter.v.html#333","","busarbiter.v.html#333","hierarchy-s.p9.html#w_data_le___busarbiter"],
+["S","busarbiter.v.html#11","","maintn.v.html#165","maintn.v.html#201","hierarchy-s.p9.html#w_data_busy___busarbiter"],
+["S","busarbiter.v.html#11","busarbiter.v.html#168","","busarbiter.v.html#168","hierarchy-s.html#bus_data_busy0___busarbiter"],
+["S","busarbiter.v.html#11","busarbiter.v.html#175","","busarbiter.v.html#175","hierarchy-s.html#bus_data_busy1___busarbiter"],
+["S","busarbiter.v.html#12","busarbiter.v.html#334","","busarbiter.v.html#334","hierarchy-s.p9.html#w_data_wdata___busarbiter"],
+["S","busarbiter.v.html#12","","maintn.v.html#166","maintn.v.html#245","hierarchy-s.p9.html#w_data_data___busarbiter"],
+["S","busarbiter.v.html#13","","maintn.v.html#167","maintn.v.html#111","hierarchy-s.p9.html#w_mtime___busarbiter"],
+["S","busarbiter.v.html#14","busarbiter.v.html#336","","busarbiter.v.html#336","hierarchy-s.p9.html#w_tlb_req___busarbiter"],
+["S","busarbiter.v.html#14","busarbiter.v.html#337","","busarbiter.v.html#337","hierarchy-s.p9.html#w_tlb_busy___busarbiter"],
+["S","busarbiter.v.html#15","busarbiter.v.html#338","","busarbiter.v.html#338","hierarchy-s.p9.html#w_mip___busarbiter"],
+["S","busarbiter.v.html#15","","maintn.v.html#169","maintn.v.html#253","hierarchy-s.p9.html#w_wmip___busarbiter"],
+["S","busarbiter.v.html#15","","maintn.v.html#169","","hierarchy-s.p9.html#w_plic_aces___busarbiter"],
+["S","busarbiter.v.html#15","","maintn.v.html#169","","hierarchy-s.p7.html#r_plic_aces_t___busarbiter"],
+["S","busarbiter.v.html#15","","maintn.v.html#169","maintn.v.html#252","hierarchy-s.p9.html#w_plic_we___busarbiter"],
+["S","busarbiter.v.html#16","busarbiter.v.html#325","","busarbiter.v.html#325","hierarchy-s.p9.html#w_dram_addr___busarbiter"],
+["S","busarbiter.v.html#16","busarbiter.v.html#326","","busarbiter.v.html#326","hierarchy-s.p9.html#w_dram_wdata___busarbiter"],
+["S","busarbiter.v.html#16","","maintn.v.html#170","memorytn.v.html#73","hierarchy-s.p9.html#w_dram_odata___busarbiter"],
+["S","busarbiter.v.html#16","busarbiter.v.html#327","","busarbiter.v.html#327","hierarchy-s.p9.html#w_dram_we_t___busarbiter"],
+["S","busarbiter.v.html#17","","maintn.v.html#171","memorytn.v.html#81","hierarchy-s.p9.html#w_dram_busy___busarbiter"],
+["S","busarbiter.v.html#17","busarbiter.v.html#329","","busarbiter.v.html#329","hierarchy-s.p9.html#w_dram_ctrl___busarbiter"],
+["S","busarbiter.v.html#17","busarbiter.v.html#328","","busarbiter.v.html#328","hierarchy-s.p9.html#w_dram_le___busarbiter"],
+["S","busarbiter.v.html#19","","maintn.v.html#173","rvcorem.v.p2.html#1011","hierarchy-s.html#bus_core_ir0___busarbiter"],
+["S","busarbiter.v.html#19","","maintn.v.html#173","rvcorem.v.html#85","hierarchy-s.html#bus_cpustate0___busarbiter"],
+["S","busarbiter.v.html#20","","maintn.v.html#174","mmu.v.html#304","hierarchy-s.html#bus_mem_paddr0___busarbiter"],
+["S","busarbiter.v.html#20","","maintn.v.html#174","mmu.v.html#345","hierarchy-s.html#bus_data_we0___busarbiter"],
+["S","busarbiter.v.html#20","","maintn.v.html#174","mmu.v.html#344","hierarchy-s.html#bus_data_le0___busarbiter"],
+["S","busarbiter.v.html#21","","maintn.v.html#175","rvcorem.v.html#439","hierarchy-s.html#bus_data_wdata0___busarbiter"],
+["S","busarbiter.v.html#22","busarbiter.v.html#320","","busarbiter.v.html#320","hierarchy-s.html#bus_data_data0___busarbiter"],
+["S","busarbiter.v.html#23","","maintn.v.html#176","rvcorem.v.html#997","hierarchy-s.html#bus_tlb_req0___busarbiter"],
+["S","busarbiter.v.html#23","","maintn.v.html#176","mmu.v.html#348","hierarchy-s.html#bus_tlb_busy0___busarbiter"],
+["S","busarbiter.v.html#24","","maintn.v.html#177","rvcorem.v.p2.html#1004","hierarchy-s.html#bus_mip0___busarbiter"],
+["S","busarbiter.v.html#24","busarbiter.v.html#313","","busarbiter.v.html#313","hierarchy-s.html#bus_wmip0___busarbiter"],
+["S","busarbiter.v.html#24","busarbiter.v.html#314","","busarbiter.v.html#314","hierarchy-s.html#bus_plic_we0___busarbiter"],
+["S","busarbiter.v.html#25","","maintn.v.html#178","mmu.v.html#324","hierarchy-s.html#bus_dram_addr0___busarbiter"],
+["S","busarbiter.v.html#25","","maintn.v.html#178","mmu.v.html#319","hierarchy-s.html#bus_dram_wdata0___busarbiter"],
+["S","busarbiter.v.html#25","busarbiter.v.html#319","","busarbiter.v.html#319","hierarchy-s.html#bus_dram_odata0___busarbiter"],
+["S","busarbiter.v.html#25","","maintn.v.html#178","mmu.v.html#352","hierarchy-s.html#bus_dram_we_t0___busarbiter"],
+["S","busarbiter.v.html#26","busarbiter.v.html#167","","busarbiter.v.html#167","hierarchy-s.html#bus_dram_busy0___busarbiter"],
+["S","busarbiter.v.html#26","","maintn.v.html#179","mmu.v.html#329","hierarchy-s.html#bus_dram_ctrl0___busarbiter"],
+["S","busarbiter.v.html#26","","maintn.v.html#179","mmu.v.html#335","hierarchy-s.html#bus_dram_le0___busarbiter"],
+["S","busarbiter.v.html#28","","maintn.v.html#181","rvcorem.v.p2.html#1011","hierarchy-s.html#bus_core_ir1___busarbiter"],
+["S","busarbiter.v.html#28","","maintn.v.html#181","rvcorem.v.html#85","hierarchy-s.html#bus_cpustate1___busarbiter"],
+["S","busarbiter.v.html#29","","maintn.v.html#182","mmu.v.html#304","hierarchy-s.html#bus_mem_paddr1___busarbiter"],
+["S","busarbiter.v.html#29","","maintn.v.html#182","mmu.v.html#345","hierarchy-s.html#bus_data_we1___busarbiter"],
+["S","busarbiter.v.html#29","","maintn.v.html#182","mmu.v.html#344","hierarchy-s.html#bus_data_le1___busarbiter"],
+["S","busarbiter.v.html#30","","maintn.v.html#183","rvcorem.v.html#439","hierarchy-s.html#bus_data_wdata1___busarbiter"],
+["S","busarbiter.v.html#31","busarbiter.v.html#322","","busarbiter.v.html#322","hierarchy-s.html#bus_data_data1___busarbiter"],
+["S","busarbiter.v.html#32","","maintn.v.html#184","rvcorem.v.html#997","hierarchy-s.html#bus_tlb_req1___busarbiter"],
+["S","busarbiter.v.html#32","","maintn.v.html#184","mmu.v.html#348","hierarchy-s.html#bus_tlb_busy1___busarbiter"],
+["S","busarbiter.v.html#33","","maintn.v.html#185","rvcorem.v.p2.html#1004","hierarchy-s.html#bus_mip1___busarbiter"],
+["S","busarbiter.v.html#33","busarbiter.v.html#316","","busarbiter.v.html#316","hierarchy-s.html#bus_wmip1___busarbiter"],
+["S","busarbiter.v.html#33","busarbiter.v.html#317","","busarbiter.v.html#317","hierarchy-s.html#bus_plic_we1___busarbiter"],
+["S","busarbiter.v.html#34","","maintn.v.html#186","mmu.v.html#324","hierarchy-s.html#bus_dram_addr1___busarbiter"],
+["S","busarbiter.v.html#34","","maintn.v.html#186","mmu.v.html#319","hierarchy-s.html#bus_dram_wdata1___busarbiter"],
+["S","busarbiter.v.html#34","busarbiter.v.html#321","","busarbiter.v.html#321","hierarchy-s.html#bus_dram_odata1___busarbiter"],
+["S","busarbiter.v.html#34","","maintn.v.html#186","mmu.v.html#352","hierarchy-s.html#bus_dram_we_t1___busarbiter"],
+["S","busarbiter.v.html#35","busarbiter.v.html#174","","busarbiter.v.html#174","hierarchy-s.html#bus_dram_busy1___busarbiter"],
+["S","busarbiter.v.html#35","","maintn.v.html#187","mmu.v.html#329","hierarchy-s.html#bus_dram_ctrl1___busarbiter"],
+["S","busarbiter.v.html#35","","maintn.v.html#187","mmu.v.html#335","hierarchy-s.html#bus_dram_le1___busarbiter"],
+["S","busarbiter.v.html#39","busarbiter.v.html#102","","busarbiter.v.html#102","hierarchy-s.p4.html#grant___busarbiter"],
+["S","busarbiter.v.html#42","busarbiter.v.html#112","","busarbiter.v.html#112","hierarchy-s.p8.html#state___busarbiter"],
+["S","busarbiter.v.html#44","busarbiter.v.html#44","","busarbiter.v.html#44","hierarchy-s.p9.html#w_sys_busy___busarbiter"],
+["S","busarbiter.v.html#46","busarbiter.v.html#170","","busarbiter.v.html#170","hierarchy-s.p7.html#r_pending_req0___busarbiter"],
+["S","busarbiter.v.html#46","busarbiter.v.html#177","","busarbiter.v.html#177","hierarchy-s.p7.html#r_pending_req1___busarbiter"],
+["S","busarbiter.v.html#346","","","","hierarchy-s.p7.html#r_ba_dram_le0___busarbiter"],
+["S","busarbiter.v.html#345","","","","hierarchy-s.p7.html#r_ba_dram_we_t0___busarbiter"],
+["S","busarbiter.v.html#352","","","","hierarchy-s.p7.html#r_ba_data_le0___busarbiter"],
+["S","busarbiter.v.html#351","","","","hierarchy-s.p7.html#r_ba_data_we0___busarbiter"],
+["S","busarbiter.v.html#346","","","","hierarchy-s.p7.html#r_ba_dram_le1___busarbiter"],
+["S","busarbiter.v.html#345","","","","hierarchy-s.p7.html#r_ba_dram_we_t1___busarbiter"],
+["S","busarbiter.v.html#352","","","","hierarchy-s.p7.html#r_ba_data_le1___busarbiter"],
+["S","busarbiter.v.html#351","","","","hierarchy-s.p7.html#r_ba_data_we1___busarbiter"],
+["S","busarbiter.v.html#348","","","","hierarchy-s.p7.html#r_bus_dram_odata0___busarbiter"],
+["S","busarbiter.v.html#354","","","","hierarchy-s.p7.html#r_bus_data_data0___busarbiter"],
+["S","busarbiter.v.html#348","","","","hierarchy-s.p7.html#r_bus_dram_odata1___busarbiter"],
+["S","busarbiter.v.html#354","","","","hierarchy-s.p7.html#r_bus_data_data1___busarbiter"],
+["S","busarbiter.v.html#343","","","","hierarchy-s.p7.html#r_bus_dram_addr0___busarbiter"],
+["S","busarbiter.v.html#343","","","","hierarchy-s.p7.html#r_bus_dram_addr1___busarbiter"],
+["S","busarbiter.v.html#344","","","","hierarchy-s.p7.html#r_bus_dram_wdata0___busarbiter"],
+["S","busarbiter.v.html#344","","","","hierarchy-s.p7.html#r_bus_dram_wdata1___busarbiter"],
+["S","busarbiter.v.html#347","","","","hierarchy-s.p7.html#r_bus_dram_ctrl0___busarbiter"],
+["S","busarbiter.v.html#347","","","","hierarchy-s.p7.html#r_bus_dram_ctrl1___busarbiter"],
+["S","busarbiter.v.html#350","","","","hierarchy-s.p7.html#r_bus_mem_paddr0___busarbiter"],
+["S","busarbiter.v.html#350","","","","hierarchy-s.p7.html#r_bus_mem_paddr1___busarbiter"],
+["S","busarbiter.v.html#353","","","","hierarchy-s.p7.html#r_bus_data_wdata0___busarbiter"],
+["S","busarbiter.v.html#353","","","","hierarchy-s.p7.html#r_bus_data_wdata1___busarbiter"],
+["S","busarbiter.v.html#340","busarbiter.v.html#340","","busarbiter.v.html#340","hierarchy-s.p9.html#w_core_ir___busarbiter"],
+["S","busarbiter.v.html#341","busarbiter.v.html#341","","busarbiter.v.html#341","hierarchy-s.p9.html#w_bus_cpustate___busarbiter"],
+["S","busarbiter.v.html#345","","","","hierarchy-s.p7.html#r_ba_dram_we_t0_aux___busarbiter"],
+["S","busarbiter.v.html#345","","","","hierarchy-s.p7.html#r_ba_dram_we_t1_aux___busarbiter"],
+["S","busarbiter.v.html#346","","","","hierarchy-s.p7.html#r_ba_dram_le0_aux___busarbiter"],
+["S","busarbiter.v.html#346","","","","hierarchy-s.p7.html#r_ba_dram_le1_aux___busarbiter"],
+["S","busarbiter.v.html#351","","","","hierarchy-s.p7.html#r_ba_data_we0_aux___busarbiter"],
+["S","busarbiter.v.html#351","","","","hierarchy-s.p7.html#r_ba_data_we1_aux___busarbiter"],
+["S","busarbiter.v.html#352","","","","hierarchy-s.p7.html#r_ba_data_le0_aux___busarbiter"],
+["S","busarbiter.v.html#352","","","","hierarchy-s.p7.html#r_ba_data_le1_aux___busarbiter"]
+];
+disabled=0;
+// -->
+</script>
+<hr>
+<table>
+ <tr><td><i>This page:</i></td>
+  <td><i>Created:</i></td><td><i>Mon May 27 16:23:36 2024</i></td></tr>
+<tr>
+ <td> </td>
+ <td><i>From:</i></td><td><i>
+../src/busarbiter.v</i></td></tr>
+</table>
+<hr>
+<table width="100%"><tr><td><i>Verilog converted to html by  <a target="_top" href="http://www.burbleland.com/v2html/v2html.html">  v2html 7.30.1.3</a> 
+ (written by <a href="mailto:v2html730@burbleland.com">Costas Calamvokis</a>).</i></td><td align="right"><b><a href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></b></td></tr></table><table height="90%"><tr><td></td></tr></table>
+</body>
+</html>

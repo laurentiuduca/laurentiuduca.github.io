@@ -1,0 +1,870 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<title>../src/rvcorem.v page 2</title>
+<link rel="Stylesheet" title="v2html stylesheet" media="Screen" href="v2html.css">
+</head>
+<script language="JavaScript" type="text/javascript"><!--
+var agt=navigator.userAgent.toLowerCase(); 
+var is_nav  = ((agt.indexOf('mozilla')!=-1) &&
+(agt.indexOf('spoofer')==-1) &&
+(agt.indexOf('compatible') == -1) &&
+(agt.indexOf('opera')==-1) &&
+(agt.indexOf('webtv')==-1)); 
+var is_major = parseInt(navigator.appVersion); 
+var is_nav4up = (is_nav && (is_major >= 4)); 
+var is_ie     = (agt.indexOf("msie") != -1); 
+var is_ie4up  = (is_ie  && (is_major >= 4)); 
+var is_nav5up = (is_nav && (is_major >= 5));
+var dirSep = (window.location.pathname.indexOf('\\') != -1) ? '\\' : '/' ;
+function setbuttons (wndw) {
+var i;
+var sl=wndw.loc[ wndw.document.forms[0].elements[0].selectedIndex ];
+for (i=0;i<sl.length;i++) {
+if(sl[i]) wndw.document.images[i].src='v2html-b1.gif';
+else      wndw.document.images[i].src='v2html-b2.gif';
+}
+if ( wndw.document.forms[0].elements[0].options[ 
+wndw.document.forms[0].elements[0].selectedIndex ].text != '-') {
+wndw.document.images[i  ].src='v2html-b1.gif';
+wndw.document.images[i+1].src='v2html-b1.gif';
+}
+else {
+wndw.document.images[i  ].src='v2html-b2.gif';
+wndw.document.images[i+1].src='v2html-b2.gif';
+}
+}
+// Unindented and uncommented to save spave - look in v2html for a prettier version
+var disabled=1;
+if (!is_nav4up) {
+var event=false; 
+}
+var last_link=0;     
+var last_class=null; 
+function qs(e,t,extra_info_index) {
+var inc=0,bnum=0,i,j;
+if (disabled) return false;
+var sig_buttons = [ "Definition" , "Local Driver" , 
+"Up to Input Driver" , "Find Source" , "Index"];
+if (is_nav4up || is_ie4up) {
+if (((e.which==2) && (!(e.modifiers&Event.SHIFT_MASK))) ||
+((e.which==1) &&  (e.modifiers&Event.CONTROL_MASK)))   inc = 1;
+else if (((e.which==2) && (e.modifiers&Event.SHIFT_MASK)) ||
+((e.which==1) && (e.modifiers&Event.SHIFT_MASK))) inc = -1;
+if (inc == 0 && extra_info_index == 0) { 
+return true;  
+}
+var linkText = is_nav4up ? t.text : t.innerText;
+var linkY    = is_nav4up && ! is_nav5up ? t.y    : t.offsetTop;
+window.status="Searching...";
+if ((last_link==-1) || (document.links[last_link]!=t)) 
+for (last_link=0;last_link<document.links.length;last_link++) 
+if (document.links[last_link] == t)  
+break;
+if (inc != 0) { 
+return search(linkText,linkY,last_link,inc,1);
+}
+else { 
+window.status="";
+extra_info_index--; 
+if (extra_info[extra_info_index][0] != 'S') { 
+return true;
+}
+var w = window.open('','SignalPopUp','width=200,height=235');
+if (null != w.document.forms[0]) {
+if ((window.location.pathname.substring(0,window.location.pathname.lastIndexOf(dirSep)))!=
+(w.pn.substring(0,w.pn.lastIndexOf(dirSep)))) {
+w.close();
+w = window.open('','SignalPopUp','width=200,height=235');
+}
+}
+w.focus(); 
+if (null == w.document.forms[0]) { 
+var Text = '<html><head></head>';
+if (is_nav4up) { 
+w.loc = new Array(10);
+w.sel = null;
+w.pn  = window.location.pathname;
+}
+else {     
+Text += '<script>var loc = new Array(10);<\/script>\n';
+Text += '<script>var sel;<\/script>\n';
+Text += '<script>var pn = opener.location.pathname;<\/script>\n';
+}
+Text += '<body bgcolor="white">\n';
+Text += '<form>';
+Text += '  <select onchange="opener.setbuttons(window);">\n';
+Text += '  <option>---------------------------</option>\n';
+for (j=0;j<9;j++) Text += '  <option>-</option>\n';
+Text += '  </select>\n';
+Text += '</form>';
+Text += '<table cellspacing=0 cellpadding=0>\n';
+for (var i=0;i<(extra_info[extra_info_index].length-1);i++) {
+Text += hbutton(sig_buttons[i], 
+'opener.location=loc[sel.selectedIndex]['+i+'];',
+bnum++);
+}
+Text += hbutton("Search Backwards", 
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link,-1,0);',bnum++);
+Text += hbutton("Search Forwards",
+'opener.search(sel.options[ sel.selectedIndex ].text,' +
+'0,opener.last_link, 1,0);',bnum++);
+Text += hbutton("Close","window.close();",bnum++);
+Text += '</table>\n';
+Text += '</body></html>\n';
+w.document.open();
+w.document.write(Text);
+w.document.close();
+w.document.forms[0].elements[0].options[0].text  = linkText;
+w.sel = w.document.forms[0].elements[0]; 
+for (j=0;j<10;j++) w.loc[j] = new Array(sig_buttons.length);  
+copy_into_loc0(w,extra_info_index);
+}
+else {
+var opts = w.document.forms[0].elements[0].options;
+if ( opts.length<10 ) { 
+w.loc[opts.length] = new Array;
+opts.length++; 
+}
+for (i=opts.length-2;i>=0;i--) {
+opts[i+1].text=opts[i].text;
+for (var j=0;j<w.loc[i].length;j++) w.loc[i+1][j] = w.loc[i][j];
+}
+opts[0].text  = linkText;
+copy_into_loc0(w,extra_info_index);
+}
+return false; 
+}
+}
+return true;
+}
+function hbutton (text,action,bnum) {
+return '  <tr><td><a href="" '+
+'onmousedown="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b3.gif\';" '+
+'onmouseup="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+'images['+bnum+'].src=\'v2html-b1.gif\';" '+
+'onclick="'+
+'if (images['+bnum+'].src.match(/v2html-b2.gif/)) return false; ' +
+action + 
+' return false;">'+
+'<img border=0 src="v2html-b1.gif"></a></td>' +
+'<td style="font-family:sans-serif; font-weight:bold; font-size:14px;"> '+text+'</td></tr>\n';
+}
+function copy_into_loc0 (w,extra_info_index) {
+for (var i=1;i<extra_info[extra_info_index].length;i++) {
+w.loc[0][i-1] = extra_info[extra_info_index][i];
+}
+w.document.forms[0].elements[0].selectedIndex=1;
+w.document.forms[0].elements[0].selectedIndex=0;
+setbuttons(w);
+}
+function search(text,y,i,inc,relative) {
+var nextpage,wrappage,linkText,linkY;
+window.status="Searching...";
+if (last_class) document.links[i].className=last_class;
+while (1) {
+for (i+=inc;i<document.links.length && i>=0;i+=inc) {
+linkText = is_nav4up ? document.links[i].text : document.links[i].innerText;
+linkY    = is_nav4up && ! is_nav5up ? document.links[i].y    : document.links[i].offsetTop;
+if ((linkText == text) && (linkY != y)) {
+window.status="";
+if (is_nav4up) 
+if (relative) window.scrollBy(0,linkY - y);
+else          window.scrollTo(0,linkY); 
+else if (is_ie4up)
+document.links[i].scrollIntoView(true); 
+last_link=i;
+last_class=document.links[i].className;
+document.links[i].className='HI';
+return false;
+}
+}
+nextpage = (inc==1) ? next_page() : prev_page();
+wrappage = (inc==1) ? first_page() : last_page();
+if (nextpage!="" || wrappage!="") {
+if (nextpage=="") { 
+if (!confirm(text + " not found. Search again from "+((inc==1)?"first":"last")+" page?"))
+return false;
+nextpage=wrappage;
+}
+location=nextpage+ "?" + escape(text) + "&" + ( y - window.pageYOffset ) + "&" + inc;
+return false;
+}
+if (confirm(text + " not found. Search again from "+((inc==1)?"start":"end")+"?")) {
+if (inc==1) i=-1;
+else i=document.links.length;
+} else return false;
+}
+return true;
+}
+function loadqs() {
+var opt=location.search, text="", s="", y=0, si=0, inc=1;
+if (opt.length==0) return true;  
+for (var i=1;i<opt.length;i++) { 
+if (opt.charAt(i) != "&") 
+s += opt.charAt(i);
+else {
+if (text=="") text=unescape(s);
+else             y=s;
+s="";
+}
+}
+if (text=="") return true;
+if (s == "-1") { si=document.links.length-1; inc=-1; }
+window.scrollTo(0,0);
+search(text,y,si,inc);
+return true;
+}
+// -->
+</script>
+<body onload='loadqs();'>
+<script language="JavaScript"type="text/javascript"><!--
+function prev_page() { return "rvcorem.v.html"; }
+function last_page() { return "rvcorem.v.p2.html"; }
+// -->
+</script>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<center><table class=NB cols=3 ><tr><td align="center" width="33%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='rvcorem.v.html#bottom_of_page';"><a target="_top" href="rvcorem.v.html#bottom_of_page">Prev</a></td><td align="center" width="33%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='rvcorem.v.html';"><a target="_top" href="rvcorem.v.html">1</a></td><td align="center" width="33%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';" ><font color="#808080">2</font></td></tr></table></center>
+<pre>
+<a name="1001"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,1)"  class=SO href="rvcorem.v.html#75">w_mstatus</a>  = <a  onClick="return qs(event,this,2)"  class=SR href="rvcorem.v.html#767">mstatus</a>;
+    <span class=C>//assign w_mtime    = w_mtime;
+</span><a name="1003"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,3)"  class=SO href="rvcorem.v.html#72">w_mtimecmp</a> = <a  onClick="return qs(event,this,4)"  class=SR href="rvcorem.v.html#736">mtimecmp</a>;
+<a name="1004"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,5)"  class=SO href="rvcorem.v.html#76">w_mip</a>      = <a  onClick="return qs(event,this,6)"  class=SR href="rvcorem.v.html#689">mip</a>;
+
+    <span class=C>/**********************************************************************************************/</span>
+<a name="1007"></a>    <span class=K>initial</span> <a  onClick="return qs(event,this,7)"  class=SOR href="rvcorem.v.html#65">r_halt</a> = 0;
+    <span class=K>always</span> @(<span class=K>posedge</span> <a  onClick="return qs(event,this,8)"  class=SI href="rvcorem.v.html#54">CLK</a>) <span class=K>if</span>(<a  onClick="return qs(event,this,9)"  class=SR href="rvcorem.v.html#135">r_opcode</a>==<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#552">OPCODE_HALT____</a>) <a  onClick="return qs(event,this,7)"  class=SOR href="rvcorem.v.html#65">r_halt</a> &lt;= 1;  <span class=C>//w_opcode
+</span>
+<a name="1010"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,10)"  class=SO href="rvcorem.v.html#77">w_core_pc</a> = <a  onClick="return qs(event,this,11)"  class=SOR href="rvcorem.v.html#86">pc</a>;
+<a name="1011"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,12)"  class=SO href="rvcorem.v.html#78">w_core_ir</a> = <a  onClick="return qs(event,this,13)"  class=SOR href="rvcorem.v.html#131">r_ir</a>;
+<a name="1012"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,14)"  class=SO href="rvcorem.v.html#66">w_core_odata</a> = 0;
+<span class=K>endmodule</span>
+<span class=C>/**************************************************************************************************/</span>
+
+
+<span class=C>/**************************************************************************************************/</span>
+<span class=C>/* 32bit-32cycle divider (signed or unsigned)                                                     */</span>
+<span class=C>/**************************************************************************************************/</span>
+<a name="m_div_unit"></a><a  href="rvcorem.v.p2.html#m_alu_im_divunit"><img alt="[Up: m_alu_im divunit]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>m_div_unit</span><a  href="hierarchy-m.html#m_div_unit"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,15)"  class=SI href="rvcorem.v.p2.html#1021">CLK</a>, <a  onClick="return qs(event,this,16)"  class=SI href="rvcorem.v.p2.html#1021">RST_X</a>, <a  onClick="return qs(event,this,17)"  class=SI href="rvcorem.v.p2.html#1022">w_init</a>, <a  onClick="return qs(event,this,18)"  class=SI href="rvcorem.v.p2.html#1022">w_signed</a>, <a  onClick="return qs(event,this,19)"  class=SI href="rvcorem.v.p2.html#1023">w_dividend</a>, <a  onClick="return qs(event,this,20)"  class=SI href="rvcorem.v.p2.html#1023">w_divisor</a>, <a  onClick="return qs(event,this,21)"  class=SO href="rvcorem.v.p2.html#1024">w_rslt</a>, <a  onClick="return qs(event,this,22)"  class=SO href="rvcorem.v.p2.html#1025">w_busy</a>);
+<a name="1021"></a>    <span class=K>input</span>  <span class=K>wire</span>         <a  onClick="return qs(event,this,15)"  class=SI href="rvcorem.v.p2.html#1130">CLK</a>, <a  onClick="return qs(event,this,16)"  class=SI href="rvcorem.v.p2.html#1130">RST_X</a>;
+<a name="1022"></a>    <span class=K>input</span>  <span class=K>wire</span>         <a  onClick="return qs(event,this,17)"  class=SI href="rvcorem.v.p2.html#1130">w_init</a>, <a  onClick="return qs(event,this,18)"  class=SI href="rvcorem.v.p2.html#1131">w_signed</a>;
+<a name="1023"></a>    <span class=K>input</span>  <span class=K>wire</span> [31:0]  <a  onClick="return qs(event,this,19)"  class=SI href="rvcorem.v.p2.html#1131">w_dividend</a>, <a  onClick="return qs(event,this,20)"  class=SI href="rvcorem.v.p2.html#1131">w_divisor</a>;
+<a name="1024"></a>    <span class=K>output</span> <span class=K>wire</span> [63:0]  <a  onClick="return qs(event,this,21)"  class=SO href="rvcorem.v.p2.html#1037">w_rslt</a>;
+<a name="1025"></a>    <span class=K>output</span> <span class=K>wire</span>         <a  onClick="return qs(event,this,22)"  class=SO href="rvcorem.v.p2.html#1033">w_busy</a>;
+
+<a name="1027"></a>    <span class=K>reg</span>         <a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1052">w_sign_dividend</a>=0, <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1053">w_sign_divisor</a>=0;
+
+<a name="1029"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,25)"  class=SW href="rvcorem.v.p2.html#1035">w_uint_dividend</a>, <a  onClick="return qs(event,this,26)"  class=SW href="rvcorem.v.p2.html#1036">w_uint_divisor</a>;
+<a name="1030"></a>    <span class=K>wire</span> [63:0] <a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>;
+
+<a name="m_div_unit_divcore"></a><a name="1032"></a>    <a  onClick="return qs(event,this,0)"  class=MM href="rvcorem.v.p2.html#m_div_unit_core">m_div_unit_core</a> divcore(<a  onClick="return qs(event,this,15)"  class=SI href="rvcorem.v.p2.html#1021">CLK</a>, <a  onClick="return qs(event,this,16)"  class=SI href="rvcorem.v.p2.html#1021">RST_X</a>, <a  onClick="return qs(event,this,17)"  class=SI href="rvcorem.v.p2.html#1022">w_init</a>, <a  onClick="return qs(event,this,25)"  class=SW href="rvcorem.v.p2.html#1029">w_uint_dividend</a>,
+<a name="1033"></a>                            <a  onClick="return qs(event,this,26)"  class=SW href="rvcorem.v.p2.html#1029">w_uint_divisor</a>, <a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1030">w_uint_rslt</a>, <a  onClick="return qs(event,this,22)"  class=SO href="rvcorem.v.p2.html#1025">w_busy</a>);
+
+<a name="1035"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,25)"  class=SW href="rvcorem.v.p2.html#1029">w_uint_dividend</a>  = (<a  onClick="return qs(event,this,18)"  class=SI href="rvcorem.v.p2.html#1022">w_signed</a> &amp; <a  onClick="return qs(event,this,19)"  class=SI href="rvcorem.v.p2.html#1023">w_dividend</a>[31]) ? ~<a  onClick="return qs(event,this,19)"  class=SI href="rvcorem.v.p2.html#1023">w_dividend</a> + 1 : <a  onClick="return qs(event,this,19)"  class=SI href="rvcorem.v.p2.html#1023">w_dividend</a>;
+<a name="1036"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,26)"  class=SW href="rvcorem.v.p2.html#1029">w_uint_divisor</a>   = (<a  onClick="return qs(event,this,18)"  class=SI href="rvcorem.v.p2.html#1022">w_signed</a> &amp; <a  onClick="return qs(event,this,20)"  class=SI href="rvcorem.v.p2.html#1023">w_divisor</a>[31])  ? ~<a  onClick="return qs(event,this,20)"  class=SI href="rvcorem.v.p2.html#1023">w_divisor</a>  + 1 : <a  onClick="return qs(event,this,20)"  class=SI href="rvcorem.v.p2.html#1023">w_divisor</a>;
+<a name="1037"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,21)"  class=SO href="rvcorem.v.p2.html#1024">w_rslt</a>[63:32]    = 
+        (~<a  onClick="return qs(event,this,18)"  class=SI href="rvcorem.v.p2.html#1022">w_signed</a>)?                   <a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[63:32]     :
+        ({<a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1052">w_sign_dividend</a>, <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1053">w_sign_divisor</a>} == 2'b00) ?  <a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[63:32]     :
+        ({<a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1052">w_sign_dividend</a>, <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1053">w_sign_divisor</a>} == 2'b01) ?  <a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[63:32]     :
+        ({<a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1052">w_sign_dividend</a>, <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1053">w_sign_divisor</a>} == 2'b10) ? ~<a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[63:32] + 1 :
+                                                       ~<a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[63:32] + 1;
+    <span class=K>assign</span> <a  onClick="return qs(event,this,21)"  class=SO href="rvcorem.v.p2.html#1024">w_rslt</a>[31: 0]    = 
+        (~<a  onClick="return qs(event,this,18)"  class=SI href="rvcorem.v.p2.html#1022">w_signed</a>)?                     <a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[31: 0]   :
+        ({<a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1052">w_sign_dividend</a>, <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1053">w_sign_divisor</a>} == 2'b00) ?  <a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[31: 0]     :
+        ({<a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1052">w_sign_dividend</a>, <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1053">w_sign_divisor</a>} == 2'b01) ? ~<a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[31: 0] + 1 :
+        ({<a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1052">w_sign_dividend</a>, <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1053">w_sign_divisor</a>} == 2'b10) ? ~<a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[31: 0] + 1 :
+                                                        <a  onClick="return qs(event,this,27)"  class=SW href="rvcorem.v.p2.html#1033">w_uint_rslt</a>[31: 0];
+        
+    <span class=K>always</span> @(<span class=K>posedge</span> <a  onClick="return qs(event,this,15)"  class=SI href="rvcorem.v.p2.html#1021">CLK</a>) <span class=K>begin</span>
+      <span class=K>if</span>(!<a  onClick="return qs(event,this,16)"  class=SI href="rvcorem.v.p2.html#1021">RST_X</a>) <span class=K>begin</span>
+<a name="1052"></a>          <a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1027">w_sign_dividend</a>   &lt;= 0;
+<a name="1053"></a>          <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1027">w_sign_divisor</a>    &lt;= 0;
+      <span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+          <a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1027">w_sign_dividend</a>   &lt;= (<a  onClick="return qs(event,this,17)"  class=SI href="rvcorem.v.p2.html#1022">w_init</a>) ? <a  onClick="return qs(event,this,19)"  class=SI href="rvcorem.v.p2.html#1023">w_dividend</a>[31] : <a  onClick="return qs(event,this,23)"  class=SR href="rvcorem.v.p2.html#1052">w_sign_dividend</a>;
+          <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1027">w_sign_divisor</a>    &lt;= (<a  onClick="return qs(event,this,17)"  class=SI href="rvcorem.v.p2.html#1022">w_init</a>) ? <a  onClick="return qs(event,this,20)"  class=SI href="rvcorem.v.p2.html#1023">w_divisor</a>[31] : <a  onClick="return qs(event,this,24)"  class=SR href="rvcorem.v.p2.html#1053">w_sign_divisor</a>;
+      <span class=K>end</span>
+    <span class=K>end</span>
+<span class=K>endmodule</span>
+
+<span class=C>/**************************************************************************************************/</span>
+<a name="m_div_unit_core"></a><a  href="rvcorem.v.p2.html#m_div_unit_divcore"><img alt="[Up: m_div_unit divcore]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>m_div_unit_core</span><a  href="hierarchy-m.html#m_div_unit_core"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,28)"  class=SI href="rvcorem.v.p2.html#1063">CLK</a>, <a  onClick="return qs(event,this,29)"  class=SI href="rvcorem.v.p2.html#1063">RST_X</a>, <a  onClick="return qs(event,this,30)"  class=SI href="rvcorem.v.p2.html#1064">w_init</a>, <a  onClick="return qs(event,this,31)"  class=SI href="rvcorem.v.p2.html#1065">w_dividend</a>, <a  onClick="return qs(event,this,32)"  class=SI href="rvcorem.v.p2.html#1065">w_divisor</a>, <a  onClick="return qs(event,this,33)"  class=SOR href="rvcorem.v.p2.html#1066">r_rslt</a>, <a  onClick="return qs(event,this,34)"  class=SO href="rvcorem.v.p2.html#1067">w_busy</a>);
+<a name="1063"></a>    <span class=K>input</span>  <span class=K>wire</span>        <a  onClick="return qs(event,this,28)"  class=SI href="rvcorem.v.p2.html#1032">CLK</a>, <a  onClick="return qs(event,this,29)"  class=SI href="rvcorem.v.p2.html#1032">RST_X</a>;
+<a name="1064"></a>    <span class=K>input</span>  <span class=K>wire</span>        <a  onClick="return qs(event,this,30)"  class=SI href="rvcorem.v.p2.html#1032">w_init</a>;
+<a name="1065"></a>    <span class=K>input</span>  <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,31)"  class=SI href="rvcorem.v.p2.html#1032">w_dividend</a>, <a  onClick="return qs(event,this,32)"  class=SI href="rvcorem.v.p2.html#1033">w_divisor</a>;
+<a name="1066"></a>    <span class=K>output</span> <span class=K>reg</span>  [63:0] <a  onClick="return qs(event,this,33)"  class=SOR href="rvcorem.v.p2.html#1080">r_rslt</a>;
+<a name="1067"></a>    <span class=K>output</span> <span class=K>wire</span>        <a  onClick="return qs(event,this,34)"  class=SO href="rvcorem.v.p2.html#1074">w_busy</a>;
+
+<a name="1069"></a>    <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,35)"  class=SR href="rvcorem.v.p2.html#1079">r_divisor</a>=0;
+<a name="1070"></a>    <span class=K>reg</span>   [5:0] <a  onClick="return qs(event,this,36)"  class=SR href="rvcorem.v.p2.html#1081">r_count</a>=0;
+    
+<a name="1072"></a>    <span class=K>wire</span> [32:0] <a  onClick="return qs(event,this,37)"  class=SW href="rvcorem.v.p2.html#1075">w_differ</a>;
+
+<a name="1074"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,34)"  class=SO href="rvcorem.v.p2.html#1067">w_busy</a>   = (<a  onClick="return qs(event,this,36)"  class=SR href="rvcorem.v.p2.html#1081">r_count</a> &lt; 32);
+<a name="1075"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,37)"  class=SW href="rvcorem.v.p2.html#1072">w_differ</a> = <a  onClick="return qs(event,this,33)"  class=SOR href="rvcorem.v.p2.html#1080">r_rslt</a>[63:31] - {1'b0, <a  onClick="return qs(event,this,35)"  class=SR href="rvcorem.v.p2.html#1079">r_divisor</a>};
+
+    <span class=K>always</span> @(<span class=K>posedge</span> <a  onClick="return qs(event,this,28)"  class=SI href="rvcorem.v.p2.html#1063">CLK</a>) <span class=K>begin</span>
+        <span class=K>if</span>(!<a  onClick="return qs(event,this,29)"  class=SI href="rvcorem.v.p2.html#1063">RST_X</a>) <span class=K>begin</span>
+<a name="1079"></a>            <a  onClick="return qs(event,this,35)"  class=SR href="rvcorem.v.p2.html#1069">r_divisor</a>   &lt;= 0;
+<a name="1080"></a>            <a  onClick="return qs(event,this,33)"  class=SOR href="rvcorem.v.p2.html#1066">r_rslt</a>      &lt;= 0;
+<a name="1081"></a>            <a  onClick="return qs(event,this,36)"  class=SR href="rvcorem.v.p2.html#1070">r_count</a>     &lt;= 0;
+        <span class=K>end</span> <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,30)"  class=SI href="rvcorem.v.p2.html#1064">w_init</a>) <span class=K>begin</span>
+            <a  onClick="return qs(event,this,35)"  class=SR href="rvcorem.v.p2.html#1069">r_divisor</a>   &lt;= <a  onClick="return qs(event,this,32)"  class=SI href="rvcorem.v.p2.html#1065">w_divisor</a>;
+            <a  onClick="return qs(event,this,33)"  class=SOR href="rvcorem.v.p2.html#1066">r_rslt</a>      &lt;= {32'h0, <a  onClick="return qs(event,this,31)"  class=SI href="rvcorem.v.p2.html#1065">w_dividend</a>};
+            <a  onClick="return qs(event,this,36)"  class=SR href="rvcorem.v.p2.html#1070">r_count</a>     &lt;= 0;
+        <span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+            <a  onClick="return qs(event,this,35)"  class=SR href="rvcorem.v.p2.html#1069">r_divisor</a>   &lt;= <a  onClick="return qs(event,this,35)"  class=SR href="rvcorem.v.p2.html#1079">r_divisor</a>;
+            <a  onClick="return qs(event,this,33)"  class=SOR href="rvcorem.v.p2.html#1066">r_rslt</a>      &lt;= (<a  onClick="return qs(event,this,37)"  class=SW href="rvcorem.v.p2.html#1075">w_differ</a>[32]) ? {<a  onClick="return qs(event,this,33)"  class=SOR href="rvcorem.v.p2.html#1080">r_rslt</a>[62:0], 1'h0} :
+                                            {<a  onClick="return qs(event,this,37)"  class=SW href="rvcorem.v.p2.html#1075">w_differ</a>[31:0], <a  onClick="return qs(event,this,33)"  class=SOR href="rvcorem.v.p2.html#1080">r_rslt</a>[30:0], 1'h1};
+            <a  onClick="return qs(event,this,36)"  class=SR href="rvcorem.v.p2.html#1070">r_count</a>     &lt;= <a  onClick="return qs(event,this,36)"  class=SR href="rvcorem.v.p2.html#1081">r_count</a> + 1;
+        <span class=K>end</span>
+    <span class=K>end</span>
+<span class=K>endmodule</span>
+
+<span class=C>/***** ALU module                                                                             *****/</span>
+<span class=C>/**************************************************************************************************/</span>
+<a name="m_alu_im"></a><a  href="rvcorem.v.html#m_RVCoreM_ALU_IM"><img alt="[Up: m_RVCoreM ALU_IM]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>m_alu_im</span><a  href="hierarchy-m.html#m_alu_im"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,38)"  class=SI href="rvcorem.v.p2.html#1099">CLK</a>, <a  onClick="return qs(event,this,39)"  class=SI href="rvcorem.v.p2.html#1099">RST_X</a>, <a  onClick="return qs(event,this,40)"  class=SI href="rvcorem.v.p2.html#1100">w_le</a>, <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>, <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>, <a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a>, <a  onClick="return qs(event,this,44)"  class=SI href="rvcorem.v.p2.html#1103">w_funct7</a>, <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a>, <a  onClick="return qs(event,this,46)"  class=SO href="rvcorem.v.p2.html#1105">w_busy</a>,
+                <a  onClick="return qs(event,this,47)"  class=SI href="rvcorem.v.p2.html#1106">w_mul_SS</a>, <a  onClick="return qs(event,this,48)"  class=SI href="rvcorem.v.p2.html#1107">w_mul_SU</a>, <a  onClick="return qs(event,this,49)"  class=SI href="rvcorem.v.p2.html#1108">w_mul_UU</a>);
+<a name="1099"></a>    <span class=K>input</span>  <span class=K>wire</span>         <a  onClick="return qs(event,this,38)"  class=SI href="rvcorem.v.html#310">CLK</a>, <a  onClick="return qs(event,this,39)"  class=SI href="rvcorem.v.html#310">RST_X</a>;
+<a name="1100"></a>    <span class=K>input</span>  <span class=K>wire</span>         <a  onClick="return qs(event,this,40)"  class=SI href="rvcorem.v.html#310">w_le</a>;
+<a name="1101"></a>    <span class=K>input</span>  <span class=K>wire</span> [31:0]  <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.html#310">w_in1</a>, <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.html#310">w_in2</a>;
+<a name="1102"></a>    <span class=K>input</span>  <span class=K>wire</span>  [2:0]  <a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.html#310">w_funct3</a>;
+<a name="1103"></a>    <span class=K>input</span>  <span class=K>wire</span>  [6:0]  <a  onClick="return qs(event,this,44)"  class=SI href="rvcorem.v.html#310">w_funct7</a>;
+<a name="1104"></a>    <span class=K>output</span> <span class=K>reg</span>  [31:0]  <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1176">r_rslt</a>;
+<a name="1105"></a>    <span class=K>output</span> <span class=K>wire</span>         <a  onClick="return qs(event,this,46)"  class=SO href="rvcorem.v.p2.html#1132">w_busy</a>;
+<a name="1106"></a>    <span class=K>input</span>  <span class=K>wire</span> [63:0]  <a  onClick="return qs(event,this,47)"  class=SI href="rvcorem.v.html#311">w_mul_SS</a>;
+<a name="1107"></a>    <span class=K>input</span>  <span class=K>wire</span> [63:0]  <a  onClick="return qs(event,this,48)"  class=SI href="rvcorem.v.html#311">w_mul_SU</a>;
+<a name="1108"></a>    <span class=K>input</span>  <span class=K>wire</span> [63:0]  <a  onClick="return qs(event,this,49)"  class=SI href="rvcorem.v.html#311">w_mul_UU</a>;
+
+<a name="1110"></a>    <span class=K>reg</span>  <a  onClick="return qs(event,this,50)"  class=SR href="rvcorem.v.p2.html#1142">r_div_first</a> = 1;
+
+<a name="1112"></a>    <span class=K>wire</span> signed [31:0] <a  onClick="return qs(event,this,51)"  class=SW href="rvcorem.v.p2.html#1112">w_sin1</a> = <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>;
+<a name="1113"></a>    <span class=K>wire</span> signed [31:0] <a  onClick="return qs(event,this,52)"  class=SW href="rvcorem.v.p2.html#1113">w_sin2</a> = <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>;
+
+<a name="1115"></a>    <span class=K>wire</span>  [4:0] <a  onClick="return qs(event,this,53)"  class=SW href="rvcorem.v.p2.html#1115">w_shamt</a>  = <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>[4:0];
+
+<span class=C>//    wire [63:0] w_mul_SS = {{32{w_sin1[31]}},w_sin1} * {{32{w_sin2[31]}},w_sin2};
+</span><span class=C>//    wire [63:0] w_mul_SU = {{32{w_sin1[31]}},w_sin1} * {32'b0, w_in2};
+</span><span class=C>//    wire [63:0] w_mul_UU = {32'b0, w_in1} * {32'b0, w_in2};
+</span>
+<a name="1121"></a>    <span class=K>wire</span>        <a  onClick="return qs(event,this,54)"  class=SW href="rvcorem.v.p2.html#1131">w_divunit_busy</a>;
+<a name="1122"></a>    <span class=K>wire</span> [63:0] <a  onClick="return qs(event,this,55)"  class=SW href="rvcorem.v.p2.html#1131">w_divunit_rslt</a>;
+
+<a name="1124"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,56)"  class=SW href="rvcorem.v.p2.html#1124">w_div_req</a>          =   (<a  onClick="return qs(event,this,44)"  class=SI href="rvcorem.v.p2.html#1103">w_funct7</a>[0] &amp;&amp;
+                                 (<a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#573">FUNCT3_DIV___</a> || <a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#574">FUNCT3_DIVU__</a> ||
+                                  <a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#575">FUNCT3_REM___</a> || <a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#576">FUNCT3_REMU__</a>));
+<a name="1127"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,57)"  class=SW href="rvcorem.v.p2.html#1127">w_div_init</a>         =   <a  onClick="return qs(event,this,56)"  class=SW href="rvcorem.v.p2.html#1124">w_div_req</a> &amp;&amp; <a  onClick="return qs(event,this,40)"  class=SI href="rvcorem.v.p2.html#1100">w_le</a> &amp;&amp; !<a  onClick="return qs(event,this,54)"  class=SW href="rvcorem.v.p2.html#1131">w_divunit_busy</a> &amp;&amp; <a  onClick="return qs(event,this,50)"  class=SR href="rvcorem.v.p2.html#1142">r_div_first</a>; 
+<a name="1128"></a>    <span class=K>wire</span> <a  onClick="return qs(event,this,58)"  class=SW href="rvcorem.v.p2.html#1128">w_div_signed</a>       =   (<a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#573">FUNCT3_DIV___</a> || <a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#575">FUNCT3_REM___</a>);
+
+<a name="m_alu_im_divunit"></a><a name="1130"></a>    <a  onClick="return qs(event,this,0)"  class=MM href="rvcorem.v.p2.html#m_div_unit">m_div_unit</a> divunit(<a  onClick="return qs(event,this,38)"  class=SI href="rvcorem.v.p2.html#1099">CLK</a>, <a  onClick="return qs(event,this,39)"  class=SI href="rvcorem.v.p2.html#1099">RST_X</a>, <a  onClick="return qs(event,this,57)"  class=SW href="rvcorem.v.p2.html#1127">w_div_init</a>,
+<a name="1131"></a>                        <a  onClick="return qs(event,this,58)"  class=SW href="rvcorem.v.p2.html#1128">w_div_signed</a>, <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>, <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>, <a  onClick="return qs(event,this,55)"  class=SW href="rvcorem.v.p2.html#1122">w_divunit_rslt</a>, <a  onClick="return qs(event,this,54)"  class=SW href="rvcorem.v.p2.html#1121">w_divunit_busy</a>);
+<a name="1132"></a>    <span class=K>assign</span> <a  onClick="return qs(event,this,46)"  class=SO href="rvcorem.v.p2.html#1105">w_busy</a> = <a  onClick="return qs(event,this,40)"  class=SI href="rvcorem.v.p2.html#1100">w_le</a> &amp;&amp; <a  onClick="return qs(event,this,56)"  class=SW href="rvcorem.v.p2.html#1124">w_div_req</a> &amp;&amp; (<a  onClick="return qs(event,this,54)"  class=SW href="rvcorem.v.p2.html#1131">w_divunit_busy</a> || <a  onClick="return qs(event,this,57)"  class=SW href="rvcorem.v.p2.html#1127">w_div_init</a>);
+
+<a name="1134"></a>    <span class=K>wire</span> [63:0] <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a> =    (<a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a> == 0) ? {<a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>, 32'hffffffff} :
+                                (<a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>==32'hffffffff &amp;&amp;
+                                (<a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#573">FUNCT3_DIV___</a> || <a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#575">FUNCT3_REM___</a>))
+                                ? {32'h0, <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>} : <a  onClick="return qs(event,this,55)"  class=SW href="rvcorem.v.p2.html#1131">w_divunit_rslt</a>;
+
+    <span class=C>// For Div unit
+</span>    <span class=K>always</span>@(<span class=K>posedge</span> <a  onClick="return qs(event,this,38)"  class=SI href="rvcorem.v.p2.html#1099">CLK</a>) <span class=K>begin</span>
+        <span class=K>if</span>(<a  onClick="return qs(event,this,57)"  class=SW href="rvcorem.v.p2.html#1127">w_div_init</a>) <span class=K>begin</span>
+<a name="1142"></a>            <a  onClick="return qs(event,this,50)"  class=SR href="rvcorem.v.p2.html#1110">r_div_first</a> &lt;= 0;
+        <span class=K>end</span>
+        <span class=K>else</span> <span class=K>if</span>(!<a  onClick="return qs(event,this,40)"  class=SI href="rvcorem.v.p2.html#1100">w_le</a>) <span class=K>begin</span>
+            <a  onClick="return qs(event,this,50)"  class=SR href="rvcorem.v.p2.html#1110">r_div_first</a> &lt;= 1;
+        <span class=K>end</span>
+        <span class=K>if</span>(<a  onClick="return qs(event,this,40)"  class=SI href="rvcorem.v.p2.html#1100">w_le</a> &amp;&amp; <a  onClick="return qs(event,this,56)"  class=SW href="rvcorem.v.p2.html#1124">w_div_req</a> &amp;&amp; !<a  onClick="return qs(event,this,46)"  class=SO href="rvcorem.v.p2.html#1105">w_busy</a>) <span class=K>begin</span>
+            <span class=K>if</span>(<a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#573">FUNCT3_DIV___</a> || <a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#574">FUNCT3_DIVU__</a>) <span class=K>begin</span>
+                <span class=K>if</span>(<a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> == <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[31:0]) <span class=K>begin</span>
+                <span class=K>end</span>
+                <span class=K>else</span> <span class=K>begin</span>
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+                    <span class=ST>$write</span>(<span class=S>&quot;CAUTION! DIV FAIL! %x/%x true:%x unit:%x %x\n&quot;</span>,
+                            <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>, <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>, <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a>, <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[63:32], <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[31:0]);
+                    <span class=ST>$finish</span>();
+<span class=M>`endif</span>
+                <span class=K>end</span>
+            <span class=K>end</span>
+            <span class=K>if</span>(<a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#575">FUNCT3_REM___</a> || <a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a> == <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#576">FUNCT3_REMU__</a>) <span class=K>begin</span>
+                <span class=K>if</span>(<a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> == <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[63:32]) <span class=K>begin</span>
+                <span class=K>end</span>
+                <span class=K>else</span> <span class=K>begin</span>
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+                    <span class=ST>$write</span>(<span class=S>&quot;CAUTION! REM FAIL! %x/%x true:%x unit:%x %x\n&quot;</span>,
+                            <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>, <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>, <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a>, <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[63:32], <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[31:0]);
+                    <span class=ST>$finish</span>();
+<span class=M>`endif</span>
+                <span class=K>end</span>
+            <span class=K>end</span>
+        <span class=K>end</span>
+    <span class=K>end</span>
+
+    <span class=K>always</span>@(*) <span class=K>begin</span>
+        <span class=K>if</span>(!<a  onClick="return qs(event,this,44)"  class=SI href="rvcorem.v.p2.html#1103">w_funct7</a>[0]) <span class=K>begin</span>
+            <span class=K>case</span> (<a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a>)
+<a name="1176"></a>                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#559">FUNCT3_ADD___</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = (<a  onClick="return qs(event,this,44)"  class=SI href="rvcorem.v.p2.html#1103">w_funct7</a>) ? <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a> - <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a> : <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a> + <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>;
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#560">FUNCT3_SLL___</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a> &lt;&lt; <a  onClick="return qs(event,this,53)"  class=SW href="rvcorem.v.p2.html#1115">w_shamt</a>;
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#561">FUNCT3_SLT___</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = {31'b0, <a  onClick="return qs(event,this,51)"  class=SW href="rvcorem.v.p2.html#1112">w_sin1</a> &lt; <a  onClick="return qs(event,this,52)"  class=SW href="rvcorem.v.p2.html#1113">w_sin2</a>};
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#562">FUNCT3_SLTU__</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = {31'b0, <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a> &lt; <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>};
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#563">FUNCT3_XOR___</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a> ^ <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>;
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#564">FUNCT3_SRL___</a> : <span class=K>begin</span>
+                                    <span class=K>if</span>(<a  onClick="return qs(event,this,44)"  class=SI href="rvcorem.v.p2.html#1103">w_funct7</a>[5]) <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,51)"  class=SW href="rvcorem.v.p2.html#1112">w_sin1</a> &gt;&gt;&gt; <a  onClick="return qs(event,this,53)"  class=SW href="rvcorem.v.p2.html#1115">w_shamt</a>;
+                                    <span class=K>else</span>            <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a> &gt;&gt; <a  onClick="return qs(event,this,53)"  class=SW href="rvcorem.v.p2.html#1115">w_shamt</a>;
+                                <span class=K>end</span>
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#565">FUNCT3_OR____</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a> | <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>;
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#566">FUNCT3_AND___</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a> &amp; <a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>;
+                <span class=K>default</span>        : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = 0;
+            <span class=K>endcase</span>
+        <span class=K>end</span> <span class=K>else</span> <span class=K>begin</span>
+            <span class=K>case</span> (<a  onClick="return qs(event,this,43)"  class=SI href="rvcorem.v.p2.html#1102">w_funct3</a>)
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#569">FUNCT3_MUL___</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,47)"  class=SI href="rvcorem.v.p2.html#1106">w_mul_SS</a>[31:0];
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#570">FUNCT3_MULH__</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,47)"  class=SI href="rvcorem.v.p2.html#1106">w_mul_SS</a>[63:32];
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#571">FUNCT3_MULHSU</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,48)"  class=SI href="rvcorem.v.p2.html#1107">w_mul_SU</a>[63:32];
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#572">FUNCT3_MULHU_</a> : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,49)"  class=SI href="rvcorem.v.p2.html#1108">w_mul_UU</a>[63:32];
+                
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#573">FUNCT3_DIV___</a> : <span class=K>begin</span>
+                                    <span class=K>if</span>(<a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>==32'hffffffff) <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>;
+                                    <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>==0)       <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = 32'hffffffff;
+                                    <span class=K>else</span>                    <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[31:0];
+                                <span class=K>end</span>
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#574">FUNCT3_DIVU__</a> : <span class=K>begin</span>
+                                    <span class=K>if</span>(<a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>==0)    <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = 32'hffffffff;
+                                    <span class=K>else</span>            <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[31:0];
+                                <span class=K>end</span>
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#575">FUNCT3_REM___</a> : <span class=K>begin</span>
+                                    <span class=K>if</span>(<a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>==32'hffffffff) <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = 0;
+                                    <span class=K>else</span> <span class=K>if</span>(<a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>==0)       <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>;
+                                    <span class=K>else</span>                    <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[63:32];
+                                <span class=K>end</span>
+                <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#576">FUNCT3_REMU__</a> : <span class=K>begin</span>
+                                    <span class=K>if</span>(<a  onClick="return qs(event,this,42)"  class=SI href="rvcorem.v.p2.html#1101">w_in2</a>==0)    <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,41)"  class=SI href="rvcorem.v.p2.html#1101">w_in1</a>;
+                                    <span class=K>else</span>            <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = <a  onClick="return qs(event,this,59)"  class=SW href="rvcorem.v.p2.html#1134">w_div_rslt</a>[63:32];
+                                <span class=K>end</span>
+                <span class=K>default</span>        : <a  onClick="return qs(event,this,45)"  class=SOR href="rvcorem.v.p2.html#1104">r_rslt</a> = 0;
+            <span class=K>endcase</span>
+        <span class=K>end</span>
+    <span class=K>end</span>
+<span class=K>endmodule</span>
+
+/***** ALU <span class=K>for</span> Branch                                                                         *****/
+/**************************************************************************************************/
+<a name="m_alu_b"></a><a  href="rvcorem.v.html#m_RVCoreM_ALU_B"><img alt="[Up: m_RVCoreM ALU_B]" align=bottom border=0 src="v2html-up.gif"></a><a  href="microc.v.html#m_RVuc_ALU_B"><img alt="[Up: m_RVuc ALU_B]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>m_alu_b</span><a  href="hierarchy-m.html#m_alu_b"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,60)"  class=SI href="rvcorem.v.p2.html#1223">w_in1</a>, <a  onClick="return qs(event,this,61)"  class=SI href="rvcorem.v.p2.html#1223">w_in2</a>, <a  onClick="return qs(event,this,62)"  class=SI href="rvcorem.v.p2.html#1224">w_funct3</a>, <a  onClick="return qs(event,this,63)"  class=SOR href="rvcorem.v.p2.html#1225">r_rslt</a>);
+<a name="1223"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0]  <a  onClick="return qs(event,this,60)"  class=SI href="rvcorem.v.html#312">w_in1</a>, <a  onClick="return qs(event,this,61)"  class=SI href="rvcorem.v.html#312">w_in2</a>;
+<a name="1224"></a>    <span class=K>input</span> <span class=K>wire</span>  [2:0]  <a  onClick="return qs(event,this,62)"  class=SI href="rvcorem.v.html#312">w_funct3</a>;
+<a name="1225"></a>    <span class=K>output</span> <span class=K>reg</span>         <a  onClick="return qs(event,this,63)"  class=SOR href="rvcorem.v.p2.html#1232">r_rslt</a>;
+
+<a name="1227"></a>    <span class=K>wire</span> signed [31:0] <a  onClick="return qs(event,this,64)"  class=SW href="rvcorem.v.p2.html#1227">w_sin1</a> = <a  onClick="return qs(event,this,60)"  class=SI href="rvcorem.v.p2.html#1223">w_in1</a>;
+<a name="1228"></a>    <span class=K>wire</span> signed [31:0] <a  onClick="return qs(event,this,65)"  class=SW href="rvcorem.v.p2.html#1228">w_sin2</a> = <a  onClick="return qs(event,this,61)"  class=SI href="rvcorem.v.p2.html#1223">w_in2</a>;
+
+    <span class=K>always</span>@(*) <span class=K>begin</span>
+        <span class=K>case</span>(<a  onClick="return qs(event,this,62)"  class=SI href="rvcorem.v.p2.html#1224">w_funct3</a>)
+<a name="1232"></a>            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#598">FUNCT3_BEQ___</a> : <a  onClick="return qs(event,this,63)"  class=SOR href="rvcorem.v.p2.html#1225">r_rslt</a> = <a  onClick="return qs(event,this,60)"  class=SI href="rvcorem.v.p2.html#1223">w_in1</a> == <a  onClick="return qs(event,this,61)"  class=SI href="rvcorem.v.p2.html#1223">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#599">FUNCT3_BNE___</a> : <a  onClick="return qs(event,this,63)"  class=SOR href="rvcorem.v.p2.html#1225">r_rslt</a> = <a  onClick="return qs(event,this,60)"  class=SI href="rvcorem.v.p2.html#1223">w_in1</a> != <a  onClick="return qs(event,this,61)"  class=SI href="rvcorem.v.p2.html#1223">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#600">FUNCT3_BLT___</a> : <a  onClick="return qs(event,this,63)"  class=SOR href="rvcorem.v.p2.html#1225">r_rslt</a> = <a  onClick="return qs(event,this,64)"  class=SW href="rvcorem.v.p2.html#1227">w_sin1</a> &lt; <a  onClick="return qs(event,this,65)"  class=SW href="rvcorem.v.p2.html#1228">w_sin2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#601">FUNCT3_BGE___</a> : <a  onClick="return qs(event,this,63)"  class=SOR href="rvcorem.v.p2.html#1225">r_rslt</a> = <a  onClick="return qs(event,this,64)"  class=SW href="rvcorem.v.p2.html#1227">w_sin1</a> &gt;= <a  onClick="return qs(event,this,65)"  class=SW href="rvcorem.v.p2.html#1228">w_sin2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#602">FUNCT3_BLTU__</a> : <a  onClick="return qs(event,this,63)"  class=SOR href="rvcorem.v.p2.html#1225">r_rslt</a> = <a  onClick="return qs(event,this,60)"  class=SI href="rvcorem.v.p2.html#1223">w_in1</a> &lt; <a  onClick="return qs(event,this,61)"  class=SI href="rvcorem.v.p2.html#1223">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#603">FUNCT3_BGEU__</a> : <a  onClick="return qs(event,this,63)"  class=SOR href="rvcorem.v.p2.html#1225">r_rslt</a> = <a  onClick="return qs(event,this,60)"  class=SI href="rvcorem.v.p2.html#1223">w_in1</a> &gt;= <a  onClick="return qs(event,this,61)"  class=SI href="rvcorem.v.p2.html#1223">w_in2</a>;
+            <span class=K>default</span>        : <a  onClick="return qs(event,this,63)"  class=SOR href="rvcorem.v.p2.html#1225">r_rslt</a> = 0;
+        <span class=K>endcase</span>
+    <span class=K>end</span>
+<span class=K>endmodule</span>
+
+<span class=C>/***** ALU for Atomic                                                                         *****/</span>
+<span class=C>/**************************************************************************************************/</span>
+<a name="m_alu_a"></a><a  href="rvcorem.v.html#m_RVCoreM_ALU_A"><img alt="[Up: m_RVCoreM ALU_A]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>m_alu_a</span><a  href="hierarchy-m.html#m_alu_a"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a>, <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>, <a  onClick="return qs(event,this,68)"  class=SI href="rvcorem.v.p2.html#1247">w_funct5</a>, <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a>);
+<a name="1246"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0]  <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.html#425">w_in1</a>, <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.html#425">w_in2</a>;
+<a name="1247"></a>    <span class=K>input</span> <span class=K>wire</span>  [4:0]  <a  onClick="return qs(event,this,68)"  class=SI href="rvcorem.v.html#425">w_funct5</a>;
+<a name="1248"></a>    <span class=K>output</span> <span class=K>reg</span> [31:0]  <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1255">r_rslt</a>;
+
+<a name="1250"></a>    <span class=K>wire</span> signed [31:0] <a  onClick="return qs(event,this,70)"  class=SW href="rvcorem.v.p2.html#1250">w_sin1</a> = <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a>;
+<a name="1251"></a>    <span class=K>wire</span> signed [31:0] <a  onClick="return qs(event,this,71)"  class=SW href="rvcorem.v.p2.html#1251">w_sin2</a> = <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>;
+
+    <span class=K>always</span>@(*) <span class=K>begin</span>
+        <span class=K>case</span>(<a  onClick="return qs(event,this,68)"  class=SI href="rvcorem.v.p2.html#1247">w_funct5</a>)
+<a name="1255"></a>            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#628">FUNCT5_AMO_LR__</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = 0;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#629">FUNCT5_AMO_SC__</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#630">FUNCT5_AMO_SWAP</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#631">FUNCT5_AMO_ADD_</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> + <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#632">FUNCT5_AMO_AND_</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> &amp; <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#633">FUNCT5_AMO_OR__</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> | <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#634">FUNCT5_AMO_XOR_</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> ^ <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#635">FUNCT5_AMO_MIN_</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = (<a  onClick="return qs(event,this,70)"  class=SW href="rvcorem.v.p2.html#1250">w_sin1</a> &lt; <a  onClick="return qs(event,this,71)"  class=SW href="rvcorem.v.p2.html#1251">w_sin2</a>) ? <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> : <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#636">FUNCT5_AMO_MINU</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = (<a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> &lt; <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>) ? <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> : <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#637">FUNCT5_AMO_MAX_</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = (<a  onClick="return qs(event,this,70)"  class=SW href="rvcorem.v.p2.html#1250">w_sin1</a> &gt; <a  onClick="return qs(event,this,71)"  class=SW href="rvcorem.v.p2.html#1251">w_sin2</a>) ? <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> : <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#638">FUNCT5_AMO_MAXU</a> : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = (<a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> &gt; <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>) ? <a  onClick="return qs(event,this,66)"  class=SI href="rvcorem.v.p2.html#1246">w_in1</a> : <a  onClick="return qs(event,this,67)"  class=SI href="rvcorem.v.p2.html#1246">w_in2</a>;
+            <span class=K>default</span>          : <a  onClick="return qs(event,this,69)"  class=SOR href="rvcorem.v.p2.html#1248">r_rslt</a> = 0;
+        <span class=K>endcase</span>
+    <span class=K>end</span>
+<span class=K>endmodule</span>
+
+/***** ALU <span class=K>for</span> CSR                                                                            *****/
+/**************************************************************************************************/
+<a name="m_alu_c"></a><a  href="rvcorem.v.html#m_RVCoreM_ALU_C"><img alt="[Up: m_RVCoreM ALU_C]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>m_alu_c</span><a  href="hierarchy-m.html#m_alu_c"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,72)"  class=SI href="rvcorem.v.p2.html#1274">w_rcsr</a>, <a  onClick="return qs(event,this,73)"  class=SI href="rvcorem.v.p2.html#1274">w_rrs1</a>, <a  onClick="return qs(event,this,74)"  class=SI href="rvcorem.v.p2.html#1274">w_imm</a>, <a  onClick="return qs(event,this,75)"  class=SI href="rvcorem.v.p2.html#1275">w_funct3</a>, <a  onClick="return qs(event,this,76)"  class=SOR href="rvcorem.v.p2.html#1276">r_rslt</a>);
+<a name="1274"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,72)"  class=SI href="rvcorem.v.html#313">w_rcsr</a>, <a  onClick="return qs(event,this,73)"  class=SI href="rvcorem.v.html#313">w_rrs1</a>, <a  onClick="return qs(event,this,74)"  class=SI href="rvcorem.v.html#313">w_imm</a>;
+<a name="1275"></a>    <span class=K>input</span> <span class=K>wire</span>  [2:0] <a  onClick="return qs(event,this,75)"  class=SI href="rvcorem.v.html#313">w_funct3</a>;
+<a name="1276"></a>    <span class=K>output</span> <span class=K>reg</span> [31:0] <a  onClick="return qs(event,this,76)"  class=SOR href="rvcorem.v.p2.html#1280">r_rslt</a>;
+
+    <span class=K>always</span>@(*) <span class=K>begin</span>
+        <span class=K>case</span>(<a  onClick="return qs(event,this,75)"  class=SI href="rvcorem.v.p2.html#1275">w_funct3</a>)
+<a name="1280"></a>            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#611">FUNCT3_CSRRW_</a> : <a  onClick="return qs(event,this,76)"  class=SOR href="rvcorem.v.p2.html#1276">r_rslt</a> = <a  onClick="return qs(event,this,73)"  class=SI href="rvcorem.v.p2.html#1274">w_rrs1</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#612">FUNCT3_CSRRS_</a> : <a  onClick="return qs(event,this,76)"  class=SOR href="rvcorem.v.p2.html#1276">r_rslt</a> = <a  onClick="return qs(event,this,72)"  class=SI href="rvcorem.v.p2.html#1274">w_rcsr</a> | <a  onClick="return qs(event,this,73)"  class=SI href="rvcorem.v.p2.html#1274">w_rrs1</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#613">FUNCT3_CSRRC_</a> : <a  onClick="return qs(event,this,76)"  class=SOR href="rvcorem.v.p2.html#1276">r_rslt</a> = <a  onClick="return qs(event,this,72)"  class=SI href="rvcorem.v.p2.html#1274">w_rcsr</a> &amp; (~<a  onClick="return qs(event,this,73)"  class=SI href="rvcorem.v.p2.html#1274">w_rrs1</a>);
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#614">FUNCT3_CSRRWI</a> : <a  onClick="return qs(event,this,76)"  class=SOR href="rvcorem.v.p2.html#1276">r_rslt</a> = <a  onClick="return qs(event,this,74)"  class=SI href="rvcorem.v.p2.html#1274">w_imm</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#615">FUNCT3_CSRRSI</a> : <a  onClick="return qs(event,this,76)"  class=SOR href="rvcorem.v.p2.html#1276">r_rslt</a> = <a  onClick="return qs(event,this,72)"  class=SI href="rvcorem.v.p2.html#1274">w_rcsr</a> | <a  onClick="return qs(event,this,74)"  class=SI href="rvcorem.v.p2.html#1274">w_imm</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#616">FUNCT3_CSRRCI</a> : <a  onClick="return qs(event,this,76)"  class=SOR href="rvcorem.v.p2.html#1276">r_rslt</a> = <a  onClick="return qs(event,this,72)"  class=SI href="rvcorem.v.p2.html#1274">w_rcsr</a> &amp; (~<a  onClick="return qs(event,this,74)"  class=SI href="rvcorem.v.p2.html#1274">w_imm</a>);
+            <span class=K>default</span>        : <a  onClick="return qs(event,this,76)"  class=SOR href="rvcorem.v.p2.html#1276">r_rslt</a> = 0;
+        <span class=K>endcase</span>
+    <span class=K>end</span>
+<span class=K>endmodule</span>
+
+<span class=C>/***** Imm generateor                                                                         *****/</span>
+<span class=C>/**************************************************************************************************/</span>
+<a name="m_imm_gen"></a><a  href="rvcorem.v.html#m_RVCoreM_imm_gen0"><img alt="[Up: m_RVCoreM imm_gen0]" align=bottom border=0 src="v2html-up.gif"></a><a  href="microc.v.html#m_RVuc_imm_gen0"><img alt="[Up: m_RVuc imm_gen0]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>m_imm_gen</span><a  href="hierarchy-m.html#m_imm_gen"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>, <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a>);
+<a name="1294"></a>    <span class=K>input</span>  <span class=K>wire</span> [31:0]  <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.html#240">w_inst</a>;
+<a name="1295"></a>    <span class=K>output</span> <span class=K>reg</span>  [31:0]  <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1307">r_imm</a>;
+    
+<a name="1297"></a>    <span class=K>wire</span> [6:0] <a  onClick="return qs(event,this,79)"  class=SW href="rvcorem.v.p2.html#1297">opcode</a> = <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[6:0];
+<a name="1298"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,80)"  class=SW href="rvcorem.v.p2.html#1298">imm_I</a> = { {21{<a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[31]}}, <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[30:25], <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[24:20] };
+<a name="1299"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,81)"  class=SW href="rvcorem.v.p2.html#1299">imm_S</a> = { {21{<a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[31]}}, <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[30:25], <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[11:8], <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[7] };
+<a name="1300"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,82)"  class=SW href="rvcorem.v.p2.html#1300">imm_B</a> = { {20{<a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[31]}}, <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[7],<a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[30:25] ,<a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[11:8], 1'b0 };
+<a name="1301"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,83)"  class=SW href="rvcorem.v.p2.html#1301">imm_U</a> = { <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[31:12], 12'b0 };
+<a name="1302"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,84)"  class=SW href="rvcorem.v.p2.html#1302">imm_J</a> = { {12{<a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[31]}}, <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[19:12], <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[20], <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[30:25], <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[24:21], 1'b0 };
+<a name="1303"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,85)"  class=SW href="rvcorem.v.p2.html#1303">imm_C</a> = { 27'b0, <a  onClick="return qs(event,this,77)"  class=SI href="rvcorem.v.p2.html#1294">w_inst</a>[19:15] };
+    
+    <span class=K>always</span> @(*) <span class=K>begin</span>
+        <span class=K>case</span> (<a  onClick="return qs(event,this,79)"  class=SW href="rvcorem.v.p2.html#1297">opcode</a>)
+<a name="1307"></a>            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#533">OPCODE_OP_IMM__</a> : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = <a  onClick="return qs(event,this,80)"  class=SW href="rvcorem.v.p2.html#1298">imm_I</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#537">OPCODE_STORE___</a> : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = <a  onClick="return qs(event,this,81)"  class=SW href="rvcorem.v.p2.html#1299">imm_S</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#534">OPCODE_LOAD____</a> : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = <a  onClick="return qs(event,this,80)"  class=SW href="rvcorem.v.p2.html#1298">imm_I</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#540">OPCODE_LUI_____</a> : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = <a  onClick="return qs(event,this,83)"  class=SW href="rvcorem.v.p2.html#1301">imm_U</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#539">OPCODE_BRANCH__</a> : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = <a  onClick="return qs(event,this,82)"  class=SW href="rvcorem.v.p2.html#1300">imm_B</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#541">OPCODE_AUIPC___</a> : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = <a  onClick="return qs(event,this,83)"  class=SW href="rvcorem.v.p2.html#1301">imm_U</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#542">OPCODE_JAL_____</a> : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = <a  onClick="return qs(event,this,84)"  class=SW href="rvcorem.v.p2.html#1302">imm_J</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#543">OPCODE_JALR____</a> : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = <a  onClick="return qs(event,this,80)"  class=SW href="rvcorem.v.p2.html#1298">imm_I</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#549">OPCODE_SYSTEM__</a> : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = <a  onClick="return qs(event,this,85)"  class=SW href="rvcorem.v.p2.html#1303">imm_C</a>;
+            <span class=K>default</span>          : <a  onClick="return qs(event,this,78)"  class=SOR href="rvcorem.v.p2.html#1295">r_imm</a> = 0;
+        <span class=K>endcase</span>
+    <span class=K>end</span>
+<span class=K>endmodule</span>
+/**************************************************************************************************/
+
+/***** ALU <span class=K>for</span> I                                                                              *****/
+/**************************************************************************************************/
+<a name="m_alu_i"></a><a  href="microc.v.html#m_RVuc_ALU_I"><img alt="[Up: m_RVuc ALU_I]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>m_alu_i</span><a  href="hierarchy-m.html#m_alu_i"><img align=top border=0 alt="Index" src="v2html-i.gif"></a> (<a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a>, <a  onClick="return qs(event,this,87)"  class=SI href="rvcorem.v.p2.html#1325">w_in2</a>, <a  onClick="return qs(event,this,88)"  class=SI href="rvcorem.v.p2.html#1326">w_funct3</a>, <a  onClick="return qs(event,this,89)"  class=SI href="rvcorem.v.p2.html#1327">w_funct7</a>, <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a>);
+<a name="1325"></a>    <span class=K>input</span> <span class=K>wire</span> [31:0]   <a  onClick="return qs(event,this,86)"  class=SI href="microc.v.html#107">w_in1</a>, <a  onClick="return qs(event,this,87)"  class=SI href="microc.v.html#107">w_in2</a>;
+<a name="1326"></a>    <span class=K>input</span> <span class=K>wire</span>  [2:0]   <a  onClick="return qs(event,this,88)"  class=SI href="microc.v.html#107">w_funct3</a>;
+<a name="1327"></a>    <span class=K>input</span> <span class=K>wire</span>  [6:0]   <a  onClick="return qs(event,this,89)"  class=SI href="microc.v.html#107">w_funct7</a>;
+<a name="1328"></a>    <span class=K>output</span> <span class=K>reg</span> [31:0]   <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1337">r_rslt</a>;
+    
+<a name="1330"></a>    <span class=K>wire</span> signed [31:0] <a  onClick="return qs(event,this,91)"  class=SW href="rvcorem.v.p2.html#1330">w_sin1</a> = <a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a>;
+<a name="1331"></a>    <span class=K>wire</span> signed [31:0] <a  onClick="return qs(event,this,92)"  class=SW href="rvcorem.v.p2.html#1331">w_sin2</a> = <a  onClick="return qs(event,this,87)"  class=SI href="rvcorem.v.p2.html#1325">w_in2</a>;
+    
+<a name="1333"></a>    <span class=K>wire</span> [4:0] <a  onClick="return qs(event,this,93)"  class=SW href="rvcorem.v.p2.html#1333">w_shamt</a> = <a  onClick="return qs(event,this,87)"  class=SI href="rvcorem.v.p2.html#1325">w_in2</a>[4:0];
+    
+    <span class=K>always</span>@(*) <span class=K>begin</span>
+        <span class=K>case</span> (<a  onClick="return qs(event,this,88)"  class=SI href="rvcorem.v.p2.html#1326">w_funct3</a>)
+<a name="1337"></a>            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#559">FUNCT3_ADD___</a> : <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = (<a  onClick="return qs(event,this,89)"  class=SI href="rvcorem.v.p2.html#1327">w_funct7</a>) ? <a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a> - <a  onClick="return qs(event,this,87)"  class=SI href="rvcorem.v.p2.html#1325">w_in2</a> : <a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a> + <a  onClick="return qs(event,this,87)"  class=SI href="rvcorem.v.p2.html#1325">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#560">FUNCT3_SLL___</a> : <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = <a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a> &lt;&lt; <a  onClick="return qs(event,this,93)"  class=SW href="rvcorem.v.p2.html#1333">w_shamt</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#561">FUNCT3_SLT___</a> : <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = {31'b0, <a  onClick="return qs(event,this,91)"  class=SW href="rvcorem.v.p2.html#1330">w_sin1</a> &lt; <a  onClick="return qs(event,this,92)"  class=SW href="rvcorem.v.p2.html#1331">w_sin2</a>};
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#562">FUNCT3_SLTU__</a> : <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = {31'b0, <a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a> &lt; <a  onClick="return qs(event,this,87)"  class=SI href="rvcorem.v.p2.html#1325">w_in2</a>};
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#563">FUNCT3_XOR___</a> : <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = <a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a> ^ <a  onClick="return qs(event,this,87)"  class=SI href="rvcorem.v.p2.html#1325">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#564">FUNCT3_SRL___</a> : <span class=K>begin</span>
+                                <span class=K>if</span>(<a  onClick="return qs(event,this,89)"  class=SI href="rvcorem.v.p2.html#1327">w_funct7</a>[5]) <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = <a  onClick="return qs(event,this,91)"  class=SW href="rvcorem.v.p2.html#1330">w_sin1</a> &gt;&gt;&gt; <a  onClick="return qs(event,this,93)"  class=SW href="rvcorem.v.p2.html#1333">w_shamt</a>;
+                                <span class=K>else</span>            <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = <a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a>   &gt;&gt; <a  onClick="return qs(event,this,93)"  class=SW href="rvcorem.v.p2.html#1333">w_shamt</a>;
+                            <span class=K>end</span>
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#565">FUNCT3_OR____</a> : <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = <a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a> | <a  onClick="return qs(event,this,87)"  class=SI href="rvcorem.v.p2.html#1325">w_in2</a>;
+            <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#566">FUNCT3_AND___</a> : <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = <a  onClick="return qs(event,this,86)"  class=SI href="rvcorem.v.p2.html#1325">w_in1</a> &amp; <a  onClick="return qs(event,this,87)"  class=SI href="rvcorem.v.p2.html#1325">w_in2</a>;
+            <span class=K>default</span>        : <span class=K>begin</span>
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+                <span class=ST>$write</span>(<span class=S>&quot;ILLEGAL INSTRUCTION! in alu_i: w_funct3=%x\n&quot;</span>, <a  onClick="return qs(event,this,88)"  class=SI href="rvcorem.v.p2.html#1326">w_funct3</a>);
+<span class=M>`endif</span>
+                <a  onClick="return qs(event,this,90)"  class=SOR href="rvcorem.v.p2.html#1328">r_rslt</a> = 0;
+<span class=M>`ifdef</span> <a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#16">SIM_MODE</a>
+                <span class=K>if</span>(<a  onClick="return qs(event,this,88)"  class=SI href="rvcorem.v.p2.html#1326">w_funct3</a> != 3'hz)
+                    <span class=ST>$finish</span>();
+<span class=M>`endif</span>
+            <span class=K>end</span>
+        <span class=K>endcase</span>
+    <span class=K>end</span>
+<span class=K>endmodule</span>
+
+<span class=C>/**************************************************************************************************/</span>
+<a name="m_decomp"></a><a  href="rvcorem.v.html#m_RVCoreM_decomp0"><img alt="[Up: m_RVCoreM decomp0]" align=bottom border=0 src="v2html-up.gif"></a>
+<span class=K>module</span> <span class=MM>m_decomp</span><a  href="hierarchy-m.html#m_decomp"><img align=top border=0 alt="Index" src="v2html-i.gif"></a>(<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>, <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>);
+<a name="1364"></a>    <span class=K>input</span>  <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.html#226">w_ic</a>;
+<a name="1365"></a>    <span class=K>output</span> <span class=K>reg</span>  [31:0] <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1401">r_iw</a>;
+
+    <span class=C>// C0
+</span><a name="1368"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,96)"  class=SW href="rvcorem.v.p2.html#1368">w_c0_rs1</a>   ={2'b01, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[9:7]};
+<a name="1369"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,97)"  class=SW href="rvcorem.v.p2.html#1369">w_c0_rs2</a>   ={2'b01, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[4:2]};
+<a name="1370"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,98)"  class=SW href="rvcorem.v.p2.html#1370">w_c0_rd</a>    ={2'b01, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[4:2]};
+<a name="1371"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,99)"  class=SW href="rvcorem.v.p2.html#1371">w_c0_uimm1</a> ={25'b0, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[5], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12:10], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6], 2'b0};
+<a name="1372"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,100)"  class=SW href="rvcorem.v.p2.html#1372">w_c0_uimm2</a> ={24'b0, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6:5], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12:10], 3'b0};
+<a name="1373"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,101)"  class=SW href="rvcorem.v.p2.html#1373">w_c0_nzuimm</a>={22'b0, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[10:7], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12:11], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[5], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6], 2'b0};
+
+    <span class=C>// C1
+</span><a name="1376"></a>    <span class=K>wire</span> [ 1:0] <a  onClick="return qs(event,this,102)"  class=SW href="rvcorem.v.p2.html#1376">w_c1_funct1</a>=<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[11:10];
+<a name="1377"></a>    <span class=K>wire</span> [ 2:0] <a  onClick="return qs(event,this,103)"  class=SW href="rvcorem.v.p2.html#1377">w_c1_funct2</a>={<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6:5]};
+<a name="1378"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,104)"  class=SW href="rvcorem.v.p2.html#1378">w_c1_rs1</a>   ={2'b01, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[9:7]};
+<a name="1379"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,105)"  class=SW href="rvcorem.v.p2.html#1379">w_c1_rs2</a>   ={2'b01, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[4:2]};
+<a name="1380"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>    ={2'b01, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[9:7]};
+<a name="1381"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,107)"  class=SW href="rvcorem.v.p2.html#1381">w_c1_nzimm</a> ={{27{<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12]}}, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6:2]};
+<a name="1382"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,108)"  class=SW href="rvcorem.v.p2.html#1382">w_c1_shamt</a> =<a  onClick="return qs(event,this,107)"  class=SW href="rvcorem.v.p2.html#1381">w_c1_nzimm</a>[4:0];
+<a name="1383"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,109)"  class=SW href="rvcorem.v.p2.html#1383">w_c1_imm1</a>  ={{21{<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12]}}, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[8], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[10:9], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[7], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[2], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[11], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[5:3],1'b0};
+<a name="1384"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,110)"  class=SW href="rvcorem.v.p2.html#1384">w_c1_imm2</a>  ={{25{<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12]}}, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6:5], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[2], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[11:10], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[4:3], 1'b0};
+<a name="1385"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,111)"  class=SW href="rvcorem.v.p2.html#1385">w_c1_imm3</a>  ={{27{<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12]}}, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6:2]};
+<a name="1386"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,112)"  class=SW href="rvcorem.v.p2.html#1386">w_c1_imm4</a>  ={{23{<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12]}}, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[4:3], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[5], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[2], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6], 4'b0};
+
+    <span class=C>// C2
+</span><a name="1389"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,113)"  class=SW href="rvcorem.v.p2.html#1389">w_c2_rs2</a>   =<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6:2];
+<a name="1390"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>    =<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[11:7];
+<a name="1391"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,115)"  class=SW href="rvcorem.v.p2.html#1391">w_c2_uimm1</a> ={23'b0, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[4:2], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6:5], 3'b0};
+<a name="1392"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,116)"  class=SW href="rvcorem.v.p2.html#1392">w_c2_uimm2</a> ={24'b0, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[3:2], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6:4], 2'b0};
+<a name="1393"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,117)"  class=SW href="rvcorem.v.p2.html#1393">w_c2_uimm3</a> ={22'b0, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[9:7], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12:10], 3'b0};
+<a name="1394"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,118)"  class=SW href="rvcorem.v.p2.html#1394">w_c2_uimm4</a> ={23'b0, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[8:7], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12:9], 2'b0};
+<a name="1395"></a>    <span class=K>wire</span> [31:0] <a  onClick="return qs(event,this,119)"  class=SW href="rvcorem.v.p2.html#1395">w_c2_nzuimm</a>={26'b0, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[6:2]};
+<a name="1396"></a>    <span class=K>wire</span> [ 4:0] <a  onClick="return qs(event,this,120)"  class=SW href="rvcorem.v.p2.html#1396">w_c2_shamt</a> =<a  onClick="return qs(event,this,119)"  class=SW href="rvcorem.v.p2.html#1395">w_c2_nzuimm</a>[4:0];
+
+    <span class=K>always</span> @(*) <span class=K>begin</span>
+        <span class=K>case</span> ({<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[1:0], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[15:13]})
+            <span class=C>// C0
+</span><a name="1401"></a>            {2'b00, 3'b000}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,101)"  class=SW href="rvcorem.v.p2.html#1373">w_c0_nzuimm</a>[11:0],  5'd2, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#559">FUNCT3_ADD___</a>, <a  onClick="return qs(event,this,98)"  class=SW href="rvcorem.v.p2.html#1370">w_c0_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#533">OPCODE_OP_IMM__</a>};                      <span class=C>// C.ADDI4SPN
+</span>            {2'b00, 3'b001}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,100)"  class=SW href="rvcorem.v.p2.html#1372">w_c0_uimm2</a>[11:0], <a  onClick="return qs(event,this,96)"  class=SW href="rvcorem.v.p2.html#1368">w_c0_rs1</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#590">FUNCT3_LD____</a>, <a  onClick="return qs(event,this,98)"  class=SW href="rvcorem.v.p2.html#1370">w_c0_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#535">OPCODE_LOAD_FP_</a>};                    <span class=C>// C.FLD
+</span>            {2'b00, 3'b010}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,99)"  class=SW href="rvcorem.v.p2.html#1371">w_c0_uimm1</a>[11:0], <a  onClick="return qs(event,this,96)"  class=SW href="rvcorem.v.p2.html#1368">w_c0_rs1</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#589">FUNCT3_LW____</a>, <a  onClick="return qs(event,this,98)"  class=SW href="rvcorem.v.p2.html#1370">w_c0_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#534">OPCODE_LOAD____</a>};                    <span class=C>// C.LW
+</span>            {2'b00, 3'b011}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,99)"  class=SW href="rvcorem.v.p2.html#1371">w_c0_uimm1</a>[11:0], <a  onClick="return qs(event,this,96)"  class=SW href="rvcorem.v.p2.html#1368">w_c0_rs1</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#589">FUNCT3_LW____</a>, <a  onClick="return qs(event,this,98)"  class=SW href="rvcorem.v.p2.html#1370">w_c0_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#535">OPCODE_LOAD_FP_</a>};                    <span class=C>// C.FLW
+</span>            {2'b00, 3'b101}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,99)"  class=SW href="rvcorem.v.p2.html#1371">w_c0_uimm1</a>[11:5], <a  onClick="return qs(event,this,97)"  class=SW href="rvcorem.v.p2.html#1369">w_c0_rs2</a>, <a  onClick="return qs(event,this,96)"  class=SW href="rvcorem.v.p2.html#1368">w_c0_rs1</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#582">FUNCT3_SD____</a>, <a  onClick="return qs(event,this,99)"  class=SW href="rvcorem.v.p2.html#1371">w_c0_uimm1</a>[4:0], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#538">OPCODE_STORE_FP</a>};  <span class=C>// C.FSD
+</span>            {2'b00, 3'b110}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,99)"  class=SW href="rvcorem.v.p2.html#1371">w_c0_uimm1</a>[11:5], <a  onClick="return qs(event,this,97)"  class=SW href="rvcorem.v.p2.html#1369">w_c0_rs2</a>, <a  onClick="return qs(event,this,96)"  class=SW href="rvcorem.v.p2.html#1368">w_c0_rs1</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#581">FUNCT3_SW____</a>, <a  onClick="return qs(event,this,99)"  class=SW href="rvcorem.v.p2.html#1371">w_c0_uimm1</a>[4:0], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#537">OPCODE_STORE___</a>};  <span class=C>// C.SW
+</span>            {2'b00, 3'b111}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,99)"  class=SW href="rvcorem.v.p2.html#1371">w_c0_uimm1</a>[11:5], <a  onClick="return qs(event,this,97)"  class=SW href="rvcorem.v.p2.html#1369">w_c0_rs2</a>, <a  onClick="return qs(event,this,96)"  class=SW href="rvcorem.v.p2.html#1368">w_c0_rs1</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#581">FUNCT3_SW____</a>, <a  onClick="return qs(event,this,99)"  class=SW href="rvcorem.v.p2.html#1371">w_c0_uimm1</a>[4:0], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#538">OPCODE_STORE_FP</a>};  <span class=C>// C.FSW
+</span>            <span class=C>// C1
+</span>            {2'b01, 3'b000}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,107)"  class=SW href="rvcorem.v.p2.html#1381">w_c1_nzimm</a>[11:0], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[11:7], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#559">FUNCT3_ADD___</a>, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[11:7], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#533">OPCODE_OP_IMM__</a>};               <span class=C>// C.ADDI
+</span>            {2'b01, 3'b001}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,109)"  class=SW href="rvcorem.v.p2.html#1383">w_c1_imm1</a>[20], <a  onClick="return qs(event,this,109)"  class=SW href="rvcorem.v.p2.html#1383">w_c1_imm1</a>[10:1], <a  onClick="return qs(event,this,109)"  class=SW href="rvcorem.v.p2.html#1383">w_c1_imm1</a>[11], <a  onClick="return qs(event,this,109)"  class=SW href="rvcorem.v.p2.html#1383">w_c1_imm1</a>[19:12], 5'd1, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#542">OPCODE_JAL_____</a>};  <span class=C>// C.JAL
+</span>            {2'b01, 3'b010}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,111)"  class=SW href="rvcorem.v.p2.html#1385">w_c1_imm3</a>[11:0], 5'd0, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#559">FUNCT3_ADD___</a>, <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[11:7], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#533">OPCODE_OP_IMM__</a>};                      <span class=C>// C.LI
+</span>            {2'b01, 3'b011}:
+              <span class=K>begin</span>
+                  <span class=K>if</span> (<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[11:7] == 2) <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,112)"  class=SW href="rvcorem.v.p2.html#1386">w_c1_imm4</a>[11:0], 5'd2, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#559">FUNCT3_ADD___</a>, 5'd2, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#533">OPCODE_OP_IMM__</a>};                    <span class=C>// C.ADDI16SP
+</span>                  <span class=K>else</span>               <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,107)"  class=SW href="rvcorem.v.p2.html#1381">w_c1_nzimm</a>[19:0], <a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[11:7], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#540">OPCODE_LUI_____</a>};                                     <span class=C>// C.LUI
+</span>              <span class=K>end</span>
+            {2'b01, 3'b101}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,109)"  class=SW href="rvcorem.v.p2.html#1383">w_c1_imm1</a>[20], <a  onClick="return qs(event,this,109)"  class=SW href="rvcorem.v.p2.html#1383">w_c1_imm1</a>[10:1], <a  onClick="return qs(event,this,109)"  class=SW href="rvcorem.v.p2.html#1383">w_c1_imm1</a>[11], <a  onClick="return qs(event,this,109)"  class=SW href="rvcorem.v.p2.html#1383">w_c1_imm1</a>[19:12], 5'd0, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#542">OPCODE_JAL_____</a>};  <span class=C>// C.J
+</span>            {2'b01, 3'b110}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,110)"  class=SW href="rvcorem.v.p2.html#1384">w_c1_imm2</a>[12], <a  onClick="return qs(event,this,110)"  class=SW href="rvcorem.v.p2.html#1384">w_c1_imm2</a>[10:5], 5'd0, <a  onClick="return qs(event,this,104)"  class=SW href="rvcorem.v.p2.html#1378">w_c1_rs1</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#598">FUNCT3_BEQ___</a>, <a  onClick="return qs(event,this,110)"  class=SW href="rvcorem.v.p2.html#1384">w_c1_imm2</a>[4:1], <a  onClick="return qs(event,this,110)"  class=SW href="rvcorem.v.p2.html#1384">w_c1_imm2</a>[11], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#539">OPCODE_BRANCH__</a>}; <span class=C>// C.BEQZ
+</span>            {2'b01, 3'b111}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,110)"  class=SW href="rvcorem.v.p2.html#1384">w_c1_imm2</a>[12], <a  onClick="return qs(event,this,110)"  class=SW href="rvcorem.v.p2.html#1384">w_c1_imm2</a>[10:5], 5'd0, <a  onClick="return qs(event,this,104)"  class=SW href="rvcorem.v.p2.html#1378">w_c1_rs1</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#599">FUNCT3_BNE___</a>, <a  onClick="return qs(event,this,110)"  class=SW href="rvcorem.v.p2.html#1384">w_c1_imm2</a>[4:1], <a  onClick="return qs(event,this,110)"  class=SW href="rvcorem.v.p2.html#1384">w_c1_imm2</a>[11], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#539">OPCODE_BRANCH__</a>}; <span class=C>// C.BNEZ
+</span>            {2'b01, 3'b100}:
+              <span class=K>begin</span>
+                  <span class=K>case</span> (<a  onClick="return qs(event,this,102)"  class=SW href="rvcorem.v.p2.html#1376">w_c1_funct1</a>)
+                      2'd0: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,107)"  class=SW href="rvcorem.v.p2.html#1381">w_c1_nzimm</a>[11:0], <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#564">FUNCT3_SRL___</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#533">OPCODE_OP_IMM__</a>};                        <span class=C>// C.SRLI
+</span>                      2'd1: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={2'b01, <a  onClick="return qs(event,this,107)"  class=SW href="rvcorem.v.p2.html#1381">w_c1_nzimm</a>[9:0], <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#564">FUNCT3_SRL___</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#533">OPCODE_OP_IMM__</a>};                  <span class=C>// C.SRAI
+</span>                      2'd2: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,107)"  class=SW href="rvcorem.v.p2.html#1381">w_c1_nzimm</a>[11:0], <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#566">FUNCT3_AND___</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#533">OPCODE_OP_IMM__</a>};                        <span class=C>// C.ANDI
+</span>                      2'd3:
+                        <span class=K>begin</span>
+                            <span class=K>case</span> (<a  onClick="return qs(event,this,103)"  class=SW href="rvcorem.v.p2.html#1377">w_c1_funct2</a>)
+                                3'd0: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={7'b0100000, <a  onClick="return qs(event,this,105)"  class=SW href="rvcorem.v.p2.html#1379">w_c1_rs2</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#559">FUNCT3_ADD___</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#530">OPCODE_OP______</a>};            <span class=C>// C.SUB
+</span>                                3'd1: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={7'b0, <a  onClick="return qs(event,this,105)"  class=SW href="rvcorem.v.p2.html#1379">w_c1_rs2</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#563">FUNCT3_XOR___</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#530">OPCODE_OP______</a>};                  <span class=C>// C.XOR
+</span>                                3'd2: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={7'b0, <a  onClick="return qs(event,this,105)"  class=SW href="rvcorem.v.p2.html#1379">w_c1_rs2</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#565">FUNCT3_OR____</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#530">OPCODE_OP______</a>};                  <span class=C>// C.OR
+</span>                                3'd3: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={7'b0, <a  onClick="return qs(event,this,105)"  class=SW href="rvcorem.v.p2.html#1379">w_c1_rs2</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#566">FUNCT3_AND___</a>, <a  onClick="return qs(event,this,106)"  class=SW href="rvcorem.v.p2.html#1380">w_c1_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#530">OPCODE_OP______</a>};                  <span class=C>// C.AND
+</span>                                <span class=K>default</span>: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>=<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#261">ILLEGAL_INST</a>;
+                            <span class=K>endcase</span>
+                        <span class=K>end</span>
+                  <span class=K>endcase</span>
+              <span class=K>end</span>
+            <span class=C>// C2
+</span>            {2'b10, 3'b000}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={7'b0, <a  onClick="return qs(event,this,120)"  class=SW href="rvcorem.v.p2.html#1396">w_c2_shamt</a>, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#560">FUNCT3_SLL___</a>, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#533">OPCODE_OP_IMM__</a>};                     <span class=C>// C.SLLI
+</span>            {2'b10, 3'b001}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,115)"  class=SW href="rvcorem.v.p2.html#1391">w_c2_uimm1</a>[11:0],  5'd2, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#590">FUNCT3_LD____</a>, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#535">OPCODE_LOAD_FP_</a>};                       <span class=C>// C.FLDSP
+</span>            {2'b10, 3'b010}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,116)"  class=SW href="rvcorem.v.p2.html#1392">w_c2_uimm2</a>[11:0],  5'd2, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#589">FUNCT3_LW____</a>, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#534">OPCODE_LOAD____</a>};                       <span class=C>// C.LWSP
+</span>            {2'b10, 3'b011}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,116)"  class=SW href="rvcorem.v.p2.html#1392">w_c2_uimm2</a>[11:0],  5'd2, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#589">FUNCT3_LW____</a>, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#535">OPCODE_LOAD_FP_</a>};                       <span class=C>// C.FLWSP
+</span>            {2'b10, 3'b101}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,117)"  class=SW href="rvcorem.v.p2.html#1393">w_c2_uimm3</a>[11:5], <a  onClick="return qs(event,this,113)"  class=SW href="rvcorem.v.p2.html#1389">w_c2_rs2</a>, 5'd2, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#582">FUNCT3_SD____</a>, <a  onClick="return qs(event,this,117)"  class=SW href="rvcorem.v.p2.html#1393">w_c2_uimm3</a>[4:0], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#538">OPCODE_STORE_FP</a>};      <span class=C>// C.FSDSP
+</span>            {2'b10, 3'b110}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,118)"  class=SW href="rvcorem.v.p2.html#1394">w_c2_uimm4</a>[11:5], <a  onClick="return qs(event,this,113)"  class=SW href="rvcorem.v.p2.html#1389">w_c2_rs2</a>, 5'd2, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#581">FUNCT3_SW____</a>, <a  onClick="return qs(event,this,118)"  class=SW href="rvcorem.v.p2.html#1394">w_c2_uimm4</a>[4:0], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#537">OPCODE_STORE___</a>};      <span class=C>// C.SWSP
+</span>            {2'b10, 3'b111}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<a  onClick="return qs(event,this,118)"  class=SW href="rvcorem.v.p2.html#1394">w_c2_uimm4</a>[11:5], <a  onClick="return qs(event,this,113)"  class=SW href="rvcorem.v.p2.html#1389">w_c2_rs2</a>, 5'd2, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#581">FUNCT3_SW____</a>, <a  onClick="return qs(event,this,118)"  class=SW href="rvcorem.v.p2.html#1394">w_c2_uimm4</a>[4:0], <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#538">OPCODE_STORE_FP</a>};      <span class=C>// C.FSWSP
+</span>            {2'b10, 3'b100}:
+              <span class=C>/*              begin
+               if (w_ic[12]) begin
+               if (w_c2_rd == 0 &amp;&amp; w_c2_rs2 == 0) r_iw={`FUNCT12_EBREAK, 13'b0, `OPCODE_SYSTEM__};                       // C.EBREAK
+               if (w_c2_rd != 0 &amp;&amp; w_c2_rs2 == 0) r_iw={12'b0, w_c2_rd, 3'b0, 5'd1, `OPCODE_JALR____};                   // C.JALR
+               if (w_c2_rd != 0 &amp;&amp; w_c2_rs2 != 0) r_iw={7'b0, w_c2_rs2, w_c2_rd, `FUNCT3_ADD___, w_c2_rd, `OPCODE_OP______};  // C.ADD
+                end else begin
+               if (w_c2_rd != 0 &amp;&amp; w_c2_rs2 == 0) r_iw={12'b0, w_c2_rd, 8'b0, `OPCODE_JALR____};                         // C.JR
+               if (w_c2_rd != 0 &amp;&amp; w_c2_rs2 != 0) r_iw={7'b0, w_c2_rs2, 5'd0, `FUNCT3_ADD___, w_c2_rd, `OPCODE_OP______};// C.MV
+                end
+            end*/</span>
+              <span class=K>if</span> (<a  onClick="return qs(event,this,113)"  class=SW href="rvcorem.v.p2.html#1389">w_c2_rs2</a> == 0) <span class=K>begin</span>
+                  <span class=K>if</span> (<a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a> == 0) <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={<span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#619">FUNCT12_EBREAK</a>, 13'b0, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#549">OPCODE_SYSTEM__</a>}; <span class=C>// C.EBREAK
+</span>                  <span class=K>else</span> <span class=K>if</span> (<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12]) <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={12'b0, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, 3'b0, 5'd1, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#543">OPCODE_JALR____</a>}; <span class=C>// C.JALR
+</span>                  <span class=K>else</span> <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={12'b0, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, 8'b0, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#543">OPCODE_JALR____</a>}; <span class=C>// C.JR
+</span>              <span class=K>end</span>
+              <span class=K>else</span> <span class=K>begin</span>
+                  <span class=K>if</span>(<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>[12]) <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={7'b0, <a  onClick="return qs(event,this,113)"  class=SW href="rvcorem.v.p2.html#1389">w_c2_rs2</a>, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#559">FUNCT3_ADD___</a>, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#530">OPCODE_OP______</a>};  <span class=C>// C.ADD
+</span>                  <span class=K>else</span> <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>={7'b0, <a  onClick="return qs(event,this,113)"  class=SW href="rvcorem.v.p2.html#1389">w_c2_rs2</a>, 5'd0, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#559">FUNCT3_ADD___</a>, <a  onClick="return qs(event,this,114)"  class=SW href="rvcorem.v.p2.html#1390">w_c2_rd</a>, <span class=D>`</span><a  onClick="return qs(event,this,0)"  class=D href="define.vh.html#530">OPCODE_OP______</a>};<span class=C>// C.MV
+</span>              <span class=K>end</span>
+
+            <span class=C>// 32bit
+</span>            {2'b11, 3'b000}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>=<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>;
+            {2'b11, 3'b001}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>=<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>;
+            {2'b11, 3'b010}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>=<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>;
+            {2'b11, 3'b011}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>=<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>;
+            {2'b11, 3'b100}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>=<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>;
+            {2'b11, 3'b101}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>=<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>;
+            {2'b11, 3'b110}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>=<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>;
+            {2'b11, 3'b111}: <a  onClick="return qs(event,this,95)"  class=SOR href="rvcorem.v.p2.html#1365">r_iw</a>=<a  onClick="return qs(event,this,94)"  class=SI href="rvcorem.v.p2.html#1364">w_ic</a>;
+            <span class=K>default</span>        : <span class=K>begin</span>
+                <span class=C>//$display(&quot;r_iw default -------------------------------- %x&quot;, {w_ic[1:0], w_ic[15:13]});
+</span>                <span class=C>// error for 04xxx - not defined; it is reserved by riscv authors
+</span>                <span class=C>// latch warning
+</span>            <span class=K>end</span>
+        <span class=K>endcase</span>
+    <span class=K>end</span>
+<span class=K>endmodule</span>
+<span class=C>/**************************************************************************************************/</span>
+
+</pre>
+<center><table class=NB cols=2 ><tr><td align="center" width="50%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='rvcorem.v.html';"><a target="_top" href="rvcorem.v.html">1</a></td><td align="center" width="50%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';" ><font color="#808080">2</font></td></tr></table></center>
+<center><table class=NB cols=7 ><tr><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy.html';"><a target="_top" href="hierarchy.html">Hierarchy</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-f.html';"><a target="_top" href="hierarchy-f.html">Files</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-m.html';"><a target="_top" href="hierarchy-m.html">Modules</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-s.html';"><a target="_top" href="hierarchy-s.html">Signals</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-t.html';"><a target="_top" href="hierarchy-t.html">Tasks</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='hierarchy-fn.html';"><a target="_top" href="hierarchy-fn.html">Functions</a></td><td align="center" width="14%" onmousedown="this.style.border='inset';" onmouseup="this.style.border='outset';"  onclick="location='http://www.burbleland.com/v2html/help_7_30.html?';"><a target="_top" href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></td></tr></table></center>
+<script language="JavaScript"type="text/javascript"><!--
+function next_page() { return ""; }
+function first_page() { return "rvcorem.v.html"; }
+var extra_info = [
+["S","rvcorem.v.html#75","rvcorem.v.p2.html#1001","","rvcorem.v.p2.html#1001","hierarchy-s.p9.html#w_mstatus___m_RVCoreM"],
+["S","rvcorem.v.html#89","rvcorem.v.html#767","","rvcorem.v.html#767","hierarchy-s.p5.html#mstatus___m_RVCoreM"],
+["S","rvcorem.v.html#72","rvcorem.v.p2.html#1003","","rvcorem.v.p2.html#1003","hierarchy-s.p9.html#w_mtimecmp___m_RVCoreM"],
+["S","rvcorem.v.html#121","rvcorem.v.html#736","","rvcorem.v.html#736","hierarchy-s.p5.html#mtimecmp___m_RVCoreM"],
+["S","rvcorem.v.html#76","rvcorem.v.p2.html#1004","","rvcorem.v.p2.html#1004","hierarchy-s.p9.html#w_mip___m_RVCoreM"],
+["S","rvcorem.v.html#98","rvcorem.v.html#689","","rvcorem.v.html#689","hierarchy-s.p5.html#mip___m_RVCoreM"],
+["S","rvcorem.v.html#65","rvcorem.v.p2.html#1007","","rvcorem.v.p2.html#1007","hierarchy-s.p7.html#r_halt___m_RVCoreM"],
+["S","rvcorem.v.html#54","","cpummu.v.html#111","","hierarchy-s.p2.html#CLK___m_RVCoreM"],
+["S","rvcorem.v.html#135","rvcorem.v.html#252","","rvcorem.v.html#252","hierarchy-s.p7.html#r_opcode___m_RVCoreM"],
+["S","rvcorem.v.html#77","rvcorem.v.p2.html#1010","","rvcorem.v.p2.html#1010","hierarchy-s.p9.html#w_core_pc___m_RVCoreM"],
+["S","rvcorem.v.html#86","rvcorem.v.html#86","","rvcorem.v.html#86","hierarchy-s.p6.html#pc___m_RVCoreM"],
+["S","rvcorem.v.html#78","rvcorem.v.p2.html#1011","","rvcorem.v.p2.html#1011","hierarchy-s.p9.html#w_core_ir___m_RVCoreM"],
+["S","rvcorem.v.html#131","rvcorem.v.html#131","","rvcorem.v.html#131","hierarchy-s.p7.html#r_ir___m_RVCoreM"],
+["S","rvcorem.v.html#66","rvcorem.v.p2.html#1012","","rvcorem.v.p2.html#1012","hierarchy-s.p9.html#w_core_odata___m_RVCoreM"],
+["S","rvcorem.v.p2.html#1021","","rvcorem.v.p2.html#1130","","hierarchy-s.p2.html#CLK___m_div_unit"],
+["S","rvcorem.v.p2.html#1021","","rvcorem.v.p2.html#1130","main.v.html#268","hierarchy-s.p7.html#RST_X___m_div_unit"],
+["S","rvcorem.v.p2.html#1022","","rvcorem.v.p2.html#1130","rvcorem.v.p2.html#1127","hierarchy-s.p9.html#w_init___m_div_unit"],
+["S","rvcorem.v.p2.html#1022","","rvcorem.v.p2.html#1131","rvcorem.v.p2.html#1128","hierarchy-s.p9.html#w_signed___m_div_unit"],
+["S","rvcorem.v.p2.html#1023","","rvcorem.v.p2.html#1131","rvcorem.v.html#250","hierarchy-s.p9.html#w_dividend___m_div_unit"],
+["S","rvcorem.v.p2.html#1023","","rvcorem.v.p2.html#1131","rvcorem.v.html#298","hierarchy-s.p9.html#w_divisor___m_div_unit"],
+["S","rvcorem.v.p2.html#1024","rvcorem.v.p2.html#1037","","rvcorem.v.p2.html#1037","hierarchy-s.p9.html#w_rslt___m_div_unit"],
+["S","rvcorem.v.p2.html#1025","rvcorem.v.p2.html#1033","","rvcorem.v.p2.html#1074","hierarchy-s.p9.html#w_busy___m_div_unit"],
+["S","rvcorem.v.p2.html#1027","rvcorem.v.p2.html#1052","","rvcorem.v.p2.html#1052","hierarchy-s.p9.html#w_sign_dividend___m_div_unit"],
+["S","rvcorem.v.p2.html#1027","rvcorem.v.p2.html#1053","","rvcorem.v.p2.html#1053","hierarchy-s.p9.html#w_sign_divisor___m_div_unit"],
+["S","rvcorem.v.p2.html#1029","rvcorem.v.p2.html#1035","","rvcorem.v.p2.html#1035","hierarchy-s.p9.html#w_uint_dividend___m_div_unit"],
+["S","rvcorem.v.p2.html#1029","rvcorem.v.p2.html#1036","","rvcorem.v.p2.html#1036","hierarchy-s.p9.html#w_uint_divisor___m_div_unit"],
+["S","rvcorem.v.p2.html#1030","rvcorem.v.p2.html#1033","","rvcorem.v.p2.html#1080","hierarchy-s.p9.html#w_uint_rslt___m_div_unit"],
+["S","rvcorem.v.p2.html#1063","","rvcorem.v.p2.html#1032","","hierarchy-s.p2.html#CLK___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1063","","rvcorem.v.p2.html#1032","main.v.html#268","hierarchy-s.p7.html#RST_X___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1064","","rvcorem.v.p2.html#1032","rvcorem.v.p2.html#1127","hierarchy-s.p9.html#w_init___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1065","","rvcorem.v.p2.html#1032","rvcorem.v.p2.html#1035","hierarchy-s.p9.html#w_dividend___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1065","","rvcorem.v.p2.html#1033","rvcorem.v.p2.html#1036","hierarchy-s.p9.html#w_divisor___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1066","rvcorem.v.p2.html#1080","","rvcorem.v.p2.html#1080","hierarchy-s.p7.html#r_rslt___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1067","rvcorem.v.p2.html#1074","","rvcorem.v.p2.html#1074","hierarchy-s.p9.html#w_busy___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1069","rvcorem.v.p2.html#1079","","rvcorem.v.p2.html#1079","hierarchy-s.p7.html#r_divisor___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1070","rvcorem.v.p2.html#1081","","rvcorem.v.p2.html#1081","hierarchy-s.p7.html#r_count___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1072","rvcorem.v.p2.html#1075","","rvcorem.v.p2.html#1075","hierarchy-s.p9.html#w_differ___m_div_unit_core"],
+["S","rvcorem.v.p2.html#1099","","rvcorem.v.html#310","","hierarchy-s.p2.html#CLK___m_alu_im"],
+["S","rvcorem.v.p2.html#1099","","rvcorem.v.html#310","main.v.html#268","hierarchy-s.p7.html#RST_X___m_alu_im"],
+["S","rvcorem.v.p2.html#1100","","rvcorem.v.html#310","rvcorem.v.html#307","hierarchy-s.p9.html#w_le___m_alu_im"],
+["S","rvcorem.v.p2.html#1101","","rvcorem.v.html#310","rvcorem.v.html#250","hierarchy-s.p9.html#w_in1___m_alu_im"],
+["S","rvcorem.v.p2.html#1101","","rvcorem.v.html#310","rvcorem.v.html#298","hierarchy-s.p9.html#w_in2___m_alu_im"],
+["S","rvcorem.v.p2.html#1102","","rvcorem.v.html#310","rvcorem.v.html#256","hierarchy-s.p9.html#w_funct3___m_alu_im"],
+["S","rvcorem.v.p2.html#1103","","rvcorem.v.html#310","rvcorem.v.html#299","hierarchy-s.p9.html#w_funct7___m_alu_im"],
+["S","rvcorem.v.p2.html#1104","rvcorem.v.p2.html#1176","","rvcorem.v.p2.html#1176","hierarchy-s.p7.html#r_rslt___m_alu_im"],
+["S","rvcorem.v.p2.html#1105","rvcorem.v.p2.html#1132","","rvcorem.v.p2.html#1132","hierarchy-s.p9.html#w_busy___m_alu_im"],
+["S","rvcorem.v.p2.html#1106","","rvcorem.v.html#311","rvcorem.v.html#294","hierarchy-s.p9.html#w_mul_SS___m_alu_im"],
+["S","rvcorem.v.p2.html#1107","","rvcorem.v.html#311","rvcorem.v.html#295","hierarchy-s.p9.html#w_mul_SU___m_alu_im"],
+["S","rvcorem.v.p2.html#1108","","rvcorem.v.html#311","rvcorem.v.html#296","hierarchy-s.p9.html#w_mul_UU___m_alu_im"],
+["S","rvcorem.v.p2.html#1110","rvcorem.v.p2.html#1142","","rvcorem.v.p2.html#1142","hierarchy-s.p7.html#r_div_first___m_alu_im"],
+["S","rvcorem.v.p2.html#1112","rvcorem.v.p2.html#1112","","rvcorem.v.p2.html#1112","hierarchy-s.p9.html#w_sin1___m_alu_im"],
+["S","rvcorem.v.p2.html#1113","rvcorem.v.p2.html#1113","","rvcorem.v.p2.html#1113","hierarchy-s.p9.html#w_sin2___m_alu_im"],
+["S","rvcorem.v.p2.html#1115","rvcorem.v.p2.html#1115","","rvcorem.v.p2.html#1115","hierarchy-s.p9.html#w_shamt___m_alu_im"],
+["S","rvcorem.v.p2.html#1121","rvcorem.v.p2.html#1131","","rvcorem.v.p2.html#1074","hierarchy-s.p9.html#w_divunit_busy___m_alu_im"],
+["S","rvcorem.v.p2.html#1122","rvcorem.v.p2.html#1131","","rvcorem.v.p2.html#1037","hierarchy-s.p9.html#w_divunit_rslt___m_alu_im"],
+["S","rvcorem.v.p2.html#1124","rvcorem.v.p2.html#1124","","rvcorem.v.p2.html#1124","hierarchy-s.p9.html#w_div_req___m_alu_im"],
+["S","rvcorem.v.p2.html#1127","rvcorem.v.p2.html#1127","","rvcorem.v.p2.html#1127","hierarchy-s.p9.html#w_div_init___m_alu_im"],
+["S","rvcorem.v.p2.html#1128","rvcorem.v.p2.html#1128","","rvcorem.v.p2.html#1128","hierarchy-s.p9.html#w_div_signed___m_alu_im"],
+["S","rvcorem.v.p2.html#1134","rvcorem.v.p2.html#1134","","rvcorem.v.p2.html#1134","hierarchy-s.p9.html#w_div_rslt___m_alu_im"],
+["S","rvcorem.v.p2.html#1223","","rvcorem.v.html#312","microc.v.html#92","hierarchy-s.p9.html#w_in1___m_alu_b"],
+["S","rvcorem.v.p2.html#1223","","rvcorem.v.html#312","microc.v.html#105","hierarchy-s.p9.html#w_in2___m_alu_b"],
+["S","rvcorem.v.p2.html#1224","","rvcorem.v.html#312","microc.v.html#89","hierarchy-s.p9.html#w_funct3___m_alu_b"],
+["S","rvcorem.v.p2.html#1225","rvcorem.v.p2.html#1232","","rvcorem.v.p2.html#1232","hierarchy-s.p7.html#r_rslt___m_alu_b"],
+["S","rvcorem.v.p2.html#1227","rvcorem.v.p2.html#1227","","rvcorem.v.p2.html#1227","hierarchy-s.p9.html#w_sin1___m_alu_b"],
+["S","rvcorem.v.p2.html#1228","rvcorem.v.p2.html#1228","","rvcorem.v.p2.html#1228","hierarchy-s.p9.html#w_sin2___m_alu_b"],
+["S","rvcorem.v.p2.html#1246","","rvcorem.v.html#425","rvcorem.v.html#251","hierarchy-s.p9.html#w_in1___m_alu_a"],
+["S","rvcorem.v.p2.html#1246","","rvcorem.v.html#425","rvcorem.v.html#403","hierarchy-s.p9.html#w_in2___m_alu_a"],
+["S","rvcorem.v.p2.html#1247","","rvcorem.v.html#425","rvcorem.v.html#257","hierarchy-s.p9.html#w_funct5___m_alu_a"],
+["S","rvcorem.v.p2.html#1248","rvcorem.v.p2.html#1255","","rvcorem.v.p2.html#1255","hierarchy-s.p7.html#r_rslt___m_alu_a"],
+["S","rvcorem.v.p2.html#1250","rvcorem.v.p2.html#1250","","rvcorem.v.p2.html#1250","hierarchy-s.p9.html#w_sin1___m_alu_a"],
+["S","rvcorem.v.p2.html#1251","rvcorem.v.p2.html#1251","","rvcorem.v.p2.html#1251","hierarchy-s.p9.html#w_sin2___m_alu_a"],
+["S","rvcorem.v.p2.html#1274","","rvcorem.v.html#313","rvcorem.v.html#297","hierarchy-s.p9.html#w_rcsr___m_alu_c"],
+["S","rvcorem.v.p2.html#1274","","rvcorem.v.html#313","rvcorem.v.html#250","hierarchy-s.p9.html#w_rrs1___m_alu_c"],
+["S","rvcorem.v.p2.html#1274","","rvcorem.v.html#313","rvcorem.v.html#260","hierarchy-s.p9.html#w_imm___m_alu_c"],
+["S","rvcorem.v.p2.html#1275","","rvcorem.v.html#313","rvcorem.v.html#256","hierarchy-s.p9.html#w_funct3___m_alu_c"],
+["S","rvcorem.v.p2.html#1276","rvcorem.v.p2.html#1280","","rvcorem.v.p2.html#1280","hierarchy-s.p7.html#r_rslt___m_alu_c"],
+["S","rvcorem.v.p2.html#1294","","rvcorem.v.html#240","microc.v.html#158","hierarchy-s.p9.html#w_inst___m_imm_gen"],
+["S","rvcorem.v.p2.html#1295","rvcorem.v.p2.html#1307","","rvcorem.v.p2.html#1307","hierarchy-s.p7.html#r_imm___m_imm_gen"],
+["S","rvcorem.v.p2.html#1297","rvcorem.v.p2.html#1297","","rvcorem.v.p2.html#1297","hierarchy-s.p6.html#opcode___m_imm_gen"],
+["S","rvcorem.v.p2.html#1298","rvcorem.v.p2.html#1298","","rvcorem.v.p2.html#1298","hierarchy-s.p4.html#imm_I___m_imm_gen"],
+["S","rvcorem.v.p2.html#1299","rvcorem.v.p2.html#1299","","rvcorem.v.p2.html#1299","hierarchy-s.p4.html#imm_S___m_imm_gen"],
+["S","rvcorem.v.p2.html#1300","rvcorem.v.p2.html#1300","","rvcorem.v.p2.html#1300","hierarchy-s.p4.html#imm_B___m_imm_gen"],
+["S","rvcorem.v.p2.html#1301","rvcorem.v.p2.html#1301","","rvcorem.v.p2.html#1301","hierarchy-s.p4.html#imm_U___m_imm_gen"],
+["S","rvcorem.v.p2.html#1302","rvcorem.v.p2.html#1302","","rvcorem.v.p2.html#1302","hierarchy-s.p4.html#imm_J___m_imm_gen"],
+["S","rvcorem.v.p2.html#1303","rvcorem.v.p2.html#1303","","rvcorem.v.p2.html#1303","hierarchy-s.p4.html#imm_C___m_imm_gen"],
+["S","rvcorem.v.p2.html#1325","","microc.v.html#107","microc.v.html#92","hierarchy-s.p9.html#w_in1___m_alu_i"],
+["S","rvcorem.v.p2.html#1325","","microc.v.html#107","microc.v.html#105","hierarchy-s.p9.html#w_in2___m_alu_i"],
+["S","rvcorem.v.p2.html#1326","","microc.v.html#107","microc.v.html#89","hierarchy-s.p9.html#w_funct3___m_alu_i"],
+["S","rvcorem.v.p2.html#1327","","microc.v.html#107","microc.v.html#102","hierarchy-s.p9.html#w_funct7___m_alu_i"],
+["S","rvcorem.v.p2.html#1328","rvcorem.v.p2.html#1337","","rvcorem.v.p2.html#1337","hierarchy-s.p7.html#r_rslt___m_alu_i"],
+["S","rvcorem.v.p2.html#1330","rvcorem.v.p2.html#1330","","rvcorem.v.p2.html#1330","hierarchy-s.p9.html#w_sin1___m_alu_i"],
+["S","rvcorem.v.p2.html#1331","rvcorem.v.p2.html#1331","","rvcorem.v.p2.html#1331","hierarchy-s.p9.html#w_sin2___m_alu_i"],
+["S","rvcorem.v.p2.html#1333","rvcorem.v.p2.html#1333","","rvcorem.v.p2.html#1333","hierarchy-s.p9.html#w_shamt___m_alu_i"],
+["S","rvcorem.v.p2.html#1364","","rvcorem.v.html#226","rvcorem.v.html#218","hierarchy-s.p9.html#w_ic___m_decomp"],
+["S","rvcorem.v.p2.html#1365","rvcorem.v.p2.html#1401","","rvcorem.v.p2.html#1401","hierarchy-s.p7.html#r_iw___m_decomp"],
+["S","rvcorem.v.p2.html#1368","rvcorem.v.p2.html#1368","","rvcorem.v.p2.html#1368","hierarchy-s.p9.html#w_c0_rs1___m_decomp"],
+["S","rvcorem.v.p2.html#1369","rvcorem.v.p2.html#1369","","rvcorem.v.p2.html#1369","hierarchy-s.p9.html#w_c0_rs2___m_decomp"],
+["S","rvcorem.v.p2.html#1370","rvcorem.v.p2.html#1370","","rvcorem.v.p2.html#1370","hierarchy-s.p9.html#w_c0_rd___m_decomp"],
+["S","rvcorem.v.p2.html#1371","rvcorem.v.p2.html#1371","","rvcorem.v.p2.html#1371","hierarchy-s.p9.html#w_c0_uimm1___m_decomp"],
+["S","rvcorem.v.p2.html#1372","rvcorem.v.p2.html#1372","","rvcorem.v.p2.html#1372","hierarchy-s.p9.html#w_c0_uimm2___m_decomp"],
+["S","rvcorem.v.p2.html#1373","rvcorem.v.p2.html#1373","","rvcorem.v.p2.html#1373","hierarchy-s.p9.html#w_c0_nzuimm___m_decomp"],
+["S","rvcorem.v.p2.html#1376","rvcorem.v.p2.html#1376","","rvcorem.v.p2.html#1376","hierarchy-s.p9.html#w_c1_funct1___m_decomp"],
+["S","rvcorem.v.p2.html#1377","rvcorem.v.p2.html#1377","","rvcorem.v.p2.html#1377","hierarchy-s.p9.html#w_c1_funct2___m_decomp"],
+["S","rvcorem.v.p2.html#1378","rvcorem.v.p2.html#1378","","rvcorem.v.p2.html#1378","hierarchy-s.p9.html#w_c1_rs1___m_decomp"],
+["S","rvcorem.v.p2.html#1379","rvcorem.v.p2.html#1379","","rvcorem.v.p2.html#1379","hierarchy-s.p9.html#w_c1_rs2___m_decomp"],
+["S","rvcorem.v.p2.html#1380","rvcorem.v.p2.html#1380","","rvcorem.v.p2.html#1380","hierarchy-s.p9.html#w_c1_rd___m_decomp"],
+["S","rvcorem.v.p2.html#1381","rvcorem.v.p2.html#1381","","rvcorem.v.p2.html#1381","hierarchy-s.p9.html#w_c1_nzimm___m_decomp"],
+["S","rvcorem.v.p2.html#1382","rvcorem.v.p2.html#1382","","rvcorem.v.p2.html#1382","hierarchy-s.p9.html#w_c1_shamt___m_decomp"],
+["S","rvcorem.v.p2.html#1383","rvcorem.v.p2.html#1383","","rvcorem.v.p2.html#1383","hierarchy-s.p9.html#w_c1_imm1___m_decomp"],
+["S","rvcorem.v.p2.html#1384","rvcorem.v.p2.html#1384","","rvcorem.v.p2.html#1384","hierarchy-s.p9.html#w_c1_imm2___m_decomp"],
+["S","rvcorem.v.p2.html#1385","rvcorem.v.p2.html#1385","","rvcorem.v.p2.html#1385","hierarchy-s.p9.html#w_c1_imm3___m_decomp"],
+["S","rvcorem.v.p2.html#1386","rvcorem.v.p2.html#1386","","rvcorem.v.p2.html#1386","hierarchy-s.p9.html#w_c1_imm4___m_decomp"],
+["S","rvcorem.v.p2.html#1389","rvcorem.v.p2.html#1389","","rvcorem.v.p2.html#1389","hierarchy-s.p9.html#w_c2_rs2___m_decomp"],
+["S","rvcorem.v.p2.html#1390","rvcorem.v.p2.html#1390","","rvcorem.v.p2.html#1390","hierarchy-s.p9.html#w_c2_rd___m_decomp"],
+["S","rvcorem.v.p2.html#1391","rvcorem.v.p2.html#1391","","rvcorem.v.p2.html#1391","hierarchy-s.p9.html#w_c2_uimm1___m_decomp"],
+["S","rvcorem.v.p2.html#1392","rvcorem.v.p2.html#1392","","rvcorem.v.p2.html#1392","hierarchy-s.p9.html#w_c2_uimm2___m_decomp"],
+["S","rvcorem.v.p2.html#1393","rvcorem.v.p2.html#1393","","rvcorem.v.p2.html#1393","hierarchy-s.p9.html#w_c2_uimm3___m_decomp"],
+["S","rvcorem.v.p2.html#1394","rvcorem.v.p2.html#1394","","rvcorem.v.p2.html#1394","hierarchy-s.p9.html#w_c2_uimm4___m_decomp"],
+["S","rvcorem.v.p2.html#1395","rvcorem.v.p2.html#1395","","rvcorem.v.p2.html#1395","hierarchy-s.p9.html#w_c2_nzuimm___m_decomp"],
+["S","rvcorem.v.p2.html#1396","rvcorem.v.p2.html#1396","","rvcorem.v.p2.html#1396","hierarchy-s.p9.html#w_c2_shamt___m_decomp"]
+];
+disabled=0;
+// -->
+</script>
+<hr>
+<table>
+ <tr><td><i>This page:</i></td>
+  <td><i>Created:</i></td><td><i>Mon May 27 16:23:36 2024</i></td></tr>
+<tr>
+ <td> </td>
+ <td><i>From:</i></td><td><i>
+../src/rvcorem.v</i></td></tr>
+</table>
+<hr>
+<table width="100%"><tr><td><i>Verilog converted to html by  <a target="_top" href="http://www.burbleland.com/v2html/v2html.html">  v2html 7.30.1.3</a> 
+ (written by <a href="mailto:v2html730@burbleland.com">Costas Calamvokis</a>).</i></td><td align="right"><b><a href="http://www.burbleland.com/v2html/help_7_30.html?">Help</a></b></td></tr></table><table height="90%"><tr><td></td></tr></table>
+</body>
+</html>
